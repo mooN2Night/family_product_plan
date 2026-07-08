@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "291564212728",
+    "project_id": "family-planner-9aff5",
+    "storage_bucket": "family-planner-9aff5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291564212728:android:e19ae2b21dd2c18dee460d",
+        "android_client_info": {
+          "package_name": "com.example.family_product_plan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8L2ByaQo9pfxqrbRrQDb99-Ok1Y6vOW0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
