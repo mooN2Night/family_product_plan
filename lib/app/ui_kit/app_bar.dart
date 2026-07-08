@@ -10,6 +10,12 @@ enum CustomAppBarType {
 
   /// AppBar экрана детальной информации о продукте.
   productDetail,
+
+  /// Авторизация
+  login,
+
+  /// Регистрация
+  register,
 }
 
 /// Пользовательская реализация AppBar.
@@ -17,8 +23,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// Базовый конструктор пользовательского AppBar.
   const CustomAppBar._({
     required this.type,
+    required this.title,
     this.actions = const [],
-    this.title,
     this.bottom,
   });
 
@@ -31,12 +37,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       type: CustomAppBarType.main,
       bottom: bottom,
       actions: actions,
+      title: 'Семья Гавриловых',
     );
   }
 
   /// Создает AppBar для экрана профиля.
   factory CustomAppBar.profile({required List<Widget> actions}) {
-    return CustomAppBar._(type: CustomAppBarType.profile, actions: actions);
+    return CustomAppBar._(
+      type: CustomAppBarType.profile,
+      actions: actions,
+      title: 'Семья Гавриловых',
+    );
   }
 
   /// Создает AppBar для экрана детальной информации о продукте.
@@ -51,6 +62,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
+  /// Создает AppBar для экрана авторизации.
+  factory CustomAppBar.login() {
+    return CustomAppBar._(type: CustomAppBarType.login, title: 'Авторизация');
+  }
+
+  /// Создает AppBar для экрана регистрации.
+  factory CustomAppBar.register() {
+    return CustomAppBar._(type: CustomAppBarType.login, title: 'Регистрация');
+  }
+
   /// Виджет, отображаемый в нижней части AppBar.
   final PreferredSizeWidget? bottom;
 
@@ -61,15 +82,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final CustomAppBarType type;
 
   /// Заголовок AppBar.
-  final String? title;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(
-        title ?? 'Семья Гавриловых',
-        style: const TextStyle(color: Colors.white),
-      ),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
       centerTitle: true,
       backgroundColor: Colors.blueGrey,
       actions: actions,

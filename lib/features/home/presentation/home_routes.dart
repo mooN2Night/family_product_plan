@@ -14,7 +14,7 @@ abstract final class HomeRoutes {
   static const String homeDetailScreenName = 'home_detail_screen';
 
   /// Путь роута главной страницы
-  static const String _homeScreenPath = '/home';
+  static const String homeScreenPath = '/home';
 
   /// Путь роута экрана с деталями
   static const String _homeDetailScreenPath = '/home/detail';
@@ -27,11 +27,11 @@ abstract final class HomeRoutes {
     List<RouteBase> routes = const [],
     List<NavigatorObserver>? observers,
   }) => StatefulShellBranch(
-    initialLocation: _homeScreenPath,
+    initialLocation: homeScreenPath,
     observers: observers,
     routes: [
       GoRoute(
-        path: _homeScreenPath,
+        path: homeScreenPath,
         name: homeScreenName,
         builder: (context, state) => const HomeScreen(),
         routes: [
