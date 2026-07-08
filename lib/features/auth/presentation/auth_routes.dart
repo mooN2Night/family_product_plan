@@ -29,25 +29,19 @@ abstract final class AuthRoutes {
       GoRoute(
         path: splashScreenPath,
         name: splashScreenName,
-        builder: (context, state) {
-          return const SplashScreen();
-        },
+        builder: (context, state) => const SplashScreen(),
       ),
 
       GoRoute(
         path: loginScreenPath,
         name: loginScreenName,
-        builder: (context, state) {
-          return const LoginScreen();
-        },
+        builder: (context, state) => const LoginScreen(),
       ),
 
       GoRoute(
         path: registerScreenPath,
         name: registerScreenName,
-        builder: (context, state) {
-          return const RegisterScreen();
-        },
+        builder: (context, state) => const RegisterScreen(),
       ),
     ];
   }
