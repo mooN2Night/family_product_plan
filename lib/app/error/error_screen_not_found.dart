@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/home/presentation/home_routes.dart';
+import '../../features/profile/presentation/profile_routes.dart';
 import '../ui_kit/app_bottom_navigation_bar.dart';
 import '../ui_kit/app_bottom_navigation_button.dart';
 
@@ -62,13 +63,13 @@ class _ErrorScreenBottomNavigationBar extends StatelessWidget {
   /// Список путей для нижнего навигационного меню
   static const _paths = [
     HomeRoutes.homeScreenName,
-    // ProfileRoutes.profileScreenName,
+    ProfileRoutes.profileScreenName,
   ];
 
   @override
   Widget build(BuildContext context) {
     return AppBottomNavigationBar(
-      navigationButtons: List.generate(4, (index) {
+      navigationButtons: List.generate(_buttons.length, (index) {
         return AppBottomNavigationButton(
           onTap: () => context.go(_paths[index]),
           isSelected: false,

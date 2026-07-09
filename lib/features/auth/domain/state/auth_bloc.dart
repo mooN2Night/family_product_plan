@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:equatable/equatable.dart';
+import 'package:family_product_plan/app/error/app_exception.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../entity/user_entity.dart';
+import '../entity/auth_user_entity.dart';
 import '../repository/i_auth_repository.dart';
 
 part 'auth_event.dart';
@@ -26,7 +27,7 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IAuthRepository _authRepository;
 
   /// Подписка на прослушивание состояния авторизации
-  StreamSubscription<UserEntity?>? _authSubscription;
+  StreamSubscription<AuthUserEntity?>? _authSubscription;
 
   /// Запускает прослушивание изменений состояния авторизации.
   Future<void> _onStarted(
@@ -52,8 +53,8 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
-    } catch (error) {
-      emit(AuthErrorState(message: error.toString()));
+    } on AppException catch (error) {
+      emit(AuthErrorState(message: error.message));
     }
   }
 
@@ -67,8 +68,8 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
-    } catch (error) {
-      emit(AuthErrorState(message: error.toString()));
+    } on AppException catch (error) {
+      emit(AuthErrorState(message: error.message));
     }
   }
 
@@ -81,8 +82,8 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.signOut();
 
       emit(const AuthUnauthenticatedState());
-    } catch (error) {
-      emit(AuthErrorState(message: error.toString()));
+    } on AppException catch (error) {
+      emit(AuthErrorState(message: error.message));
     }
   }
 
@@ -91,14 +92,15 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthDeleteAccountEvent event,
     Emitter<AuthState> emit,
   ) async {
+    if (state is AuthLoadingState) return;
     emit(const AuthLoadingState());
 
     try {
       await _authRepository.deleteAccount(password: event.password);
 
       emit(const AuthUnauthenticatedState());
-    } catch (error) {
-      emit(AuthErrorState(message: error.toString()));
+    } on AppException catch (error) {
+      emit(AuthErrorState(message: error.message));
     }
   }
 
@@ -127,7 +129,7 @@ final class _AuthUserChanged extends AuthEvent {
   const _AuthUserChanged(this.user);
 
   /// Пользователь.
-  final UserEntity? user;
+  final AuthUserEntity? user;
 
   @override
   List<Object?> get props => [user];

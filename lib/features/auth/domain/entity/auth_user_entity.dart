@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 /// Сущность пользователя
-class UserEntity extends Equatable {
-  const UserEntity({required this.id, required this.email});
+class AuthUserEntity extends Equatable {
+  const AuthUserEntity({required this.id, required this.email});
 
   /// Уникальный идентификатор
   final String id;

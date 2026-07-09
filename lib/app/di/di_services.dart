@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:family_product_plan/app/database/app_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -14,11 +15,14 @@ final class DiServices {
   /// Сервис авторизации.
   late final FirebaseAuth firebaseAuth;
 
+  late final FirebaseFirestore firestore;
+
   /// Инициализирует сервисы приложения.
   Future<void> init() async {
     pathProvider = AppPathProvider();
 
     firebaseAuth = FirebaseAuth.instance;
+    firestore = FirebaseFirestore.instance;
 
     final path = await pathProvider.getAppDocumentsDirectoryPath();
     database = AppDatabase(path);
