@@ -33,7 +33,7 @@ final class AuthAuthenticatedState extends AuthState {
   const AuthAuthenticatedState({required this.user});
 
   /// Текущий пользователь.
-  final UserEntity user;
+  final AuthUserEntity user;
 
   @override
   List<Object?> get props => [user];

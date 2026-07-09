@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../domain/entity/user_entity.dart';
+import '../../domain/entity/auth_user_entity.dart';
 
 /// Расширение для преобразования FirebaseUser в UserEntity
 extension FirebaseUserMapper on User {
-  UserEntity toEntity() {
-    return UserEntity(
+  AuthUserEntity toEntity() {
+    return AuthUserEntity(
       id: uid,
       email: email ?? '',
     );

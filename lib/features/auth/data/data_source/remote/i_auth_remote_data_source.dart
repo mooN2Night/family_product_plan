@@ -1,12 +1,12 @@
-import '../../../domain/entity/user_entity.dart';
+import '../../../domain/entity/auth_user_entity.dart';
 
 /// Интерфейс удаленного статуса авторизации
 abstract interface class IAuthRemoteDataSource {
   /// Метод регистрации.
-  Future<UserEntity> signUp({required String email, required String password});
+  Future<void> signUp({required String email, required String password});
 
   /// Метод авторизации.
-  Future<UserEntity> signIn({required String email, required String password});
+  Future<void> signIn({required String email, required String password});
 
   /// Метод выхода.
   Future<void> signOut();
@@ -15,8 +15,8 @@ abstract interface class IAuthRemoteDataSource {
   Future<void> delete({required String password});
 
   /// Получения текущего пользователя.
-  UserEntity? get currentUser;
+  AuthUserEntity? get currentUser;
 
   /// Поток изменений авторизации.
-  Stream<UserEntity?> authStateChanges();
+  Stream<AuthUserEntity?> authStateChanges();
 }

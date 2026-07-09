@@ -1,12 +1,12 @@
-import 'package:family_product_plan/features/auth/domain/entity/user_entity.dart';
+import 'package:family_product_plan/features/auth/domain/entity/auth_user_entity.dart';
 
 /// Интерфейс репозитория авторизации
 abstract interface class IAuthRepository {
   /// Метод регистрации.
-  Future<UserEntity> signUp({required String email, required String password});
+  Future<void> signUp({required String email, required String password});
 
   /// Метод авторизации.
-  Future<UserEntity> signIn({required String email, required String password});
+  Future<void> signIn({required String email, required String password});
 
   /// Метод выхода.
   Future<void> signOut();
@@ -15,8 +15,8 @@ abstract interface class IAuthRepository {
   Future<void> deleteAccount({required String password});
 
   /// Получения текущего пользователя.
-  UserEntity? get currentUser;
+  AuthUserEntity? get currentUser;
 
   /// Поток изменений авторизации.
-  Stream<UserEntity?> authStateChanges();
+  Stream<AuthUserEntity?> authStateChanges();
 }
