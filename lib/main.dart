@@ -39,5 +39,6 @@ Future<void> _run() async {
 Future<DiContainer> _initDependencies() async {
   final diContainer = DiContainer();
   await diContainer.init();
+  final k = 1;
   return diContainer;
 }
