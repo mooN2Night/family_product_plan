@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:family_product_plan/app/services/database/i_database.dart';
 import 'package:path/path.dart' as p;
 
 part 'app_database.g.dart';
@@ -23,7 +24,7 @@ class Products extends Table {
 
 /// Основная база данных приложения.
 @DriftDatabase(tables: [Products])
-class AppDatabase extends _$AppDatabase {
+class AppDatabase extends _$AppDatabase implements IDatabase {
   AppDatabase(this.path) : super(_openConnection(path));
 
   /// Путь к директории хранения файла базы данных.
@@ -33,23 +34,22 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
-  /// Возвращает поток со списком всех продуктов. Обновляется автоматически при изменении данных.
+  @override
   Stream<List<Product>> watchAllProducts() => select(products).watch();
 
-  /// Добавляет новый продукт в базу данных.
-  /// Возвращает идентификатор созданной записи.
+  @override
   Future<int> insertProduct(ProductsCompanion entity) =>
       into(products).insert(entity);
 
-  /// Обновляет существующий продукт.
+  @override
   Future<void> updateProduct(Product entity) =>
       update(products).replace(entity);
 
-  /// Удаляет продукт по его идентификатору.
+  @override
   Future<int> deleteProductById(int id) =>
       (delete(products)..where((t) => t.id.equals(id))).go();
 
-  /// Получает продукт по его идентификатору.
+  @override
   Future<Product> getProductById(int id) =>
       (select(products)..where((product) => product.id.equals(id))).getSingle();
 }

@@ -3,7 +3,6 @@ import 'package:family_product_plan/features/profile/domain/entity/profile_user_
 import 'package:family_product_plan/features/profile/domain/repository/i_profile_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../dto/profile_user_dto.dart';
 import '../mapper/profile_exception_mapper.dart';
 
@@ -11,11 +10,15 @@ final class ProfileRepository implements IProfileRepository {
   const ProfileRepository({
     required FirebaseAuth firebaseAuth,
     required FirebaseFirestore firestore,
+    // required FirebaseStorage storage,
   }) : _firebaseAuth = firebaseAuth,
        _firestore = firestore;
 
   final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
+
+  // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
+  // final FirebaseStorage _storage;
 
   @override
   Future<ProfileUserEntity> getProfile() async {
@@ -72,4 +75,24 @@ final class ProfileRepository implements IProfileRepository {
 
     return profile;
   }
+
+  // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
+  // @override
+  // Future<void> uploadAvatar(File file) async {
+  //   try {
+  //     final uid = _firebaseAuth.currentUser!.uid;
+  //
+  //     final ref = _storage.ref('avatars/$uid.jpg');
+  //
+  //     await ref.putFile(file);
+  //
+  //     final url = await ref.getDownloadURL();
+  //
+  //     await _firestore.collection('users').doc(uid).update({
+  //       'avatarUrl': url,
+  //     });
+  //   } on Object catch (error) {
+  //     throw ProfileExceptionMapper.fromException(error);
+  //   }
+  // }
 }

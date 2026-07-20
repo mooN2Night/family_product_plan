@@ -22,3 +22,19 @@ final class ProfileUpdateEvent extends ProfileEvent {
 final class ProfileWatchEvent extends ProfileEvent {
   const ProfileWatchEvent();
 }
+
+/// Событие получения профиля
+final class ProfileGetEvent extends ProfileEvent {
+  const ProfileGetEvent();
+}
+
+/// Событие выбора аватара
+// TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
+// final class ProfileAvatarChangedEvent extends ProfileEvent {
+//   const ProfileAvatarChangedEvent({required this.file});
+//
+//   final File file;
+//
+//   @override
+//   List<Object?> get props => [file];
+// }

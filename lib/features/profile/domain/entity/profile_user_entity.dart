@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:family_product_plan/features/profile/data/dto/profile_user_dto.dart';
+import 'package:intl/intl.dart';
 
 /// Перечисление гендеров
 enum Gender {
@@ -54,10 +55,7 @@ final class ProfileUserEntity extends Equatable {
   });
 
   /// Конструктор пустого профиля при создании пользователя
-  factory ProfileUserEntity.empty({
-    required String id,
-    required String email,
-  }) {
+  factory ProfileUserEntity.empty({required String id, required String email}) {
     return ProfileUserEntity(
       id: id,
       email: email,
@@ -97,6 +95,46 @@ final class ProfileUserEntity extends Equatable {
 
   /// Идентификатор семьи.
   final String? familyId;
+
+  /// Возраст пользователя в годах.
+  String? get age {
+    if (birthDate == null) return null;
+
+    final now = DateTime.now();
+
+    var age = now.year - birthDate!.year;
+
+    final birthdayThisYear = DateTime(
+      now.year,
+      birthDate!.month,
+      birthDate!.day,
+    );
+
+    if (now.isBefore(birthdayThisYear)) {
+      age--;
+    }
+    return _yearsToString(age);
+  }
+
+  String? get formatedBirthDate {
+    return DateFormat('dd MMMM yyyy', 'ru').format(birthDate!);
+  }
+
+  // TODO: добавить метод для множественного отображения значения
+  String _yearsToString(int years) {
+    final mod10 = years % 10;
+    final mod100 = years % 100;
+
+    if (mod10 == 1 && mod100 != 11) {
+      return '$years год';
+    }
+
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+      return '$years года';
+    }
+
+    return '$years лет';
+  }
 
   /// Метод для преобразования Entity в DTO
   ProfileUserDto toDto() => ProfileUserDto(

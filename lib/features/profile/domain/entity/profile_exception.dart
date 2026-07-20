@@ -15,3 +15,8 @@ final class ProfileNotFoundException extends AppException {
 final class ProfileSaveException extends AppException {
   const ProfileSaveException() : super('Не удалось сохранить изменения');
 }
+
+/// Пользователь отменил выбранную фотографию
+final class ProfileImageCanceledException extends AppException {
+  const ProfileImageCanceledException() : super('Выбор фотографии отменён');
+}

@@ -9,4 +9,8 @@ abstract interface class IProfileRepository {
   Future<void> saveProfile(ProfileUserEntity user);
 
   Stream<ProfileUserEntity> watchProfile();
+
+  /// Загрузка аватара пользователя
+  // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
+  // Future<void> uploadAvatar(File file);
 }

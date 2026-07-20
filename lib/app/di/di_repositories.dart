@@ -30,6 +30,7 @@ final class DiRepositories {
     profileRepository = ProfileRepository(
       firebaseAuth: diContainer.services.firebaseAuth,
       firestore: diContainer.services.firestore,
+      // storage: diContainer.services.storage,
     );
   }
 }

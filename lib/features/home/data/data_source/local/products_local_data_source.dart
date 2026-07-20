@@ -1,17 +1,17 @@
 import 'package:drift/drift.dart';
-
-import '../../../../../app/database/app_database.dart';
 import '../../../../../app/mapper/app_product_mapper.dart';
+import '../../../../../app/services/database/app_database.dart';
+import '../../../../../app/services/database/i_database.dart';
 import '../../../domain/entity/product_entity.dart';
 import 'i_products_local_data_source.dart';
 
 /// Реализация локального хр`анения продуктов
 final class ProductsLocalDataSource implements IProductsLocalDataSource {
-  ProductsLocalDataSource({required AppDatabase database})
+  ProductsLocalDataSource({required IDatabase database})
     : _database = database;
 
   /// Экземпляр локальной базы данных.
-  final AppDatabase _database;
+  final IDatabase _database;
 
   @override
   Stream<List<Product>> watchProducts() {
