@@ -1,6 +1,7 @@
 import 'package:family_product_plan/app/router/auth_refresh_listener.dart';
 import 'package:family_product_plan/features/auth/domain/state/auth_bloc.dart';
 import 'package:family_product_plan/features/auth/presentation/auth_routes.dart';
+import 'package:family_product_plan/features/family/presentation/family_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -59,7 +60,12 @@ abstract interface class AppRouter {
               RootScreen(navigationShell: navigationShell),
           branches: [
             HomeRoutes.buildShellBranch(),
-            ProfileRoutes.buildShellBranch(),
+            ProfileRoutes.buildShellBranch(
+              routes: [
+                FamilyRoutes.buildFamilyCreateRoute(),
+                FamilyRoutes.buildFamilyInfoRoute(),
+              ],
+            ),
           ],
         ),
         ErrorRoutes.buildRoute(),

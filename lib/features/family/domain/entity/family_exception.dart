@@ -1,0 +1,11 @@
+import '../../../../app/error/app_exception.dart';
+
+/// Нет доступа к данным семьи.
+final class FamilyPermissionDeniedException extends AppException {
+  const FamilyPermissionDeniedException() : super('Нет доступа к данным семьи');
+}
+
+/// Семья не найдена.
+final class FamilyNotFoundException extends AppException {
+  const FamilyNotFoundException() : super('Семья не найдена');
+}

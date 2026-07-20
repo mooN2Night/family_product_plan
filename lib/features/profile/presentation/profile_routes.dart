@@ -38,6 +38,7 @@ abstract final class ProfileRoutes {
             name: profileEditorScreenName,
             builder: (context, state) => const ProfileEditorScreen(),
           ),
+          ...routes,
         ],
       ),
     ],
