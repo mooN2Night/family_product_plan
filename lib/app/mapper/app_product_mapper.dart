@@ -1,5 +1,5 @@
 import '../../features/home/domain/entity/product_entity.dart';
-import '../database/app_database.dart';
+import '../services/database/app_database.dart';
 
 extension ProductMapper on Product {
   ProductEntity toEntity() {

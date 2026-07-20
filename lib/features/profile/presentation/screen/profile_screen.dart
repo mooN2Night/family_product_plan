@@ -56,69 +56,97 @@ class _ProfileScreenView extends StatelessWidget {
 
           final user = state.user;
 
-          return Padding(
+          return ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                HBox(40),
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.greenAccent,
-                  ),
-                ),
-                HBox(10),
-                ProfileInfo(title: 'Имя:', description: user.firstName),
-                HBox(5),
-                ProfileInfo(title: 'Фамилия:', description: user.lastName),
-                HBox(5),
+            children: [
+              HBox(40),
+              // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 40),
+              //   child: AspectRatio(
+              //     aspectRatio: 1,
+              //     child: Container(
+              //       decoration: const BoxDecoration(
+              //         shape: BoxShape.circle,
+              //         color: Colors.greenAccent,
+              //       ),
+              //       child: Padding(
+              //         padding: const EdgeInsets.all(40),
+              //         child: Image.asset(
+              //           'assets/images/person_no_image.png',
+              //           fit: BoxFit.contain,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // HBox(20),
+              ProfileInfo(
+                title: 'Фамилия:',
+                description: user.lastName.isNotEmpty
+                    ? user.lastName
+                    : 'Не указано',
+              ),
+              HBox(5),
+              ProfileInfo(
+                title: 'Имя:',
+                description: user.firstName.isNotEmpty
+                    ? user.firstName
+                    : 'Не указано',
+              ),
+              HBox(5),
+              if (user.middleName.isNotEmpty) ...[
                 ProfileInfo(title: 'Отчество:', description: user.middleName),
                 HBox(5),
-                ProfileInfo(title: 'Пол:', description: user.gender.title),
+              ],
+              ProfileInfo(title: 'Пол:', description: user.gender.title),
+              if (user.formatedBirthDate != null) ...[
                 HBox(5),
                 ProfileInfo(
                   title: 'Дата рождения:',
-                  description: user.birthDate.toString(),
-                ),
-                HBox(5),
-                ProfileInfo(title: 'Почта:', description: user.email),
-                HBox(30),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: TextButton(
-                    onPressed: () =>
-                        context.read<AuthBloc>().add(const AuthSignOutEvent()),
-                    style: ButtonStyle(
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: WidgetStatePropertyAll(EdgeInsets.zero),
-                      minimumSize: const WidgetStatePropertyAll(Size.zero),
-                    ),
-                    child: Text('Выйти из аккаунта'),
-                  ),
-                ),
-                HBox(10),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: TextButton(
-                    // TODO: Сделать модалку с проверкой пароля и удалить после этого аккаунт
-                    onPressed: () => context.read<AuthBloc>().add(
-                      const AuthDeleteAccountEvent(password: '123123'),
-                    ),
-                    style: ButtonStyle(
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: WidgetStatePropertyAll(EdgeInsets.zero),
-                      minimumSize: const WidgetStatePropertyAll(Size.zero),
-                    ),
-                    child: Text(
-                      'Удалить аккаунта',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
+                  description: user.formatedBirthDate!,
                 ),
               ],
-            ),
+              if (user.age != null) ...[
+                HBox(5),
+                ProfileInfo(title: 'Возраст:', description: user.age!),
+              ],
+              HBox(5),
+              ProfileInfo(title: 'Почта:', description: user.email),
+              HBox(30),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: TextButton(
+                  onPressed: () =>
+                      context.read<AuthBloc>().add(const AuthSignOutEvent()),
+                  style: ButtonStyle(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: WidgetStatePropertyAll(EdgeInsets.zero),
+                    minimumSize: const WidgetStatePropertyAll(Size.zero),
+                  ),
+                  child: Text('Выйти из аккаунта'),
+                ),
+              ),
+              HBox(10),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: TextButton(
+                  // TODO: Сделать модалку с проверкой пароля и удалить после этого аккаунт
+                  onPressed: () => context.read<AuthBloc>().add(
+                    const AuthDeleteAccountEvent(password: '123123'),
+                  ),
+                  style: ButtonStyle(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: WidgetStatePropertyAll(EdgeInsets.zero),
+                    minimumSize: const WidgetStatePropertyAll(Size.zero),
+                  ),
+                  child: Text(
+                    'Удалить аккаунта',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),

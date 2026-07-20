@@ -1,4 +1,4 @@
-import '../../../../../app/database/app_database.dart';
+import '../../../../../app/services/database/app_database.dart';
 import '../../../domain/entity/product_entity.dart';
 
 /// Интерфейс локальной БД

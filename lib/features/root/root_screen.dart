@@ -50,7 +50,8 @@ class _RootScreenState extends State<RootScreen> {
 
   /// Метод для обработки нажатия на кнопку меню
   void _onTap(int index, BuildContext context) {
-    widget.navigationShell.goBranch(index);
-    if (index == widget.navigationShell.currentIndex) return;
+    final isCurrentBrunch = index == widget.navigationShell.currentIndex;
+
+    widget.navigationShell.goBranch(index, initialLocation: isCurrentBrunch);
   }
 }

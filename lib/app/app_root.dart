@@ -1,6 +1,7 @@
 import 'package:family_product_plan/app/app_providers.dart';
 import 'package:family_product_plan/features/auth/domain/state/auth_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import 'di/di_container.dart';
@@ -31,6 +32,13 @@ class AppRoot extends StatelessWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: router,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('ru'), Locale('en')],
+        locale: const Locale('ru'),
       ),
     );
   }
