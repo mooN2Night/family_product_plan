@@ -1,6 +1,7 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/app/ui_kit/app_bar.dart';
 import 'package:family_product_plan/app/ui_kit/app_box.dart';
+import 'package:family_product_plan/features/family/presentation/family_routes.dart';
 import 'package:family_product_plan/features/profile/domain/state/profile_bloc.dart';
 import 'package:family_product_plan/features/profile/presentation/profile_routes.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,15 @@ class _ProfileScreenView extends StatelessWidget {
               ],
               HBox(5),
               ProfileInfo(title: 'Почта:', description: user.email),
-              HBox(30),
+              HBox(40),
+              Text('У вас пока нет семьи'),
+              HBox(5),
+              FilledButton(
+                onPressed: () =>
+                    context.pushNamed(FamilyRoutes.familyCreateScreenName),
+                child: Text('Создать семью'),
+              ),
+              HBox(40),
               Align(
                 alignment: Alignment.bottomLeft,
                 child: TextButton(
@@ -127,7 +136,7 @@ class _ProfileScreenView extends StatelessWidget {
                   child: Text('Выйти из аккаунта'),
                 ),
               ),
-              HBox(10),
+              HBox(20),
               Align(
                 alignment: Alignment.bottomLeft,
                 child: TextButton(

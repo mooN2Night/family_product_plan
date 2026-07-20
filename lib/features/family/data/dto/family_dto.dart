@@ -1,0 +1,49 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../domain/entity/family_entity.dart';
+import 'family_member_dto.dart';
+
+/// DTO семьи пользователя.
+final class FamilyDto {
+  const FamilyDto({
+    required this.name,
+    required this.members,
+    required this.createdAt,
+  });
+
+  factory FamilyDto.fromJson(Map<String, dynamic> json) {
+    return FamilyDto(
+      name: json['name'] as String,
+      members: (json['members'] as List)
+          .map((e) => FamilyMemberDto.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      createdAt: (json['createdAt'] as Timestamp).toDate(),
+    );
+  }
+
+  /// Название семьи
+  final String name;
+
+  /// Список участников
+  final List<FamilyMemberDto> members;
+
+  /// Дата создания
+  final DateTime createdAt;
+
+  FamilyEntity toEntity(String id) {
+    return FamilyEntity(
+      id: id,
+      name: name,
+      members: members.map((e) => e.toEntity()).toList(),
+      createdAt: createdAt,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'members': members.map((e) => e.toJson()).toList(),
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
+  }
+}
