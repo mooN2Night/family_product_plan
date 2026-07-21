@@ -7,6 +7,8 @@ import 'i_auth_remote_data_source.dart';
 final class AuthRemoteDataSource implements IAuthRemoteDataSource {
   const AuthRemoteDataSource({required FirebaseAuth firebaseAuth})
     : _firebaseAuth = firebaseAuth;
+
+  /// Сервис авторизации
   final FirebaseAuth _firebaseAuth;
 
   @override

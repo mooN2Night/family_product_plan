@@ -14,7 +14,7 @@ abstract final class FamilyRoutes {
   static const String _familyCreateScreenPath = 'family_create';
 
   /// Путь роута страницы информации о семье
-  static const String _familyInfoScreenPath = 'family_info';
+  static const String _familyInfoScreenPath = 'family_info/:familyId';
 
   /// Метод для построения роута страницы создания семьи
   static GoRoute buildFamilyCreateRoute({List<RouteBase> routes = const []}) =>
@@ -24,11 +24,15 @@ abstract final class FamilyRoutes {
         builder: (context, state) => FamilyCreateScreen(),
       );
 
-  /// Метод для построения роута страницы создания семьи
+  /// Метод для построения роута страницы информации о семье
   static GoRoute buildFamilyInfoRoute({List<RouteBase> routes = const []}) =>
       GoRoute(
         path: _familyInfoScreenPath,
         name: familyInfoScreenName,
-        builder: (context, state) => FamilyInfoScreen(),
+        builder: (context, state) {
+          final familyId = state.pathParameters['familyId'];
+
+          return FamilyInfoScreen(familyId: familyId!);
+        },
       );
 }

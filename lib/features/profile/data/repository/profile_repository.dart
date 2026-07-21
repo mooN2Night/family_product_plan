@@ -1,4 +1,5 @@
 import 'package:family_product_plan/app/error/app_exception.dart';
+import 'package:family_product_plan/features/profile/domain/entity/profile_exception.dart';
 import 'package:family_product_plan/features/profile/domain/entity/profile_user_entity.dart';
 import 'package:family_product_plan/features/profile/domain/repository/i_profile_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../dto/profile_user_dto.dart';
 import '../mapper/profile_exception_mapper.dart';
 
+/// Реализация репозитория для работы с профилем.
 final class ProfileRepository implements IProfileRepository {
   const ProfileRepository({
     required FirebaseAuth firebaseAuth,
@@ -14,7 +16,10 @@ final class ProfileRepository implements IProfileRepository {
   }) : _firebaseAuth = firebaseAuth,
        _firestore = firestore;
 
+  /// Сервис авторизации.
   final FirebaseAuth _firebaseAuth;
+
+  /// Сервис удаленной бд.
   final FirebaseFirestore _firestore;
 
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
@@ -68,6 +73,19 @@ final class ProfileRepository implements IProfileRepository {
     });
   }
 
+  @override
+  Future<ProfileUserEntity> getProfileById({required String userId}) async {
+    try {
+      final document = await _firestore.collection('users').doc(userId).get();
+
+      if (!document.exists) throw ProfileNotFoundException();
+      return ProfileUserDto.fromJson(document.data()!).toEntity();
+    } on Object catch (error) {
+      throw ProfileExceptionMapper.fromException(error);
+    }
+  }
+
+  /// Вспомогательный метод для создания пустого профиля.
   Future<ProfileUserEntity> _createEmptyProfile(User user) async {
     final profile = ProfileUserEntity.empty(id: user.uid, email: user.email!);
 

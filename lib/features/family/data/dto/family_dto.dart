@@ -11,6 +11,7 @@ final class FamilyDto {
     required this.createdAt,
   });
 
+  /// Фабричный конструктор для преобразования серверной модели в [FamilyDto]
   factory FamilyDto.fromJson(Map<String, dynamic> json) {
     return FamilyDto(
       name: json['name'] as String,
@@ -30,6 +31,7 @@ final class FamilyDto {
   /// Дата создания
   final DateTime createdAt;
 
+  /// Метод для преобразования DTO в сущность.
   FamilyEntity toEntity(String id) {
     return FamilyEntity(
       id: id,
@@ -39,6 +41,7 @@ final class FamilyDto {
     );
   }
 
+  /// Фабричный конструктор для преобразования [FamilyDto] в серверную модель
   Map<String, dynamic> toJson() {
     return {
       'name': name,

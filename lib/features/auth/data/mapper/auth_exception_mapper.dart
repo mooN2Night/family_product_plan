@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../app/mapper/app_exception_mapper.dart';
 import '../../domain/entity/auth_exception.dart';
 
+/// Маппер ошибок авторизации
 abstract final class AuthExceptionMapper {
   static AppException fromException(Object error) {
     if (error is FirebaseAuthException) {

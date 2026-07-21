@@ -117,7 +117,11 @@ final class ProfileUserEntity extends Equatable {
   }
 
   String? get formatedBirthDate {
-    return DateFormat('dd MMMM yyyy', 'ru').format(birthDate!);
+    if (birthDate != null) {
+      return DateFormat('dd MMMM yyyy', 'ru').format(birthDate!);
+    }
+
+    return null;
   }
 
   // TODO: добавить метод для множественного отображения значения

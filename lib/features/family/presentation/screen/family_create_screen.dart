@@ -1,10 +1,13 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/app/ui_kit/app_bar.dart';
 import 'package:family_product_plan/app/ui_kit/app_box.dart';
+import 'package:family_product_plan/app/ui_kit/app_snack_bar.dart';
 import 'package:family_product_plan/features/family/domain/state/family_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+/// Экран создания семьи.
 class FamilyCreateScreen extends StatelessWidget {
   const FamilyCreateScreen({super.key});
 
@@ -19,6 +22,7 @@ class FamilyCreateScreen extends StatelessWidget {
   }
 }
 
+/// Содержимое экрана создания семьи.
 class FamilyCreateScreenView extends StatefulWidget {
   const FamilyCreateScreenView({super.key});
 
@@ -27,6 +31,7 @@ class FamilyCreateScreenView extends StatefulWidget {
 }
 
 class _FamilyCreateScreenViewState extends State<FamilyCreateScreenView> {
+  /// Контроллер названия семьи.
   late final TextEditingController _familyNameController;
 
   @override
@@ -37,39 +42,64 @@ class _FamilyCreateScreenViewState extends State<FamilyCreateScreenView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar.profile(actions: []),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          children: [
-            HBox(40),
-            TextField(
-              controller: _familyNameController,
-              decoration: const InputDecoration(labelText: 'Название семьи'),
-            ),
-            HBox(40),
-            BlocBuilder<FamilyBloc, FamilyState>(
-              builder: (context, state) {
-                return FilledButton(
-                  onPressed: state.isLoading
-                      ? null
-                      : () {
-                          final name = _familyNameController.text.trim();
+    return BlocListener<FamilyBloc, FamilyState>(
+      listener: (context, state) {
+        switch (state) {
+          case FamilyCreatedState():
+            AppSnackBar.showSuccess(
+              context: context,
+              message: 'Семья успешно создана',
+            );
 
-                          if (name.isEmpty) return;
+            context.pop();
+          case FamilyErrorState():
+            AppSnackBar.showError(context, message: state.message);
+          default:
+            break;
+        }
+      },
+      child: Scaffold(
+        appBar: CustomAppBar.profile(actions: []),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              HBox(40),
+              TextField(
+                controller: _familyNameController,
+                decoration: const InputDecoration(labelText: 'Название семьи'),
+              ),
+              HBox(40),
+              BlocBuilder<FamilyBloc, FamilyState>(
+                builder: (context, state) {
+                  final isLoading = state is FamilyCreatingState;
 
-                          context.read<FamilyBloc>().add(
-                            FamilyCreateEvent(name: name),
-                          );
-                        },
-                  child: state.isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Создать'),
-                );
-              },
-            ),
-          ],
+                  return FilledButton(
+                    onPressed: isLoading
+                        ? null
+                        : () {
+                            final name = _familyNameController.text.trim();
+
+                            if (name.isEmpty) return;
+
+                            context.read<FamilyBloc>().add(
+                              FamilyCreateEvent(name: name),
+                            );
+                          },
+                    child: isLoading
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('Создать'),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

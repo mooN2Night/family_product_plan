@@ -18,7 +18,7 @@ final class ProfileLoadingState extends ProfileState {
   const ProfileLoadingState();
 }
 
-/// Общий класс для состояний успешной загрущки и обновления
+/// Общий класс для состояний успешной загрузки и обновления
 abstract class ProfileLoadedState extends ProfileState {
   const ProfileLoadedState({required this.user});
 
