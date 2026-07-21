@@ -1,5 +1,6 @@
 import 'app_database.dart';
 
+/// Интерфес локальной бд.
 abstract interface class IDatabase {
   /// Возвращает поток со списком всех продуктов. Обновляется автоматически при изменении данных.
   Stream<List<Product>> watchAllProducts();

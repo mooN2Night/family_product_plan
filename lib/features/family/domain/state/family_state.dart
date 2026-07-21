@@ -1,37 +1,60 @@
 part of 'family_bloc.dart';
 
 /// Базовое состояние.
-final class FamilyState extends Equatable {
-  const FamilyState({
-    this.isLoading = false,
-    this.error,
-    this.isCreated = false,
-  });
-
-  final bool isLoading;
-
-  final String? error;
-
-  final bool isCreated;
-
-
-  FamilyState copyWith({
-    bool? isLoading,
-    String? error,
-    bool? isCreated,
-  }) {
-    return FamilyState(
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      isCreated: isCreated ?? this.isCreated,
-    );
-  }
-
+sealed class FamilyState extends Equatable {
+  const FamilyState();
 
   @override
-  List<Object?> get props => [
-    isLoading,
-    error,
-    isCreated,
-  ];
+  List<Object?> get props => [];
+}
+
+/// Начальное состояние.
+final class FamilyInitialState extends FamilyState {
+  const FamilyInitialState();
+}
+
+/// Состояние загрузки.
+final class FamilyLoadingState extends FamilyState {
+  const FamilyLoadingState();
+}
+
+/// Состояния успешного получения информации.
+final class FamilyLoadedState extends FamilyState {
+  const FamilyLoadedState({required this.family, required this.members});
+
+  /// Сущность семьи.
+  final FamilyEntity family;
+
+  /// Сущность участников семьи.
+  final List<FamilyMemberInfoEntity> members;
+
+  @override
+  List<Object?> get props => [family, members];
+}
+
+/// Состояния создании семьи.
+final class FamilyCreatingState extends FamilyState {
+  const FamilyCreatingState();
+}
+
+/// Состояния успешно созданной семьи.
+final class FamilyCreatedState extends FamilyState {
+  const FamilyCreatedState({required this.familyId});
+
+  /// Уникальный идентификаторв семьи.
+  final String familyId;
+
+  @override
+  List<Object?> get props => [familyId];
+}
+
+/// Состояние ошибки
+final class FamilyErrorState extends FamilyState {
+  const FamilyErrorState({required this.message});
+
+  /// Ошибка.
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
 }

@@ -10,8 +10,6 @@ import '../../../../app/ui_kit/app_bar.dart';
 import '../../domain/state/products_bloc.dart';
 
 /// Класс для отображения главного экрана
-///
-/// Инициализируется блок и запрашивается ивент получения списка покупок
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 

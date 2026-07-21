@@ -8,7 +8,11 @@ abstract interface class IProfileRepository {
   /// Сохранение профиля
   Future<void> saveProfile(ProfileUserEntity user);
 
+  /// Метод для отслеживания состояния профиля.
   Stream<ProfileUserEntity> watchProfile();
+
+  /// Получить пользователя по id.
+  Future<ProfileUserEntity> getProfileById({required String userId});
 
   /// Загрузка аватара пользователя
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы

@@ -23,6 +23,7 @@ final class FamilyEntity extends Equatable {
   /// Дата создания
   final DateTime createdAt;
 
+  /// Метод для преобразования сущности в DTO.
   FamilyDto toDto() {
     return FamilyDto(
       name: name,

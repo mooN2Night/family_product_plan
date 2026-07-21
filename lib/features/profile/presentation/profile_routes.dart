@@ -18,9 +18,6 @@ abstract final class ProfileRoutes {
   static const String _profileEditorScreenPath = 'profile_editor';
 
   /// Метод для построения ветки роутов экрана профиля
-  ///
-  /// Принимает:
-  /// - [routes] - вложенные роуты
   static StatefulShellBranch buildShellBranch({
     List<RouteBase> routes = const [],
     List<NavigatorObserver>? observers,

@@ -1,1 +1,23 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"family-planner-9aff5","appId":"1:291564212728:android:e19ae2b21dd2c18dee460d","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"family-planner-9aff5","configurations":{"android":"1:291564212728:android:e19ae2b21dd2c18dee460d","ios":"1:291564212728:ios:5eb19dc6041ec737ee460d","web":"1:291564212728:web:ce37679faa4946c2ee460d"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "family-planner-9aff5",
+          "appId": "1:291564212728:android:e19ae2b21dd2c18dee460d",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "family-planner-9aff5",
+          "configurations": {
+            "android": "1:291564212728:android:e19ae2b21dd2c18dee460d",
+            "ios": "1:291564212728:ios:5eb19dc6041ec737ee460d",
+            "web": "1:291564212728:web:ce37679faa4946c2ee460d"
+          }
+        }
+      }
+    }
+  }
+}

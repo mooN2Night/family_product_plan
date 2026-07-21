@@ -12,6 +12,7 @@ sealed class ProfileEvent extends Equatable {
 final class ProfileUpdateEvent extends ProfileEvent {
   const ProfileUpdateEvent({required this.user});
 
+  /// Пользователь.
   final ProfileUserEntity user;
 
   @override

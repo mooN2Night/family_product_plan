@@ -9,3 +9,9 @@ final class FamilyPermissionDeniedException extends AppException {
 final class FamilyNotFoundException extends AppException {
   const FamilyNotFoundException() : super('Семья не найдена');
 }
+
+/// У пользователя уже есть семья.
+final class UserAlreadyHasFamilyException extends AppException {
+  const UserAlreadyHasFamilyException()
+    : super('У пользователя уже есть семья');
+}

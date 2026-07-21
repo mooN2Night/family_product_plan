@@ -15,16 +15,19 @@ final class DiServices {
   /// Сервис для получения путей к директориям приложения.
   late final IPathProvider pathProvider;
 
-  /// Экземпляр базы данных приложения.
+  /// Экземпляр локальной базы данных приложения.
   late final IDatabase database;
 
+  /// Сервис для выбора фотографии.
   late final IImagePicker imagePicker;
 
+  /// Сервис для получения жоступа к функциям телефона.
   late final IPermissionHandler permissionHandler;
 
   /// Сервис авторизации.
   late final FirebaseAuth firebaseAuth;
 
+  /// Сервис удаленной базы данных приложения.
   late final FirebaseFirestore firestore;
 
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы

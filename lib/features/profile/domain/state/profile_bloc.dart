@@ -28,6 +28,7 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   /// Подписка на прослушивание состояния профиля
   StreamSubscription<ProfileUserEntity?>? _profileSubscription;
 
+  /// Метод для отслеживания состояния профиля.
   Future<void> _onWatch(
     ProfileWatchEvent event,
     Emitter<ProfileState> emit,
@@ -44,6 +45,7 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     );
   }
 
+  /// Метод для получения профиля.
   Future<void> _fetchProfile(
     ProfileGetEvent event,
     Emitter<ProfileState> emit,
@@ -60,6 +62,7 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
   }
 
+  /// Метод для обновления профиля.
   Future<void> _onUpdate(
     ProfileUpdateEvent event,
     Emitter<ProfileState> emit,
@@ -75,6 +78,14 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileErrorState(message: error.message));
       addError(error, stackTrace);
     }
+  }
+
+  /// Метод для эмита успешного состояния.
+  Future<void> _onChanged(
+      _ProfileChangedEvent event,
+      Emitter<ProfileState> emit,
+      ) async {
+    emit(ProfileSuccessState(user: event.user));
   }
 
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
@@ -96,13 +107,6 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   //   }
   // }
 
-  Future<void> _onChanged(
-    _ProfileChangedEvent event,
-    Emitter<ProfileState> emit,
-  ) async {
-    emit(ProfileSuccessState(user: event.user));
-  }
-
   @override
   Future<void> close() {
     _profileSubscription?.cancel();
@@ -110,9 +114,11 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 }
 
+/// Внутреннее событие изменения профиля.
 final class _ProfileChangedEvent extends ProfileEvent {
   const _ProfileChangedEvent(this.user);
 
+  /// Пользователь.
   final ProfileUserEntity user;
 
   @override

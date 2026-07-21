@@ -1,13 +1,20 @@
 import 'package:family_product_plan/features/family/domain/entity/family_entity.dart';
 
+import '../entity/family_member_info_entity.dart';
+
 /// Интерфейс репозитория семьи
 abstract interface class IFamilyRepository {
   /// Содание семьи
-  Future<void> createFamily({required String name});
+  Future<String> createFamily({required String name});
 
   /// Получение семьи
   Future<FamilyEntity> getFamily({required String familyId});
 
   /// Поток обновления семьи
   Stream<FamilyEntity> watchFamily({required String familyId});
+
+  /// Получения списка участников в семье.
+  Future<List<FamilyMemberInfoEntity>> getFamilyMembersInfo({
+    required FamilyEntity family,
+  });
 }
