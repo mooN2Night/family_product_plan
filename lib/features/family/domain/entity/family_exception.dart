@@ -21,3 +21,11 @@ final class FamilyInviteCodeNotFoundException extends AppException {
   const FamilyInviteCodeNotFoundException()
       : super('Семья с таким кодом не найдена');
 }
+
+/// Владелец семьи не может покинуть семью
+final class FamilyOwnerCannotLeaveException extends AppException {
+  const FamilyOwnerCannotLeaveException()
+      : super(
+    'Владелец семьи не может покинуть семью. Передайте права другому участнику или удалите семью.',
+  );
+}

@@ -28,4 +28,18 @@ abstract interface class IFamilyRepository {
 
   /// Присоединиться к семье по коду.
   Future<void> joinFamily({required String joinCode});
+
+  /// Покинуть семью.
+  Future<void> leaveFamily({required String familyId});
+
+  /// Удалить учестника из семьи.
+  Future<void> removeMember({
+    required String familyId,
+    required String memberId,
+  });
+
+  /// УДалить всю семью.
+  Future<void> deleteFamily({
+    required String familyId,
+  });
 }

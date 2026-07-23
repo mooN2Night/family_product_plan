@@ -71,6 +71,8 @@ abstract final class FamilyRoutes {
       final relation = state.uri.queryParameters['relation'];
       final canEditRelation = state.uri.queryParameters['canEditRelation']
           .toBool();
+      final isCurrentUser = state.uri.queryParameters['isCurrentUser']
+          .toBool();
 
       assert(
         userId != null && familyId != null && role != null && relation != null,
@@ -83,6 +85,7 @@ abstract final class FamilyRoutes {
         role: role!,
         relation: relation!,
         canEditRelation: canEditRelation,
+        isCurrentUser: isCurrentUser,
       );
     },
   );

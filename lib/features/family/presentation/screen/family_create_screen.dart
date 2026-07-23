@@ -48,7 +48,7 @@ class _FamilyCreateScreenViewState extends State<FamilyCreateScreenView> {
         switch (state) {
           case FamilyCreateSuccessState():
             AppSnackBar.showSuccess(
-              context: context,
+              context,
               message: 'Семья успешно создана',
             );
 

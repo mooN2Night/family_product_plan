@@ -66,8 +66,8 @@ class AppSnackBar extends StatefulWidget {
     );
   }
 
-  static void showSuccess({
-    required BuildContext context,
+  static void showSuccess(
+    BuildContext context, {
     required String message,
     Duration displayDuration = const Duration(seconds: 3),
   }) {
