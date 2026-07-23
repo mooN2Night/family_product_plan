@@ -9,6 +9,7 @@ final class FamilyEntity extends Equatable {
     required this.name,
     required this.members,
     required this.createdAt,
+    required this.joinCode,
   });
 
   /// Id семьи
@@ -23,15 +24,19 @@ final class FamilyEntity extends Equatable {
   /// Дата создания
   final DateTime createdAt;
 
+  /// Код для вступления в семью.
+  final String joinCode;
+
   /// Метод для преобразования сущности в DTO.
   FamilyDto toDto() {
     return FamilyDto(
       name: name,
       members: members.map((e) => e.toDto()).toList(),
       createdAt: createdAt,
+      joinCode: joinCode,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, members, createdAt];
+  List<Object?> get props => [id, name, members, createdAt, joinCode];
 }

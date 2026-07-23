@@ -15,3 +15,9 @@ final class UserAlreadyHasFamilyException extends AppException {
   const UserAlreadyHasFamilyException()
     : super('У пользователя уже есть семья');
 }
+
+/// Семья с таким кодом не найдена.
+final class FamilyInviteCodeNotFoundException extends AppException {
+  const FamilyInviteCodeNotFoundException()
+      : super('Семья с таким кодом не найдена');
+}

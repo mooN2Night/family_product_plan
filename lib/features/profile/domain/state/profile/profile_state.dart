@@ -19,24 +19,14 @@ final class ProfileLoadingState extends ProfileState {
 }
 
 /// Общий класс для состояний успешной загрузки и обновления
-abstract class ProfileLoadedState extends ProfileState {
-  const ProfileLoadedState({required this.user});
+final class ProfileSuccessState extends ProfileState {
+  const ProfileSuccessState({required this.user});
 
   /// Текущий пользователь.
   final ProfileUserEntity user;
 
   @override
   List<Object?> get props => [user];
-}
-
-/// Пользователь получен успешно.
-final class ProfileSuccessState extends ProfileLoadedState {
-  const ProfileSuccessState({required super.user});
-}
-
-/// Состояние обновления пользователя
-final class ProfileSavingState extends ProfileLoadedState {
-  const ProfileSavingState({required super.user});
 }
 
 /// Ошибка получения профиля.

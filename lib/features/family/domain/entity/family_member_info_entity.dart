@@ -15,6 +15,8 @@ final class FamilyMemberInfoEntity extends Equatable {
     required this.gender,
     required this.role,
     required this.relation,
+    required this.canEditRelation,
+    required this.isCurrentUser,
   });
 
   /// Id пользователя.
@@ -41,6 +43,11 @@ final class FamilyMemberInfoEntity extends Equatable {
   /// Родственная связь.
   final FamilyRelation relation;
 
+  final bool canEditRelation;
+
+  /// Является ли этот участник текущим пользователем.
+  final bool isCurrentUser;
+
   /// Полное имя пользователя.
   String get fullName {
     return [
@@ -60,5 +67,7 @@ final class FamilyMemberInfoEntity extends Equatable {
     gender,
     role,
     relation,
+    canEditRelation,
+    isCurrentUser,
   ];
 }

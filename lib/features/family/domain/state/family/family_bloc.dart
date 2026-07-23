@@ -5,8 +5,8 @@ import 'package:family_product_plan/features/family/domain/entity/family_member_
 import 'package:family_product_plan/features/family/domain/repository/i_family_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../app/error/app_exception.dart';
-import '../../data/mapper/family_exception_mapper.dart';
+import '../../../../../app/error/app_exception.dart';
+import '../../../data/mapper/family_exception_mapper.dart';
 
 part 'family_event.dart';
 
@@ -17,7 +17,6 @@ final class FamilyBloc extends Bloc<FamilyEvent, FamilyState> {
   FamilyBloc({required IFamilyRepository familyRepository})
     : _familyRepository = familyRepository,
       super(const FamilyInitialState()) {
-    on<FamilyCreateEvent>(_createFamily);
     on<FamilyWatchEvent>(_watchFamily);
     on<FamilyStopWatchEvent>(_stopWatchFamily);
     on<FamilyUpdateEvent>(_updateFamily);
@@ -29,23 +28,6 @@ final class FamilyBloc extends Bloc<FamilyEvent, FamilyState> {
 
   /// Подписка на прослушивание состояния семьи
   StreamSubscription<FamilyEntity?>? _familySubscription;
-
-  /// Метод для создания семьи.
-  Future<void> _createFamily(
-    FamilyCreateEvent event,
-    Emitter<FamilyState> emit,
-  ) async {
-    emit(const FamilyCreatingState());
-
-    try {
-      final familyId = await _familyRepository.createFamily(name: event.name);
-
-      emit(FamilyCreatedState(familyId: familyId));
-    } on AppException catch (error, stackTrace) {
-      emit(FamilyErrorState(message: error.message));
-      addError(error, stackTrace);
-    }
-  }
 
   /// Метод для отслеживания обновления статуса семьи.
   Future<void> _watchFamily(

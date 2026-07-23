@@ -4,11 +4,13 @@ import 'package:family_product_plan/features/family/data/dto/family_dto.dart';
 import 'package:family_product_plan/features/family/data/dto/family_member_dto.dart';
 import 'package:family_product_plan/features/family/data/dto/family_member_info_dto.dart';
 import 'package:family_product_plan/features/family/domain/entity/family_entity.dart';
+import 'package:family_product_plan/features/family/domain/entity/family_member_entity.dart';
 import 'package:family_product_plan/features/family/domain/entity/family_member_info_entity.dart';
 import 'package:family_product_plan/features/family/domain/entity/family_relation.dart';
 import 'package:family_product_plan/features/profile/domain/entity/profile_exception.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../../app/utils/family_invite_code_generator.dart';
 import '../../domain/entity/family_exception.dart';
 import '../../domain/entity/family_role.dart';
 import '../../domain/repository/i_family_repository.dart';
@@ -47,6 +49,7 @@ final class FamilyRepository implements IFamilyRepository {
           ),
         ],
         createdAt: DateTime.now(),
+        joinCode: FamilyInviteCodeGenerator.generate(),
       );
 
       final userDoc = await _firestore
@@ -114,6 +117,16 @@ final class FamilyRepository implements IFamilyRepository {
     required FamilyEntity family,
   }) async {
     try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) throw AppUnknownException();
+
+      final currentMember = family.members.firstWhere(
+        (member) => member.userId == currentUser.uid,
+      );
+
+      final canEditRelation = currentMember.role == FamilyRole.owner;
+
       final members = await Future.wait(
         family.members.map((member) async {
           final snapshot = await _firestore
@@ -127,11 +140,104 @@ final class FamilyRepository implements IFamilyRepository {
             snapshot.id,
             snapshot.data()!,
           );
-          return dto.toEntity(role: member.role, relation: member.relation);
+          return dto.toEntity(
+            role: member.role,
+            relation: member.relation,
+            canEditRelation: canEditRelation,
+            isCurrentUser: member.userId == currentUser.uid,
+          );
         }),
       );
 
       return members;
+    } on Object catch (error) {
+      throw FamilyExceptionMapper.fromException(error);
+    }
+  }
+
+  @override
+  Future<void> updateMemberRelation({
+    required String familyId,
+    required String userId,
+    required FamilyRelation relation,
+  }) async {
+    try {
+      final family = await getFamily(familyId: familyId);
+
+      final updatedMembers = family.members.map((member) {
+        if (member.userId != userId) return member;
+
+        return FamilyMemberEntity(
+          userId: member.userId,
+          role: member.role,
+          relation: relation,
+        );
+      }).toList();
+
+      await _firestore.collection('families').doc(familyId).update({
+        'members': updatedMembers
+            .map((member) => member.toDto().toJson())
+            .toList(),
+      });
+    } on Object catch (error) {
+      throw FamilyExceptionMapper.fromException(error);
+    }
+  }
+
+  @override
+  Future<void> joinFamily({required String joinCode}) async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) throw AppUnknownException();
+
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+      final familyId = userDoc.data()?['familyId'];
+
+      if (familyId != null) throw UserAlreadyHasFamilyException();
+
+      final query = await _firestore
+          .collection('families')
+          .where('joinCode', isEqualTo: joinCode)
+          .limit(1)
+          .get();
+
+      if (query.docs.isEmpty) throw FamilyInviteCodeNotFoundException();
+
+      final familyDoc = query.docs.first;
+
+      final family = FamilyDto.fromJson(
+        familyDoc.data(),
+      ).toEntity(familyDoc.id);
+
+      final alreadyMember = family.members.any(
+        (member) => member.userId == currentUser.uid,
+      );
+
+      if (alreadyMember) throw UserAlreadyHasFamilyException();
+
+      final updatedMembers = [
+        ...family.members,
+        FamilyMemberEntity(
+          userId: currentUser.uid,
+          role: FamilyRole.member,
+          relation: FamilyRelation.undefined,
+        ),
+      ];
+
+      await _firestore.runTransaction((transaction) async {
+        transaction.update(familyDoc.reference, {
+          'members': updatedMembers
+              .map((updatedMember) => updatedMember.toDto().toJson())
+              .toList(),
+        });
+
+        transaction.update(userDoc.reference, {'familyId': family.id});
+      });
     } on Object catch (error) {
       throw FamilyExceptionMapper.fromException(error);
     }

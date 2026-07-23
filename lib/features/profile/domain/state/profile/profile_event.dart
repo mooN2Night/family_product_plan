@@ -8,7 +8,17 @@ sealed class ProfileEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Событие обновления профиля
+/// Событие потокового просмотра профиля
+final class ProfileWatchEvent extends ProfileEvent {
+  const ProfileWatchEvent();
+}
+
+/// Остановить отслеживание профиля.
+final class ProfileStopWatchEvent extends ProfileEvent {
+  const ProfileStopWatchEvent();
+}
+
+/// Внутреннее событие обновления профиля.
 final class ProfileUpdateEvent extends ProfileEvent {
   const ProfileUpdateEvent({required this.user});
 
@@ -19,14 +29,15 @@ final class ProfileUpdateEvent extends ProfileEvent {
   List<Object?> get props => [user];
 }
 
-/// Событие потокового просмотра профиля
-final class ProfileWatchEvent extends ProfileEvent {
-  const ProfileWatchEvent();
-}
+/// Внутреннее событие ошибки.
+final class ProfileWatchErrorEvent extends ProfileEvent {
+  const ProfileWatchErrorEvent({required this.error});
 
-/// Событие получения профиля
-final class ProfileGetEvent extends ProfileEvent {
-  const ProfileGetEvent();
+  /// Ошибка.
+  final AppException error;
+
+  @override
+  List<Object?> get props => [error];
 }
 
 /// Событие выбора аватара
