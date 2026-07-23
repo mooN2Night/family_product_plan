@@ -1,0 +1,1 @@
+enum FamilyMemberAction { leave, remove }

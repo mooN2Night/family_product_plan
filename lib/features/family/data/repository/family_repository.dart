@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:family_product_plan/app/error/app_exception.dart';
 import 'package:family_product_plan/features/family/data/dto/family_dto.dart';
@@ -237,6 +238,144 @@ final class FamilyRepository implements IFamilyRepository {
         });
 
         transaction.update(userDoc.reference, {'familyId': family.id});
+      });
+    } on Object catch (error) {
+      throw FamilyExceptionMapper.fromException(error);
+    }
+  }
+
+  @override
+  Future<void> leaveFamily({required String familyId}) async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) throw AppUnknownException();
+
+      final familyRef = _firestore.collection('families').doc(familyId);
+      final userRef = _firestore.collection('users').doc(currentUser.uid);
+
+      await _firestore.runTransaction((transaction) async {
+        final familySnapshot = await transaction.get(familyRef);
+
+        if (!familySnapshot.exists) throw FamilyNotFoundException();
+
+        final family = FamilyDto.fromJson(
+          familySnapshot.data()!,
+        ).toEntity(familySnapshot.id);
+
+        final member = family.members.firstWhereOrNull(
+          (member) => member.userId == currentUser.uid,
+        );
+
+        if (member == null) throw ProfileNotFoundException();
+
+        if (member.role == FamilyRole.owner) {
+          throw FamilyOwnerCannotLeaveException();
+        }
+
+        final updatedMembers = family.members
+            .where((member) => member.userId != currentUser.uid)
+            .map((member) => member.toDto().toJson())
+            .toList();
+
+        transaction.update(familyRef, {'members': updatedMembers});
+
+        transaction.update(userRef, {'familyId': null});
+      });
+    } on Object catch (error) {
+      throw FamilyExceptionMapper.fromException(error);
+    }
+  }
+
+  @override
+  Future<void> removeMember({
+    required String familyId,
+    required String memberId,
+  }) async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) {
+        throw AppUnknownException();
+      }
+
+      final familyRef = _firestore.collection('families').doc(familyId);
+      final userRef = _firestore.collection('users').doc(memberId);
+
+      await _firestore.runTransaction((transaction) async {
+        final familySnapshot = await transaction.get(familyRef);
+
+        if (!familySnapshot.exists) {
+          throw FamilyNotFoundException();
+        }
+
+        final family = FamilyDto.fromJson(
+          familySnapshot.data()!,
+        ).toEntity(familySnapshot.id);
+
+        final currentMember = family.members.firstWhere(
+          (member) => member.userId == currentUser.uid,
+        );
+
+        if (currentMember.role != FamilyRole.owner) {
+          throw const FamilyPermissionDeniedException();
+        }
+
+        if (currentUser.uid == memberId) {
+          throw const FamilyOwnerCannotLeaveException();
+        }
+
+        final updatedMembers = family.members
+            .where((member) => member.userId != memberId)
+            .map((member) => member.toDto().toJson())
+            .toList();
+
+        transaction.update(familyRef, {'members': updatedMembers});
+
+        transaction.update(userRef, {'familyId': null});
+      });
+    } on Object catch (error) {
+      throw FamilyExceptionMapper.fromException(error);
+    }
+  }
+
+  @override
+  Future<void> deleteFamily({required String familyId}) async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) throw AppUnknownException();
+
+      final familyRef = _firestore.collection('families').doc(familyId);
+
+      await _firestore.runTransaction((transaction) async {
+        final familySnapshot = await transaction.get(familyRef);
+
+        if (!familySnapshot.exists) throw FamilyNotFoundException();
+
+        final family = FamilyDto.fromJson(
+          familySnapshot.data()!,
+        ).toEntity(familySnapshot.id);
+
+        final currentMember = family.members.firstWhere(
+              (member) => member.userId == currentUser.uid,
+        );
+
+        if (currentMember.role != FamilyRole.owner) {
+          throw FamilyPermissionDeniedException();
+        }
+
+        for (final member in family.members) {
+          final userRef = _firestore
+              .collection('users')
+              .doc(member.userId);
+
+          transaction.update(userRef, {
+            'familyId': null,
+          });
+        }
+
+        transaction.delete(familyRef);
       });
     } on Object catch (error) {
       throw FamilyExceptionMapper.fromException(error);

@@ -48,7 +48,7 @@ class _FamilyJoinScreenViewState extends State<FamilyJoinScreenView> {
           switch (state) {
             case FamilyJoinSuccessState():
               AppSnackBar.showSuccess(
-                context: context,
+                context,
                 message: 'Вы успешно присоединились к семье!',
               );
 

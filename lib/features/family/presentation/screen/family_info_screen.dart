@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/ui_kit/app_bar.dart';
 import '../../domain/state/family/family_bloc.dart';
+import '../../domain/state/family_delete/family_delete_bloc.dart';
+import '../../domain/state/family_remove_member/family_remove_member_bloc.dart';
 import '../components/family_info_success_view.dart';
 
 /// Экран информации о семье.
@@ -17,11 +19,23 @@ class FamilyInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final familyRepository = context.di.repositories.familyRepository;
 
-    return BlocProvider(
-      create: (context) =>
-          FamilyBloc(familyRepository: familyRepository)
-            ..add(FamilyWatchEvent(familyId: familyId)),
-      child: FamilyInfoScreenView(familyId: familyId,),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              FamilyBloc(familyRepository: familyRepository)
+                ..add(FamilyWatchEvent(familyId: familyId)),
+        ),
+        BlocProvider(
+          create: (context) =>
+              FamilyRemoveMemberBloc(familyRepository: familyRepository),
+        ),
+        BlocProvider(
+          create: (context) =>
+              FamilyDeleteBloc(familyRepository: familyRepository),
+        ),
+      ],
+      child: FamilyInfoScreenView(familyId: familyId),
     );
   }
 }

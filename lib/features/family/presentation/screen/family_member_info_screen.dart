@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/state/family_member/family_member_info_bloc.dart';
+import '../../domain/state/family_remove_member/family_remove_member_bloc.dart';
 import '../components/family_member_info_success_view.dart';
 
 class FamilyMemberInfoScreen extends StatelessWidget {
@@ -15,6 +16,7 @@ class FamilyMemberInfoScreen extends StatelessWidget {
     required this.role,
     required this.relation,
     required this.canEditRelation,
+    required this.isCurrentUser,
     super.key,
   });
 
@@ -23,22 +25,32 @@ class FamilyMemberInfoScreen extends StatelessWidget {
   final String role;
   final String relation;
   final bool canEditRelation;
+  final bool isCurrentUser;
 
   @override
   Widget build(BuildContext context) {
     final familyRepository = context.di.repositories.familyRepository;
     final profileRepository = context.di.repositories.profileRepository;
 
-    return BlocProvider(
-      create: (context) => FamilyMemberInfoBloc(
-        familyRepository: familyRepository,
-        profileRepository: profileRepository,
-      )..add(FamilyMemberInfoLoadEvent(userId: userId)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => FamilyMemberInfoBloc(
+            familyRepository: familyRepository,
+            profileRepository: profileRepository,
+          )..add(FamilyMemberInfoLoadEvent(userId: userId)),
+        ),
+        BlocProvider(
+          create: (context) =>
+              FamilyRemoveMemberBloc(familyRepository: familyRepository),
+        ),
+      ],
       child: FamilyMemberInfoScreenView(
         familyId: familyId,
         role: FamilyRole.fromString(role),
         relation: FamilyRelation.fromString(relation),
         canEditRelation: canEditRelation,
+        isCurrentUser: isCurrentUser,
       ),
     );
   }
@@ -50,6 +62,7 @@ class FamilyMemberInfoScreenView extends StatelessWidget {
     required this.role,
     required this.relation,
     required this.canEditRelation,
+    required this.isCurrentUser,
     super.key,
   });
 
@@ -57,6 +70,7 @@ class FamilyMemberInfoScreenView extends StatelessWidget {
   final FamilyRole role;
   final FamilyRelation relation;
   final bool canEditRelation;
+  final bool isCurrentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +85,13 @@ class FamilyMemberInfoScreenView extends StatelessWidget {
           }
 
           final user = state.profile;
-
           return FamilyMemberInfoSuccessView(
             familyId: familyId,
             user: user,
             role: role,
             relation: relation,
             canEditRelation: canEditRelation,
+            isCurrentUser: isCurrentUser,
           );
         },
       ),
