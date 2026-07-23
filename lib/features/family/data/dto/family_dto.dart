@@ -9,6 +9,7 @@ final class FamilyDto {
     required this.name,
     required this.members,
     required this.createdAt,
+    required this.joinCode,
   });
 
   /// Фабричный конструктор для преобразования серверной модели в [FamilyDto]
@@ -19,6 +20,7 @@ final class FamilyDto {
           .map((e) => FamilyMemberDto.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
       createdAt: (json['createdAt'] as Timestamp).toDate(),
+      joinCode: json['joinCode'] as String,
     );
   }
 
@@ -31,6 +33,9 @@ final class FamilyDto {
   /// Дата создания
   final DateTime createdAt;
 
+  /// Код для вступления в семью.
+  final String joinCode;
+
   /// Метод для преобразования DTO в сущность.
   FamilyEntity toEntity(String id) {
     return FamilyEntity(
@@ -38,6 +43,7 @@ final class FamilyDto {
       name: name,
       members: members.map((e) => e.toEntity()).toList(),
       createdAt: createdAt,
+      joinCode: joinCode,
     );
   }
 
@@ -47,6 +53,7 @@ final class FamilyDto {
       'name': name,
       'members': members.map((e) => e.toJson()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
+      'joinCode': joinCode,
     };
   }
 }

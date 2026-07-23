@@ -48,6 +48,8 @@ final class FamilyMemberInfoDto {
   FamilyMemberInfoEntity toEntity({
     required FamilyRole role,
     required FamilyRelation relation,
+    required bool canEditRelation,
+    required bool isCurrentUser,
   }) {
     return FamilyMemberInfoEntity(
       userId: id,
@@ -58,6 +60,8 @@ final class FamilyMemberInfoDto {
       gender: gender,
       role: role,
       relation: relation,
+      canEditRelation: canEditRelation,
+      isCurrentUser: isCurrentUser,
     );
   }
 }

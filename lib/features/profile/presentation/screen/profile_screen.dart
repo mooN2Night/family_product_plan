@@ -1,6 +1,6 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/app/ui_kit/app_bar.dart';
-import 'package:family_product_plan/features/profile/domain/state/profile_bloc.dart';
+import 'package:family_product_plan/features/profile/domain/state/profile/profile_bloc.dart';
 import 'package:family_product_plan/features/profile/presentation/profile_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

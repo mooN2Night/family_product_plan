@@ -32,22 +32,6 @@ final class FamilyLoadedState extends FamilyState {
   List<Object?> get props => [family, members];
 }
 
-/// Состояния создании семьи.
-final class FamilyCreatingState extends FamilyState {
-  const FamilyCreatingState();
-}
-
-/// Состояния успешно созданной семьи.
-final class FamilyCreatedState extends FamilyState {
-  const FamilyCreatedState({required this.familyId});
-
-  /// Уникальный идентификаторв семьи.
-  final String familyId;
-
-  @override
-  List<Object?> get props => [familyId];
-}
-
 /// Состояние ошибки
 final class FamilyErrorState extends FamilyState {
   const FamilyErrorState({required this.message});

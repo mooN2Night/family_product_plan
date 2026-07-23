@@ -1,5 +1,6 @@
 import 'package:family_product_plan/features/profile/domain/entity/profile_user_entity.dart';
 import 'package:family_product_plan/features/profile/presentation/components/profile_info.dart';
+import 'package:family_product_plan/features/profile/presentation/profile_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -77,13 +78,40 @@ class ProfileSuccessView extends StatelessWidget {
           Text('У вас пока нет семьи'),
           HBox(5),
           FilledButton(
-            onPressed: () =>
-                context.pushNamed(FamilyRoutes.familyCreateScreenName),
+            onPressed:
+                user.firstName.isEmpty ||
+                    user.lastName.isEmpty ||
+                    user.birthDate == null ||
+                    user.gender == Gender.unspecified
+                ? () => _openEnterFamilyErrorDialog(
+                    context,
+                    title: 'создания семьи',
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    middleName: user.middleName,
+                    birthDate: user.birthDate,
+                    gender: user.gender,
+                  )
+                : () => context.pushNamed(FamilyRoutes.familyCreateScreenName),
             child: Text('Создать семью'),
           ),
           HBox(5),
           OutlinedButton(
-            onPressed: () {},
+            onPressed:
+                user.firstName.isEmpty ||
+                    user.lastName.isEmpty ||
+                    user.birthDate == null ||
+                    user.gender == Gender.unspecified
+                ? () => _openEnterFamilyErrorDialog(
+                    context,
+                    title: 'присоединении к семье',
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    middleName: user.middleName,
+                    birthDate: user.birthDate,
+                    gender: user.gender,
+                  )
+                : () => context.pushNamed(FamilyRoutes.familyJoinScreenName),
             child: Text('Присоединиться к семье'),
           ),
         ] else ...[
@@ -132,4 +160,49 @@ class ProfileSuccessView extends StatelessWidget {
       ],
     );
   }
+}
+
+Future<void> _openEnterFamilyErrorDialog(
+  BuildContext context, {
+  required String title,
+  required String firstName,
+  required String lastName,
+  required String middleName,
+  required DateTime? birthDate,
+  required Gender gender,
+}) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Для $title нужно указать эти поля:'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: [
+              if (firstName.isEmpty) Text('- Имя'),
+              if (lastName.isEmpty) Text('- Фамилия'),
+              if (middleName.isEmpty) Text('- Отчество'),
+              if (birthDate == null) Text('- Дата рождения'),
+              if (gender == Gender.unspecified) Text('- Пол'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context
+              ..pop()
+              ..pushNamed(ProfileRoutes.profileEditorScreenName),
+            child: const Text(
+              'Перейти в настройки',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          TextButton(
+            child: const Text('Отмена', style: TextStyle(color: Colors.red)),
+            onPressed: () => context.pop(),
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/ui_kit/app_box.dart';
 import '../../domain/entity/profile_user_entity.dart';
-import '../../domain/state/profile_bloc.dart';
+import '../../domain/state/profile_update/profile_update_bloc.dart';
 
 /// Виджет отображения успешно загруженных данных пользователя.
 class ProfileEditorSuccessView extends StatefulWidget {
@@ -172,8 +172,8 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    context.read<ProfileBloc>().add(
-      ProfileUpdateEvent(
+    context.read<ProfileUpdateBloc>().add(
+      ProfileUpdateRequestedEvent(
         user: widget.user.copyWith(
           firstName: _firstNameController.text.trim(),
           lastName: _lastNameController.text.trim(),

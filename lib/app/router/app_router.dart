@@ -63,7 +63,10 @@ abstract interface class AppRouter {
             ProfileRoutes.buildShellBranch(
               routes: [
                 FamilyRoutes.buildFamilyCreateRoute(),
-                FamilyRoutes.buildFamilyInfoRoute(),
+                FamilyRoutes.buildFamilyInfoRoute(
+                  routes: [FamilyRoutes.buildFamilyMemberInfoRoute()],
+                ),
+                FamilyRoutes.buildFamilyJoinRoute(),
               ],
             ),
           ],

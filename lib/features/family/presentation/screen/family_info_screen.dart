@@ -1,9 +1,9 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/features/family/domain/state/family_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/ui_kit/app_bar.dart';
+import '../../domain/state/family/family_bloc.dart';
 import '../components/family_info_success_view.dart';
 
 /// Экран информации о семье.
@@ -21,14 +21,17 @@ class FamilyInfoScreen extends StatelessWidget {
       create: (context) =>
           FamilyBloc(familyRepository: familyRepository)
             ..add(FamilyWatchEvent(familyId: familyId)),
-      child: FamilyInfoScreenView(),
+      child: FamilyInfoScreenView(familyId: familyId,),
     );
   }
 }
 
 /// Виджет, отвечающий за отображение содержимого в зависимости от состояния.
 class FamilyInfoScreenView extends StatelessWidget {
-  const FamilyInfoScreenView({super.key});
+  const FamilyInfoScreenView({required this.familyId, super.key});
+
+  /// Уникальный идентификатор семьи.
+  final String familyId;
 
   @override
   Widget build(BuildContext context) {
@@ -38,15 +41,13 @@ class FamilyInfoScreenView extends StatelessWidget {
         builder: (context, state) {
           switch (state) {
             case FamilyLoadingState():
-            case FamilyCreatingState():
               return const Center(child: CircularProgressIndicator());
-
             case FamilyErrorState():
               return Center(child: Text(state.message));
-
             case FamilyLoadedState():
               return FamilyInfoSuccessView(
                 family: state.family,
+                familyId: familyId,
                 members: state.members,
               );
 

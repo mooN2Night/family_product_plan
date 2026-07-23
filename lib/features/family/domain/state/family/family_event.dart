@@ -8,16 +8,6 @@ sealed class FamilyEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Создать семью.
-final class FamilyCreateEvent extends FamilyEvent {
-  const FamilyCreateEvent({required this.name});
-
-  final String name;
-
-  @override
-  List<Object?> get props => [name];
-}
-
 /// Начать отслеживание семьи.
 final class FamilyWatchEvent extends FamilyEvent {
   const FamilyWatchEvent({required this.familyId});
