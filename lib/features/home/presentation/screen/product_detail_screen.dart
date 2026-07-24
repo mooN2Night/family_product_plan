@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/app_context_ext.dart';
 import '../../../../app/ui_kit/app_bar.dart';
 import '../../../../app/ui_kit/app_box.dart';
-import '../../domain/state/products_bloc.dart';
+import '../../domain/state/products_bloc/products_bloc.dart';
 
 /// Класс для отображения экрана детальной информации о продукте.
 class ProductDetailScreen extends StatelessWidget {
@@ -19,8 +19,8 @@ class ProductDetailScreen extends StatelessWidget {
 
     return BlocProvider(
       create: (context) =>
-      ProductsBloc(homeRepository: homeRepository)
-        ..add(ProductGetEvent(id: int.parse(id))),
+          ProductsBloc(homeRepository: homeRepository)
+            ..add(ProductGetEvent(id: id)),
       child: const _ProductDetailView(),
     );
   }

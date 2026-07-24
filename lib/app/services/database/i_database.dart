@@ -13,8 +13,16 @@ abstract interface class IDatabase {
   Future<void> updateProduct(Product entity);
 
   /// Удаляет продукт по его идентификатору.
-  Future<int> deleteProductById(int id);
+  Future<int> deleteProductById(String id);
 
   /// Получает продукт по его идентификатору.
-  Future<Product> getProductById(int id);
+  Future<Product> getProductById(String id);
+
+  Future<void> replaceProducts(List<Product> entity);
+
+  Future<void> upsertProduct(Product product);
+
+  Future<List<Product>> getProducts();
+
+  Future<void> clearProducts();
 }

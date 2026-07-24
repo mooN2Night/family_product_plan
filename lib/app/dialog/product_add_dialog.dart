@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/home/domain/entity/product_entity.dart';
-import '../../features/home/domain/state/products_bloc.dart';
+import '../../features/home/domain/entity/product_create_entity.dart';
+import '../../features/home/domain/state/products_bloc/products_bloc.dart';
 import '../ui_kit/app_box.dart';
 import '../ui_kit/app_snack_bar.dart';
 
@@ -114,7 +114,7 @@ class _DialogState extends State<_Dialog> {
         TextButton(
           onPressed: () {
             if (_productController.text.isNotEmpty) {
-              final product = ProductEntity(
+              final product = ProductCreateEntity(
                 productName: _productController.text,
                 productManufacturer: _manufacturerController.text,
                 isToBuy: _isNeedToBuy,

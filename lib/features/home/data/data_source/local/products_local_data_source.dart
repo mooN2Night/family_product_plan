@@ -7,8 +7,7 @@ import 'i_products_local_data_source.dart';
 
 /// Реализация локального хр`анения продуктов
 final class ProductsLocalDataSource implements IProductsLocalDataSource {
-  ProductsLocalDataSource({required IDatabase database})
-    : _database = database;
+  ProductsLocalDataSource({required IDatabase database}) : _database = database;
 
   /// Экземпляр локальной базы данных.
   final IDatabase _database;
@@ -22,15 +21,18 @@ final class ProductsLocalDataSource implements IProductsLocalDataSource {
   Future<void> addProduct(ProductEntity product) {
     return _database.insertProduct(
       ProductsCompanion.insert(
+        id: product.id,
         name: product.productName,
         manufacturer: Value(product.productManufacturer),
         isToBuy: Value(product.isToBuy),
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
       ),
     );
   }
 
   @override
-  Future<Product> getProduct(int id) {
+  Future<Product> getProduct(String id) {
     return _database.getProductById(id);
   }
 
@@ -40,7 +42,29 @@ final class ProductsLocalDataSource implements IProductsLocalDataSource {
   }
 
   @override
-  Future<void> deleteProduct(int id) {
+  Future<void> deleteProduct(String id) {
     return _database.deleteProductById(id);
+  }
+
+  @override
+  Future<void> replaceProducts(List<ProductEntity> products) async {
+    await _database.replaceProducts(
+      products.map((e) => e.toDatabaseModel()).toList(),
+    );
+  }
+
+  @override
+  Future<void> upsertProduct(ProductEntity product) {
+    return _database.upsertProduct(product.toDatabaseModel());
+  }
+
+  @override
+  Future<List<Product>> getProducts() {
+    return _database.getProducts();
+  }
+
+  @override
+  Future<void> clearProducts() {
+    return _database.clearProducts();
   }
 }

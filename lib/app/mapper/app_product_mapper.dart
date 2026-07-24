@@ -9,6 +9,8 @@ extension ProductMapper on Product {
       productName: name,
       productManufacturer: manufacturer,
       isToBuy: isToBuy,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }
@@ -17,10 +19,12 @@ extension ProductMapper on Product {
 extension ProductEntityMapper on ProductEntity {
   Product toDatabaseModel() {
     return Product(
-      id: id!,
+      id: id,
       name: productName,
       manufacturer: productManufacturer,
       isToBuy: isToBuy,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }

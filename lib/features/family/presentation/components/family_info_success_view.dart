@@ -9,8 +9,8 @@ import '../../../profile/presentation/profile_routes.dart';
 import '../../domain/entity/family_entity.dart';
 import '../../domain/entity/family_member_info_entity.dart';
 import '../../domain/entity/family_role.dart';
-import '../../domain/state/family_delete/family_delete_bloc.dart';
-import '../../domain/state/family_remove_member/family_remove_member_bloc.dart';
+import '../../domain/state/family_delete_bloc/family_delete_bloc.dart';
+import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
 import '../../utils/family_member_action.dart';
 import 'family_info_member_tile.dart';
 

@@ -4,9 +4,8 @@ import 'package:family_product_plan/features/family/domain/entity/family_relatio
 import 'package:family_product_plan/features/family/domain/entity/family_role.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../domain/state/family_member/family_member_info_bloc.dart';
-import '../../domain/state/family_remove_member/family_remove_member_bloc.dart';
+import '../../domain/state/family_member_bloc/family_member_info_bloc.dart';
+import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
 import '../components/family_member_info_success_view.dart';
 
 class FamilyMemberInfoScreen extends StatelessWidget {
