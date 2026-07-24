@@ -29,7 +29,7 @@ class ProductAddEvent extends ProductsEvent {
   const ProductAddEvent({required this.product});
 
   /// Прордукт.
-  final ProductEntity product;
+  final ProductCreateEntity product;
 
   @override
   List<Object?> get props => [product];
@@ -40,7 +40,7 @@ class ProductGetEvent extends ProductsEvent {
   const ProductGetEvent({required this.id});
 
   /// Уникальный идентификатор.
-  final int id;
+  final String id;
 
   @override
   List<Object?> get props => [id];
@@ -51,7 +51,7 @@ class ProductDeleteEvent extends ProductsEvent {
   const ProductDeleteEvent({required this.id});
 
   /// Уникальный идентификатор.
-  final int id;
+  final String id;
 
   @override
   List<Object?> get props => [id];

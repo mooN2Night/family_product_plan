@@ -1,6 +1,7 @@
-import 'package:collection/collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:family_product_plan/app/error/app_exception.dart';
+import 'package:family_product_plan/app/services/family/i_current_family_provider.dart';
 import 'package:family_product_plan/features/family/data/dto/family_dto.dart';
 import 'package:family_product_plan/features/family/data/dto/family_member_dto.dart';
 import 'package:family_product_plan/features/family/data/dto/family_member_info_dto.dart';
@@ -22,14 +23,18 @@ final class FamilyRepository implements IFamilyRepository {
   const FamilyRepository({
     required FirebaseFirestore firestore,
     required FirebaseAuth firebaseAuth,
+    required ICurrentFamilyProvider currentFamilyProvider,
   }) : _firestore = firestore,
-       _firebaseAuth = firebaseAuth;
+       _firebaseAuth = firebaseAuth,
+       _currentFamilyProvider = currentFamilyProvider;
 
   /// Сервис удаленной бд.
   final FirebaseFirestore _firestore;
 
   /// Сервис авторизации
   final FirebaseAuth _firebaseAuth;
+
+  final ICurrentFamilyProvider _currentFamilyProvider;
 
   @override
   Future<String> createFamily({required String name}) async {
@@ -72,6 +77,8 @@ final class FamilyRepository implements IFamilyRepository {
           {'familyId': familyRef.id},
         );
       });
+
+      await _currentFamilyProvider.setCurrentFamilyId(familyRef.id);
 
       return familyRef.id;
     } on Object catch (error) {
@@ -239,6 +246,8 @@ final class FamilyRepository implements IFamilyRepository {
 
         transaction.update(userDoc.reference, {'familyId': family.id});
       });
+
+      await _currentFamilyProvider.setCurrentFamilyId(family.id);
     } on Object catch (error) {
       throw FamilyExceptionMapper.fromException(error);
     }
@@ -282,6 +291,7 @@ final class FamilyRepository implements IFamilyRepository {
 
         transaction.update(userRef, {'familyId': null});
       });
+      await _currentFamilyProvider.clearCurrentFamilyId();
     } on Object catch (error) {
       throw FamilyExceptionMapper.fromException(error);
     }
@@ -358,7 +368,7 @@ final class FamilyRepository implements IFamilyRepository {
         ).toEntity(familySnapshot.id);
 
         final currentMember = family.members.firstWhere(
-              (member) => member.userId == currentUser.uid,
+          (member) => member.userId == currentUser.uid,
         );
 
         if (currentMember.role != FamilyRole.owner) {
@@ -366,17 +376,15 @@ final class FamilyRepository implements IFamilyRepository {
         }
 
         for (final member in family.members) {
-          final userRef = _firestore
-              .collection('users')
-              .doc(member.userId);
+          final userRef = _firestore.collection('users').doc(member.userId);
 
-          transaction.update(userRef, {
-            'familyId': null,
-          });
+          transaction.update(userRef, {'familyId': null});
         }
 
         transaction.delete(familyRef);
       });
+
+      await _currentFamilyProvider.clearCurrentFamilyId();
     } on Object catch (error) {
       throw FamilyExceptionMapper.fromException(error);
     }

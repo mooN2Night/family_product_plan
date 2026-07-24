@@ -3,9 +3,12 @@ import 'package:family_product_plan/app/services/image_picker/i_image_picker.dar
 import 'package:family_product_plan/app/services/permission_hendler/app_permission_handler.dart';
 import 'package:family_product_plan/app/services/permission_hendler/i_permission_handler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/database/app_database.dart';
 import '../services/database/i_database.dart';
+import '../services/family/current_family_provider.dart';
+import '../services/family/i_current_family_provider.dart';
 import '../services/image_picker/app_image_picker.dart';
 import '../services/path_provider/i_path_provider.dart';
 import '../services/path_provider/app_path_provider.dart';
@@ -30,12 +33,17 @@ final class DiServices {
   /// Сервис удаленной базы данных приложения.
   late final FirebaseFirestore firestore;
 
+  late final ICurrentFamilyProvider currentFamilyProvider;
+
+  late final FlutterSecureStorage storage;
+
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
   // late final FirebaseStorage storage;
 
   /// Инициализирует сервисы приложения.
   Future<void> init() async {
     pathProvider = AppPathProvider();
+    storage = FlutterSecureStorage();
 
     final path = await pathProvider.getAppDocumentsDirectoryPath();
     database = AppDatabase(path);
@@ -47,5 +55,7 @@ final class DiServices {
     imagePicker = AppImagePickerService();
 
     permissionHandler = AppPermissionHandler();
+
+    currentFamilyProvider = CurrentFamilyProvider(storage: storage);
   }
 }

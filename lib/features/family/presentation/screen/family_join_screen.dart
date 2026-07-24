@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/ui_kit/app_box.dart';
-import '../../domain/state/family_join/family_join_bloc.dart';
+import '../../domain/state/family_join_bloc/family_join_bloc.dart';
 
 class FamilyJoinScreen extends StatelessWidget {
   const FamilyJoinScreen({super.key});
@@ -14,9 +14,13 @@ class FamilyJoinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final familyRepository = context.di.repositories.familyRepository;
+    final homeRepository = context.di.repositories.homeRepository;
 
     return BlocProvider(
-      create: (context) => FamilyJoinBloc(familyRepository: familyRepository),
+      create: (context) => FamilyJoinBloc(
+        familyRepository: familyRepository,
+        homeRepository: homeRepository,
+      ),
       child: FamilyJoinScreenView(),
     );
   }

@@ -10,8 +10,8 @@ import '../../../profile/presentation/components/profile_info.dart';
 import '../../../profile/presentation/profile_routes.dart';
 import '../../domain/entity/family_relation.dart';
 import '../../domain/entity/family_role.dart';
-import '../../domain/state/family_member/family_member_info_bloc.dart';
-import '../../domain/state/family_remove_member/family_remove_member_bloc.dart';
+import '../../domain/state/family_member_bloc/family_member_info_bloc.dart';
+import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
 import '../../utils/family_member_action.dart';
 
 class FamilyMemberInfoSuccessView extends StatelessWidget {

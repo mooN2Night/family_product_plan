@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../entity/product_entity.dart';
-import '../repository/i_home_repository.dart';
+import '../../entity/product_create_entity.dart';
+import '../../entity/product_entity.dart';
+import '../../repository/i_home_repository.dart';
 
 part 'products_event.dart';
 
@@ -20,10 +21,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     });
 
     on<ProductToggleEvent>((event, emit) async {
-      final updatedProduct = event.product.copyWith(
-        isToBuy: !event.product.isToBuy,
-      );
-      await _homeRepository.toggleProductStatus(updatedProduct);
+      await _homeRepository.toggleProductStatus(event.product);
     });
 
     on<ProductAddEvent>((event, emit) async {

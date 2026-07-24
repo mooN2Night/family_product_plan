@@ -1,3 +1,4 @@
+import '../entity/product_create_entity.dart';
 import '../entity/product_entity.dart';
 
 /// Интерфейс репозитория главного экрана
@@ -6,14 +7,18 @@ abstract interface class IHomeRepository {
   Stream<List<ProductEntity>> watchProducts();
 
   /// Добавление нового продукта
-  Future<void> addProduct(ProductEntity product);
+  Future<void> addProduct(ProductCreateEntity product);
 
   /// Получение продукта
-  Future<ProductEntity> getProduct(int id);
+  Future<ProductEntity> getProduct(String id);
 
   /// Переключение статуса "Нужно купить"
   Future<void> toggleProductStatus(ProductEntity product);
 
   /// Удаление продукта
-  Future<void> deleteProduct(int id);
+  Future<void> deleteProduct(String id);
+
+  Future<void> moveLocalProductsToFamily();
+
+  Future<void> clearLocalProducts();
 }

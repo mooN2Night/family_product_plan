@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../domain/state/family_create/family_create_bloc.dart';
+import '../../domain/state/family_create_bloc/family_create_bloc.dart';
 
 /// Экран создания семьи.
 class FamilyCreateScreen extends StatelessWidget {
@@ -15,9 +15,13 @@ class FamilyCreateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final familyRepository = context.di.repositories.familyRepository;
+    final homeRepository = context.di.repositories.homeRepository;
 
     return BlocProvider(
-      create: (context) => FamilyCreateBloc(familyRepository: familyRepository),
+      create: (context) => FamilyCreateBloc(
+        familyRepository: familyRepository,
+        homeRepository: homeRepository,
+      ),
       child: FamilyCreateScreenView(),
     );
   }
@@ -47,10 +51,7 @@ class _FamilyCreateScreenViewState extends State<FamilyCreateScreenView> {
       listener: (context, state) {
         switch (state) {
           case FamilyCreateSuccessState():
-            AppSnackBar.showSuccess(
-              context,
-              message: 'Семья успешно создана',
-            );
+            AppSnackBar.showSuccess(context, message: 'Семья успешно создана');
 
             context.pop();
           case FamilyCreateErrorState():

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/ui_kit/app_bar.dart';
-import '../../domain/state/family/family_bloc.dart';
-import '../../domain/state/family_delete/family_delete_bloc.dart';
-import '../../domain/state/family_remove_member/family_remove_member_bloc.dart';
+import '../../domain/state/family_bloc/family_bloc.dart';
+import '../../domain/state/family_delete_bloc/family_delete_bloc.dart';
+import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
 import '../components/family_info_success_view.dart';
 
 /// Экран информации о семье.

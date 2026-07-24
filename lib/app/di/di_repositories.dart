@@ -26,6 +26,8 @@ final class DiRepositories {
   void init({required DiContainer diContainer}) {
     homeRepository = HomeRepository(
       localDataSource: diContainer.dataSource.productsLocalDataSource,
+      remoteDataSource: diContainer.dataSource.productsRemoteDataSource,
+      currentFamilyProvider: diContainer.services.currentFamilyProvider,
     );
 
     authRepository = AuthRepository(
@@ -41,6 +43,7 @@ final class DiRepositories {
     familyRepository = FamilyRepository(
       firestore: diContainer.services.firestore,
       firebaseAuth: diContainer.services.firebaseAuth,
+      currentFamilyProvider: diContainer.services.currentFamilyProvider,
     );
   }
 }
