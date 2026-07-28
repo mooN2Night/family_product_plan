@@ -1,6 +1,6 @@
 part of 'family_remove_member_bloc.dart';
 
-/// Класс базового события удаления семьи.
+/// Класс базового события выхода/удаления пользователя из семьи.
 sealed class FamilyRemoveMemberEvent extends Equatable {
   const FamilyRemoveMemberEvent();
 
@@ -8,7 +8,7 @@ sealed class FamilyRemoveMemberEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Событие удаления самого себя из семьи.
+/// Событие выхода из семьи.
 final class FamilyRemoveMemberYourselfEvent extends FamilyRemoveMemberEvent {
   const FamilyRemoveMemberYourselfEvent({required this.familyId});
 

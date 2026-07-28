@@ -34,6 +34,7 @@ final class FamilyRepository implements IFamilyRepository {
   /// Сервис авторизации
   final FirebaseAuth _firebaseAuth;
 
+  /// Провайдер текущей выбранной семьи.
   final ICurrentFamilyProvider _currentFamilyProvider;
 
   @override

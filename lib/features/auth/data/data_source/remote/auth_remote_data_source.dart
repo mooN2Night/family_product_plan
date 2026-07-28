@@ -19,8 +19,10 @@ final class AuthRemoteDataSource implements IAuthRemoteDataSource {
   /// Сервис авторизации
   final FirebaseAuth _firebaseAuth;
 
+  /// Сервис удаленной бд.
   final FirebaseFirestore _firestore;
 
+  /// Провайдер текущей выбранной семьи.
   final ICurrentFamilyProvider _currentFamilyProvider;
 
   @override

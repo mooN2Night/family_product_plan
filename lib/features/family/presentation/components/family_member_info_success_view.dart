@@ -14,6 +14,7 @@ import '../../domain/state/family_member_bloc/family_member_info_bloc.dart';
 import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
 import '../../utils/family_member_action.dart';
 
+/// Экран с информацией об участнике семьи.
 class FamilyMemberInfoSuccessView extends StatelessWidget {
   const FamilyMemberInfoSuccessView({
     required this.familyId,
@@ -25,11 +26,22 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
     super.key,
   });
 
+  /// Идентификатор семьи.
   final String familyId;
+
+  /// Информация о пользователе.
   final ProfileUserEntity user;
+
+  /// Роль пользователя в семье.
   final FamilyRole role;
+
+  /// Статус пользователя в семье.
   final FamilyRelation relation;
+
+  /// Определяет, можно ли изменять статус участника.
   final bool canEditRelation;
+
+  /// Указывает, является ли открытый профиль текущим пользователем.
   final bool isCurrentUser;
 
   @override
@@ -149,6 +161,7 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
   }
 }
 
+/// Поле отображения или изменения статуса участника в семье.
 class _FamilyRelationField extends StatelessWidget {
   const _FamilyRelationField({
     required this.relation,
@@ -156,8 +169,13 @@ class _FamilyRelationField extends StatelessWidget {
     required this.onChanged,
   });
 
+  /// Текущий статус участника.
   final FamilyRelation relation;
+
+  /// Определяет, доступно ли редактирование статуса.
   final bool canEdit;
+
+  /// Вызывается при изменении статуса.
   final ValueChanged<FamilyRelation> onChanged;
 
   @override

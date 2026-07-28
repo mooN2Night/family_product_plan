@@ -3,22 +3,18 @@ import '../../../domain/entity/product_entity.dart';
 import '../../dto/product_dto.dart';
 import 'i_product_remote_data_source.dart';
 
+/// Реализация удалённого источника данных для работы с продуктами.
 final class ProductsRemoteDataSource implements IProductsRemoteDataSource {
   const ProductsRemoteDataSource({required FirebaseFirestore firestore})
     : _firestore = firestore;
 
+  /// Сервис удаленной бд.
   final FirebaseFirestore _firestore;
 
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> watchProducts({
     required String familyId,
-  }) {
-    return _collection(familyId).snapshots();
-    // return _collection(familyId).snapshots().map(
-    //   (snapshot) =>
-    //       snapshot.docs.map((e) => ProductDto.fromJson(e.data())).toList(),
-    // );
-  }
+  }) => _collection(familyId).snapshots();
 
   @override
   Future<List<ProductDto>> getProducts({required String familyId}) async {
@@ -54,6 +50,7 @@ final class ProductsRemoteDataSource implements IProductsRemoteDataSource {
     return _collection(familyId).doc(productId).delete();
   }
 
+  /// Возвращает коллекцию продуктов указанной семьи.
   CollectionReference<Map<String, dynamic>> _collection(String familyId) {
     return _firestore
         .collection('families')

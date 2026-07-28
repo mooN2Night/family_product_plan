@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../data/dto/product_create_dto.dart';
 
-/// Сущность создания продукта.
+/// Сущность, содержащая данные для создания нового продукта.
 class ProductCreateEntity extends Equatable {
   const ProductCreateEntity({
     required this.productName,
@@ -10,13 +10,13 @@ class ProductCreateEntity extends Equatable {
     required this.isToBuy,
   });
 
-  /// Имя продукта.
+  /// Название продукта.
   final String productName;
 
-  /// Производитель продукта
+  /// Производитель продукта.
   final String productManufacturer;
 
-  /// Флаг необходимости покупки
+  /// Признак необходимости покупки.
   final bool isToBuy;
 
   /// Метод для частичного изменения полей продукта
@@ -32,6 +32,7 @@ class ProductCreateEntity extends Equatable {
     );
   }
 
+  /// Преобразует сущность в DTO.
   ProductCreateDto toDto() {
     return ProductCreateDto(
       productName: productName,

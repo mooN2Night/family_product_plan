@@ -18,7 +18,9 @@ abstract interface class IHomeRepository {
   /// Удаление продукта
   Future<void> deleteProduct(String id);
 
+  /// Переносит локальные продукты в семейное хранилище.
   Future<void> moveLocalProductsToFamily();
 
+  /// Удаляет все локально сохранённые продукты.
   Future<void> clearLocalProducts();
 }

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:family_product_plan/app/services/image_picker/i_image_picker.dart';
+import 'package:family_product_plan/app/services/network/i_network_service.dart';
+import 'package:family_product_plan/app/services/network/network_service.dart';
 import 'package:family_product_plan/app/services/permission_hendler/app_permission_handler.dart';
 import 'package:family_product_plan/app/services/permission_hendler/i_permission_handler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +14,7 @@ import '../services/family/i_current_family_provider.dart';
 import '../services/image_picker/app_image_picker.dart';
 import '../services/path_provider/i_path_provider.dart';
 import '../services/path_provider/app_path_provider.dart';
+import 'di_container.dart';
 
 /// Контейнер сервисов приложения.
 final class DiServices {
@@ -33,15 +36,20 @@ final class DiServices {
   /// Сервис удаленной базы данных приложения.
   late final FirebaseFirestore firestore;
 
+  /// Провайдер текущей выбранной семьи.
   late final ICurrentFamilyProvider currentFamilyProvider;
 
+  /// Безопасное локальное хранилище.
   late final FlutterSecureStorage storage;
+
+  /// Сервис проверки наличия интеренета.
+  late final INetworkService networkService;
 
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
   // late final FirebaseStorage storage;
 
   /// Инициализирует сервисы приложения.
-  Future<void> init() async {
+  Future<void> init({required DiContainer diContainer}) async {
     pathProvider = AppPathProvider();
     storage = FlutterSecureStorage();
 
@@ -57,5 +65,7 @@ final class DiServices {
     permissionHandler = AppPermissionHandler();
 
     currentFamilyProvider = CurrentFamilyProvider(storage: storage);
+
+    networkService = NetworkService();
   }
 }

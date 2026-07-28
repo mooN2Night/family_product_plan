@@ -1,5 +1,7 @@
 import 'package:family_product_plan/features/auth/data/repository/auth_repository.dart';
 import 'package:family_product_plan/features/auth/domain/repository/i_auth_repository.dart';
+import 'package:family_product_plan/features/current_family/data/repository/current_family_repository.dart';
+import 'package:family_product_plan/features/current_family/domain/repository/i_current_family_repository.dart';
 import 'package:family_product_plan/features/family/data/repository/family_repository.dart';
 import 'package:family_product_plan/features/family/domain/repository/i_family_repository.dart';
 import 'package:family_product_plan/features/home/data/repository/home_repository.dart';
@@ -22,12 +24,17 @@ final class DiRepositories {
   /// Репозиторий для работы с экраном семьи.
   late final IFamilyRepository familyRepository;
 
+  /// Репозиторий для получения id семьи.
+  late final ICurrentFamilyRepository currentFamilyRepository;
+
   /// Инициализирует репозитории приложения.
   void init({required DiContainer diContainer}) {
     homeRepository = HomeRepository(
       localDataSource: diContainer.dataSource.productsLocalDataSource,
       remoteDataSource: diContainer.dataSource.productsRemoteDataSource,
       currentFamilyProvider: diContainer.services.currentFamilyProvider,
+      pendingSyncService: diContainer.business.pendingSyncService,
+      networkService: diContainer.services.networkService,
     );
 
     authRepository = AuthRepository(
@@ -44,6 +51,12 @@ final class DiRepositories {
       firestore: diContainer.services.firestore,
       firebaseAuth: diContainer.services.firebaseAuth,
       currentFamilyProvider: diContainer.services.currentFamilyProvider,
+    );
+
+    currentFamilyRepository = CurrentFamilyRepository(
+      provider: diContainer.services.currentFamilyProvider,
+      firestore: diContainer.services.firestore,
+      firebaseAuth: diContainer.services.firebaseAuth,
     );
   }
 }

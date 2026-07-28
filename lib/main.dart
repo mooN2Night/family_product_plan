@@ -21,6 +21,8 @@ Future<void> _run() async {
 
     final diContainer = await _initDependencies();
 
+    await diContainer.business.syncManager.start();
+
     final authBloc = AuthBloc(
       authRepository: diContainer.repositories.authRepository,
     )..add(const AuthStartedEvent());

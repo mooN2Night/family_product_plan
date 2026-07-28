@@ -8,6 +8,7 @@ import '../../domain/state/family_member_bloc/family_member_info_bloc.dart';
 import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
 import '../components/family_member_info_success_view.dart';
 
+/// Экран с информацией об участнике семьи.
 class FamilyMemberInfoScreen extends StatelessWidget {
   const FamilyMemberInfoScreen({
     required this.userId,
@@ -19,11 +20,22 @@ class FamilyMemberInfoScreen extends StatelessWidget {
     super.key,
   });
 
+  /// Идентификатор пользователя.
   final String userId;
+
+  /// Идентификатор семьи.
   final String familyId;
+
+  /// Роль пользователя в семье.
   final String role;
+
+  /// Статус пользователя в семье.
   final String relation;
+
+  /// Определяет, можно ли изменять статус участника.
   final bool canEditRelation;
+
+  /// Указывает, является ли открытый профиль текущим пользователем.
   final bool isCurrentUser;
 
   @override
@@ -44,7 +56,7 @@ class FamilyMemberInfoScreen extends StatelessWidget {
               FamilyRemoveMemberBloc(familyRepository: familyRepository),
         ),
       ],
-      child: FamilyMemberInfoScreenView(
+      child: _FamilyMemberInfoScreenView(
         familyId: familyId,
         role: FamilyRole.fromString(role),
         relation: FamilyRelation.fromString(relation),
@@ -55,20 +67,29 @@ class FamilyMemberInfoScreen extends StatelessWidget {
   }
 }
 
-class FamilyMemberInfoScreenView extends StatelessWidget {
-  const FamilyMemberInfoScreenView({
+/// Виджет, отображающий содержимое экрана информации об участнике семьи.
+class _FamilyMemberInfoScreenView extends StatelessWidget {
+  const _FamilyMemberInfoScreenView({
     required this.familyId,
     required this.role,
     required this.relation,
     required this.canEditRelation,
     required this.isCurrentUser,
-    super.key,
   });
 
+  /// Идентификатор семьи.
   final String familyId;
+
+  /// Роль пользователя в семье.
   final FamilyRole role;
+
+  /// Статус пользователя в семье.
   final FamilyRelation relation;
+
+  /// Определяет, можно ли изменять статус участника.
   final bool canEditRelation;
+
+  /// Указывает, является ли открытый профиль текущим пользователем.
   final bool isCurrentUser;
 
   @override

@@ -425,15 +425,394 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   }
 }
 
+class $PendingSyncOperationsTable extends PendingSyncOperations
+    with TableInfo<$PendingSyncOperationsTable, PendingSyncOperation> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PendingSyncOperationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _operationMeta = const VerificationMeta(
+    'operation',
+  );
+  @override
+  late final GeneratedColumn<String> operation = GeneratedColumn<String>(
+    'operation',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _entityIdMeta = const VerificationMeta(
+    'entityId',
+  );
+  @override
+  late final GeneratedColumn<String> entityId = GeneratedColumn<String>(
+    'entity_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    operation,
+    entityId,
+    payload,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pending_sync_operations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PendingSyncOperation> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('operation')) {
+      context.handle(
+        _operationMeta,
+        operation.isAcceptableOrUnknown(data['operation']!, _operationMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_operationMeta);
+    }
+    if (data.containsKey('entity_id')) {
+      context.handle(
+        _entityIdMeta,
+        entityId.isAcceptableOrUnknown(data['entity_id']!, _entityIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entityIdMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PendingSyncOperation map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PendingSyncOperation(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      operation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operation'],
+      )!,
+      entityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity_id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PendingSyncOperationsTable createAlias(String alias) {
+    return $PendingSyncOperationsTable(attachedDatabase, alias);
+  }
+}
+
+class PendingSyncOperation extends DataClass
+    implements Insertable<PendingSyncOperation> {
+  /// Уникальный идентификатор операции.
+  final String id;
+
+  /// Тип операции.
+  final String operation;
+
+  /// Идентификатор продукта.
+  final String entityId;
+
+  /// Json продукта.
+  final String? payload;
+
+  /// Время создания операции.
+  final DateTime createdAt;
+  const PendingSyncOperation({
+    required this.id,
+    required this.operation,
+    required this.entityId,
+    this.payload,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['operation'] = Variable<String>(operation);
+    map['entity_id'] = Variable<String>(entityId);
+    if (!nullToAbsent || payload != null) {
+      map['payload'] = Variable<String>(payload);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  PendingSyncOperationsCompanion toCompanion(bool nullToAbsent) {
+    return PendingSyncOperationsCompanion(
+      id: Value(id),
+      operation: Value(operation),
+      entityId: Value(entityId),
+      payload: payload == null && nullToAbsent
+          ? const Value.absent()
+          : Value(payload),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory PendingSyncOperation.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PendingSyncOperation(
+      id: serializer.fromJson<String>(json['id']),
+      operation: serializer.fromJson<String>(json['operation']),
+      entityId: serializer.fromJson<String>(json['entityId']),
+      payload: serializer.fromJson<String?>(json['payload']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'operation': serializer.toJson<String>(operation),
+      'entityId': serializer.toJson<String>(entityId),
+      'payload': serializer.toJson<String?>(payload),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  PendingSyncOperation copyWith({
+    String? id,
+    String? operation,
+    String? entityId,
+    Value<String?> payload = const Value.absent(),
+    DateTime? createdAt,
+  }) => PendingSyncOperation(
+    id: id ?? this.id,
+    operation: operation ?? this.operation,
+    entityId: entityId ?? this.entityId,
+    payload: payload.present ? payload.value : this.payload,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  PendingSyncOperation copyWithCompanion(PendingSyncOperationsCompanion data) {
+    return PendingSyncOperation(
+      id: data.id.present ? data.id.value : this.id,
+      operation: data.operation.present ? data.operation.value : this.operation,
+      entityId: data.entityId.present ? data.entityId.value : this.entityId,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingSyncOperation(')
+          ..write('id: $id, ')
+          ..write('operation: $operation, ')
+          ..write('entityId: $entityId, ')
+          ..write('payload: $payload, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, operation, entityId, payload, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PendingSyncOperation &&
+          other.id == this.id &&
+          other.operation == this.operation &&
+          other.entityId == this.entityId &&
+          other.payload == this.payload &&
+          other.createdAt == this.createdAt);
+}
+
+class PendingSyncOperationsCompanion
+    extends UpdateCompanion<PendingSyncOperation> {
+  final Value<String> id;
+  final Value<String> operation;
+  final Value<String> entityId;
+  final Value<String?> payload;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const PendingSyncOperationsCompanion({
+    this.id = const Value.absent(),
+    this.operation = const Value.absent(),
+    this.entityId = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PendingSyncOperationsCompanion.insert({
+    required String id,
+    required String operation,
+    required String entityId,
+    this.payload = const Value.absent(),
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       operation = Value(operation),
+       entityId = Value(entityId),
+       createdAt = Value(createdAt);
+  static Insertable<PendingSyncOperation> custom({
+    Expression<String>? id,
+    Expression<String>? operation,
+    Expression<String>? entityId,
+    Expression<String>? payload,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (operation != null) 'operation': operation,
+      if (entityId != null) 'entity_id': entityId,
+      if (payload != null) 'payload': payload,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PendingSyncOperationsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? operation,
+    Value<String>? entityId,
+    Value<String?>? payload,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return PendingSyncOperationsCompanion(
+      id: id ?? this.id,
+      operation: operation ?? this.operation,
+      entityId: entityId ?? this.entityId,
+      payload: payload ?? this.payload,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (operation.present) {
+      map['operation'] = Variable<String>(operation.value);
+    }
+    if (entityId.present) {
+      map['entity_id'] = Variable<String>(entityId.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingSyncOperationsCompanion(')
+          ..write('id: $id, ')
+          ..write('operation: $operation, ')
+          ..write('entityId: $entityId, ')
+          ..write('payload: $payload, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ProductsTable products = $ProductsTable(this);
+  late final $PendingSyncOperationsTable pendingSyncOperations =
+      $PendingSyncOperationsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [products];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    products,
+    pendingSyncOperations,
+  ];
 }
 
 typedef $$ProductsTableCreateCompanionBuilder =
@@ -651,10 +1030,231 @@ typedef $$ProductsTableProcessedTableManager =
       Product,
       PrefetchHooks Function()
     >;
+typedef $$PendingSyncOperationsTableCreateCompanionBuilder =
+    PendingSyncOperationsCompanion Function({
+      required String id,
+      required String operation,
+      required String entityId,
+      Value<String?> payload,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$PendingSyncOperationsTableUpdateCompanionBuilder =
+    PendingSyncOperationsCompanion Function({
+      Value<String> id,
+      Value<String> operation,
+      Value<String> entityId,
+      Value<String?> payload,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$PendingSyncOperationsTableFilterComposer
+    extends Composer<_$AppDatabase, $PendingSyncOperationsTable> {
+  $$PendingSyncOperationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get operation => $composableBuilder(
+    column: $table.operation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PendingSyncOperationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PendingSyncOperationsTable> {
+  $$PendingSyncOperationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get operation => $composableBuilder(
+    column: $table.operation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PendingSyncOperationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PendingSyncOperationsTable> {
+  $$PendingSyncOperationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get operation =>
+      $composableBuilder(column: $table.operation, builder: (column) => column);
+
+  GeneratedColumn<String> get entityId =>
+      $composableBuilder(column: $table.entityId, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$PendingSyncOperationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PendingSyncOperationsTable,
+          PendingSyncOperation,
+          $$PendingSyncOperationsTableFilterComposer,
+          $$PendingSyncOperationsTableOrderingComposer,
+          $$PendingSyncOperationsTableAnnotationComposer,
+          $$PendingSyncOperationsTableCreateCompanionBuilder,
+          $$PendingSyncOperationsTableUpdateCompanionBuilder,
+          (
+            PendingSyncOperation,
+            BaseReferences<
+              _$AppDatabase,
+              $PendingSyncOperationsTable,
+              PendingSyncOperation
+            >,
+          ),
+          PendingSyncOperation,
+          PrefetchHooks Function()
+        > {
+  $$PendingSyncOperationsTableTableManager(
+    _$AppDatabase db,
+    $PendingSyncOperationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PendingSyncOperationsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$PendingSyncOperationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PendingSyncOperationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> operation = const Value.absent(),
+                Value<String> entityId = const Value.absent(),
+                Value<String?> payload = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PendingSyncOperationsCompanion(
+                id: id,
+                operation: operation,
+                entityId: entityId,
+                payload: payload,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String operation,
+                required String entityId,
+                Value<String?> payload = const Value.absent(),
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PendingSyncOperationsCompanion.insert(
+                id: id,
+                operation: operation,
+                entityId: entityId,
+                payload: payload,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PendingSyncOperationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PendingSyncOperationsTable,
+      PendingSyncOperation,
+      $$PendingSyncOperationsTableFilterComposer,
+      $$PendingSyncOperationsTableOrderingComposer,
+      $$PendingSyncOperationsTableAnnotationComposer,
+      $$PendingSyncOperationsTableCreateCompanionBuilder,
+      $$PendingSyncOperationsTableUpdateCompanionBuilder,
+      (
+        PendingSyncOperation,
+        BaseReferences<
+          _$AppDatabase,
+          $PendingSyncOperationsTable,
+          PendingSyncOperation
+        >,
+      ),
+      PendingSyncOperation,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$ProductsTableTableManager get products =>
       $$ProductsTableTableManager(_db, _db.products);
+  $$PendingSyncOperationsTableTableManager get pendingSyncOperations =>
+      $$PendingSyncOperationsTableTableManager(_db, _db.pendingSyncOperations);
 }

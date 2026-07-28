@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/ui_kit/app_box.dart';
 import '../../domain/state/family_join_bloc/family_join_bloc.dart';
 
+/// Класс для реализация экрана присоединения к семье.
 class FamilyJoinScreen extends StatelessWidget {
   const FamilyJoinScreen({super.key});
 
@@ -26,6 +27,7 @@ class FamilyJoinScreen extends StatelessWidget {
   }
 }
 
+/// Класс для реализация содержимого экрана в зависимости от состояния.
 class FamilyJoinScreenView extends StatefulWidget {
   const FamilyJoinScreenView({super.key});
 

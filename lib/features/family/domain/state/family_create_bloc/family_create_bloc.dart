@@ -10,7 +10,7 @@ part 'family_create_event.dart';
 
 part 'family_create_state.dart';
 
-/// Блок управлением состоянием экрана семьи
+/// Блок управлением состоянием экрана создания семьи
 final class FamilyCreateBloc
     extends Bloc<FamilyCreateEvent, FamilyCreateState> {
   FamilyCreateBloc({

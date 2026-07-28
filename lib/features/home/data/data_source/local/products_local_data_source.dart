@@ -5,7 +5,7 @@ import '../../../../../app/services/database/i_database.dart';
 import '../../../domain/entity/product_entity.dart';
 import 'i_products_local_data_source.dart';
 
-/// Реализация локального хр`анения продуктов
+/// Реализация локального хранения продуктов
 final class ProductsLocalDataSource implements IProductsLocalDataSource {
   ProductsLocalDataSource({required IDatabase database}) : _database = database;
 

@@ -10,7 +10,7 @@ part 'family_join_event.dart';
 
 part 'family_join_state.dart';
 
-/// Блок управлением состоянием экрана семьи
+/// Блок управлением состоянием экрана вступления в семью
 final class FamilyJoinBloc extends Bloc<FamilyJoinEvent, FamilyJoinState> {
   FamilyJoinBloc({
     required IFamilyRepository familyRepository,
@@ -27,6 +27,7 @@ final class FamilyJoinBloc extends Bloc<FamilyJoinEvent, FamilyJoinState> {
   /// Репозиторий главного экрана
   final IHomeRepository _homeRepository;
 
+  /// Метод для вступления в семью
   Future<void> _joinFamily(
     FamilyJoinRequestedEvent event,
     Emitter<FamilyJoinState> emit,

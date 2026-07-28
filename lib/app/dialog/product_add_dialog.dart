@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/home/domain/entity/product_create_entity.dart';
-import '../../features/home/domain/state/products_bloc/products_bloc.dart';
+import '../../features/home/domain/state/products_action_bloc/products_action_bloc.dart';
 import '../ui_kit/app_box.dart';
 import '../ui_kit/app_snack_bar.dart';
 
@@ -16,20 +16,20 @@ import '../ui_kit/app_snack_bar.dart';
 /// - iOS — [CupertinoAlertDialog];
 /// - Android и другие платформы — [AlertDialog].
 Future<void> showAddProductDialog(BuildContext parentContext) async {
-  final productsBloc = parentContext.read<ProductsBloc>();
+  final productsActionBloc = parentContext.read<ProductsActionBloc>();
 
   if (Platform.isIOS) {
     await showCupertinoDialog(
       context: parentContext,
       builder: (context) {
-        return _Dialog(productsBloc: productsBloc);
+        return _Dialog(productsActionBloc: productsActionBloc);
       },
     );
   } else {
     await showDialog(
       context: parentContext,
       builder: (context) {
-        return _Dialog(productsBloc: productsBloc);
+        return _Dialog(productsActionBloc: productsActionBloc);
       },
     );
   }
@@ -37,10 +37,10 @@ Future<void> showAddProductDialog(BuildContext parentContext) async {
 
 /// Диалог добавления нового продукта.
 class _Dialog extends StatefulWidget {
-  const _Dialog({required this.productsBloc});
+  const _Dialog({required this.productsActionBloc});
 
   /// BLoC для управления списком продуктов.
-  final ProductsBloc productsBloc;
+  final ProductsActionBloc productsActionBloc;
 
   @override
   State<_Dialog> createState() => _DialogState();
@@ -120,7 +120,9 @@ class _DialogState extends State<_Dialog> {
                 isToBuy: _isNeedToBuy,
               );
 
-              widget.productsBloc.add(ProductAddEvent(product: product));
+              widget.productsActionBloc.add(
+                ProductActionAddEvent(product: product),
+              );
               context.pop();
             } else {
               AppSnackBar.showError(

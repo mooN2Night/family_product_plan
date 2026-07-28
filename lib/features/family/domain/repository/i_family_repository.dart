@@ -38,7 +38,7 @@ abstract interface class IFamilyRepository {
     required String memberId,
   });
 
-  /// УДалить всю семью.
+  /// Удалить всю семью.
   Future<void> deleteFamily({
     required String familyId,
   });

@@ -1,23 +1,36 @@
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart';
+
 import 'i_current_family_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+/// Реализация [ICurrentFamilyProvider], использующая [FlutterSecureStorage] для
+/// хранения идентификатора текущей семьи.
 final class CurrentFamilyProvider implements ICurrentFamilyProvider {
   CurrentFamilyProvider({required FlutterSecureStorage storage})
-    : _storage = storage {
-    _init();
-  }
+    : _storage = storage;
 
+  /// Безопасное локальное хранилище.
   final FlutterSecureStorage _storage;
 
-  final _controller = StreamController<String?>.broadcast();
+  /// Контроллер, уведомляющий подписчиков об изменении текущей семьи.
+  final _controller = BehaviorSubject<String?>();
 
+  /// Ключ для хранения идентификатора семьи.
   static const _key = 'current_family_id';
 
   @override
-  Future<String?> getCurrentFamilyId() {
-    return _storage.read(key: _key);
+  Future<String?> getCurrentFamilyId() async {
+    final cached = _controller.valueOrNull;
+    if (cached != null) {
+      return cached;
+    }
+
+    final value = await _storage.read(key: _key);
+    _controller.add(value);
+
+    return value;
   }
 
   @override
@@ -38,12 +51,16 @@ final class CurrentFamilyProvider implements ICurrentFamilyProvider {
   }
 
   @override
-  Stream<String?> watchCurrentFamilyId() => _controller.stream;
+  Stream<String?> watchCurrentFamilyId() async* {
+    if (!_controller.hasValue) {
+      final value = await _storage.read(key: _key);
+      _controller.add(value);
+    }
 
-  Future<void> _init() async {
-    _controller.add(await getCurrentFamilyId());
+    yield* _controller.stream;
   }
 
+  /// Освобождает ресурсы провайдера.
   void dispose() {
     _controller.close();
   }

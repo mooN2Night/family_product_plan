@@ -3,43 +3,20 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:family_product_plan/app/services/database/i_database.dart';
+import 'package:family_product_plan/app/services/database/pending_sync_operations_table.dart';
+import 'package:family_product_plan/app/services/database/products_table.dart';
 import 'package:path/path.dart' as p;
 
 part 'app_database.g.dart';
 
-/// Таблица продуктов.
-class Products extends Table {
-  /// Уникальный идентификатор продукта. Генерируется автоматически при создании записи.
-  TextColumn get id => text()();
-
-  /// Наименование продукта.
-  TextColumn get name => text()();
-
-  /// Производитель продукта.
-  TextColumn get manufacturer => text().withDefault(const Constant(''))();
-
-  /// Флаг необходимости покупки продукта.
-  BoolColumn get isToBuy => boolean().withDefault(const Constant(false))();
-
-  /// Дата создания.
-  DateTimeColumn get createdAt => dateTime()();
-
-  /// Дата последнего обновления.
-  DateTimeColumn get updatedAt => dateTime()();
-
-  @override
-  Set<Column<Object>>? get primaryKey => {id};
-}
-
 /// Основная база данных приложения.
-@DriftDatabase(tables: [Products])
+@DriftDatabase(tables: [Products, PendingSyncOperations])
 class AppDatabase extends _$AppDatabase implements IDatabase {
   AppDatabase(this.path) : super(_openConnection(path));
 
   /// Путь к директории хранения файла базы данных.
   final String path;
 
-  /// Текущая версия схемы базы данных.
   @override
   int get schemaVersion => 1;
 
@@ -86,6 +63,42 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   @override
   Future<void> clearProducts() {
     return delete(products).go();
+  }
+
+  @override
+  Future<void> insertPendingSyncOperation(
+      PendingSyncOperationsCompanion entity,
+      ) {
+    return into(pendingSyncOperations).insertOnConflictUpdate(entity);
+  }
+
+  @override
+  Future<void> updatePendingSyncOperation(
+      PendingSyncOperation entity,
+      ) {
+    return update(pendingSyncOperations).replace(entity);
+  }
+
+  @override
+  Future<void> deletePendingSyncOperationById(String id) {
+    return (delete(
+      pendingSyncOperations,
+    )..where((t) => t.id.equals(id))).go();
+  }
+
+  @override
+  Future<List<PendingSyncOperation>> getPendingSyncOperations() {
+    return select(pendingSyncOperations).get();
+  }
+
+  @override
+  Stream<List<PendingSyncOperation>> watchPendingSyncOperations() {
+    return select(pendingSyncOperations).watch();
+  }
+
+  @override
+  Future<void> clearPendingSyncOperations() {
+    return delete(pendingSyncOperations).go();
   }
 }
 

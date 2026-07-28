@@ -1,7 +1,9 @@
 import 'package:family_product_plan/app/di/di_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../features/auth/domain/state/auth_bloc.dart';
+import '../features/current_family/domain/state/current_family_cubit.dart';
 
 /// Регистрирует зависимости приложения в дереве виджетов.
 class AppProviders extends StatelessWidget {
@@ -26,13 +28,17 @@ class AppProviders extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider.value(value: diContainer),
-        Provider.value(value: authBloc),
+        BlocProvider.value(value: authBloc),
+        BlocProvider(
+          create: (_) => CurrentFamilyCubit(
+            repository: diContainer.repositories.currentFamilyRepository,
+          )..initialize(),
+        ),
       ],
       child: child,
     );
   }
 }
-
 
 // BlocProvider.value(
 //   value: authBloc,

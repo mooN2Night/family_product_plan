@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Информационная карточка о режиме локального хранения продуктов.
 class HomeInfoModalView extends StatelessWidget {
   const HomeInfoModalView({super.key});
 
@@ -8,19 +9,23 @@ class HomeInfoModalView extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.all(16),
       color: Colors.amber.shade100,
-      child: const Padding(
+      child: Padding(
         padding: EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
           children: [
-            Icon(Icons.info_outline),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Сейчас список хранится только на этом устройстве.\n\n'
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.info_outline),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Сейчас список хранится только на этом устройстве.\n\n'
                     'Создайте или вступите в семью, чтобы делиться списком покупок '
                     'и синхронизировать изменения между всеми участниками.',
-              ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'package:family_product_plan/app/di/di_business.dart';
 import 'package:family_product_plan/app/di/di_data_sources.dart';
 import 'package:family_product_plan/app/di/di_repositories.dart';
 import 'package:family_product_plan/app/di/di_services.dart';
@@ -16,12 +17,17 @@ final class DiContainer {
   /// Контейнер источников данных приложения.
   late final DiDataSources dataSource;
 
+  /// Контейнер источников данных приложения.
+  late final DiBusiness business;
+
   /// Инициализирует все зависимости приложения.
   Future<void> init() async {
     services = DiServices();
-    await services.init();
+    await services.init(diContainer: this);
 
     dataSource = DiDataSources()..init(diContainer: this);
+
+    business = DiBusiness()..init(diContainer: this);
 
     repositories = DiRepositories()..init(diContainer: this);
   }
