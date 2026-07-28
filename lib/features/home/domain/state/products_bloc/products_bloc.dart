@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../entity/product_create_entity.dart';
 import '../../entity/product_entity.dart';
 import '../../repository/i_home_repository.dart';
 
@@ -14,31 +13,9 @@ part 'products_state.dart';
 class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   ProductsBloc({required IHomeRepository homeRepository})
     : _homeRepository = homeRepository,
-      super(const ProductsState(isLoading: true)) {
+      super(const ProductsInitialState()) {
     on<ProductsWatchEvent>(_watchProducts);
-    on<_UpdateProductsInternalEvent>((event, emit) {
-      emit(ProductsState(products: event.products));
-    });
-
-    on<ProductToggleEvent>((event, emit) async {
-      await _homeRepository.toggleProductStatus(event.product);
-    });
-
-    on<ProductAddEvent>((event, emit) async {
-      await _homeRepository.addProduct(event.product);
-    });
-
-    on<ProductGetEvent>((event, emit) async {
-      emit(state.copyWith(isLoading: true));
-
-      final product = await _homeRepository.getProduct(event.id);
-
-      emit(ProductsState(products: [product]));
-    });
-
-    on<ProductDeleteEvent>((event, emit) async {
-      await _homeRepository.deleteProduct(event.id);
-    });
+    on<_ProductsUpdatedEvent>(_onProductsUpdated);
   }
 
   /// Репозиторий для запросов
@@ -52,12 +29,25 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     ProductsWatchEvent event,
     Emitter<ProductsState> emit,
   ) async {
+    emit(const ProductsLoadingState());
+
     await _subscription?.cancel();
 
     _subscription = _homeRepository.watchProducts().listen(
-      (products) => add(_UpdateProductsInternalEvent(products)),
+      (products) {
+        add(_ProductsUpdatedEvent(products));
+      },
+      onError: (error) {
+        emit(ProductsErrorState(error.toString()));
+      },
     );
   }
+
+  /// Метод для эмита успешного состояния.
+  void _onProductsUpdated(
+    _ProductsUpdatedEvent event,
+    Emitter<ProductsState> emit,
+  ) => emit(ProductsSuccessState(products: event.products));
 
   @override
   Future<void> close() async {
@@ -67,9 +57,10 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 }
 
 /// Внутреннее событие для обновления списка из стрима
-class _UpdateProductsInternalEvent extends ProductsEvent {
-  const _UpdateProductsInternalEvent(this.products);
+class _ProductsUpdatedEvent extends ProductsEvent {
+  const _ProductsUpdatedEvent(this.products);
 
+  /// Список продуктов.
   final List<ProductEntity> products;
 
   @override

@@ -12,7 +12,7 @@ part 'family_member_info_event.dart';
 
 part 'family_member_info_state.dart';
 
-/// Блок управлением состоянием экрана семьи
+/// Блок управлением состоянием экрана информации об участнике семьи
 final class FamilyMemberInfoBloc
     extends Bloc<FamilyMemberInfoEvent, FamilyMemberInfoState> {
   FamilyMemberInfoBloc({
@@ -31,6 +31,7 @@ final class FamilyMemberInfoBloc
   /// Репозиторий профиля
   final IProfileRepository _profileRepository;
 
+  /// Метод получения профиля пользователя семьи
   Future<void> _load(
     FamilyMemberInfoLoadEvent event,
     Emitter<FamilyMemberInfoState> emit,
@@ -50,6 +51,7 @@ final class FamilyMemberInfoBloc
     }
   }
 
+  /// Метод для обновления статуса пользователя в семье
   Future<void> _updateRelation(
     FamilyMemberInfoUpdateRelationEvent event,
     Emitter<FamilyMemberInfoState> emit,

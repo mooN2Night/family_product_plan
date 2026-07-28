@@ -35,6 +35,8 @@ dependencies:
 
   flutter_secure_storage: 10.3.1
   collection: 1.19.1
+  rxdart: 0.28.0
+  internet_connection_checker_plus: 3.1.1
 
 dev_dependencies:
   flutter_test:

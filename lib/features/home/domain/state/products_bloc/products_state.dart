@@ -1,23 +1,41 @@
 part of 'products_bloc.dart';
 
-/// Класс состояния для покупок.
-class ProductsState extends Equatable {
-  const ProductsState({this.isLoading = false, this.products = const []});
+/// Базовый класс состояния для покупок.
+sealed class ProductsState extends Equatable {
+  const ProductsState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Начальное состояние.
+final class ProductsInitialState extends ProductsState {
+  const ProductsInitialState();
+}
+
+/// Состояние загрузки.
+final class ProductsLoadingState extends ProductsState {
+  const ProductsLoadingState();
+}
+
+/// Состояние успешной загрузки.
+final class ProductsSuccessState extends ProductsState {
+  const ProductsSuccessState({required this.products});
 
   /// Список покупок.
   final List<ProductEntity> products;
 
-  /// Флаг загрузки.
-  final bool isLoading;
+  @override
+  List<Object?> get props => [products];
+}
 
-  /// Метод для частичного обновления полей.
-  ProductsState copyWith({List<ProductEntity>? products, bool? isLoading}) {
-    return ProductsState(
-      products: products ?? this.products,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
+/// Состояние ошибки.
+final class ProductsErrorState extends ProductsState {
+  const ProductsErrorState(this.message);
+
+  /// Текст ошибки
+  final String message;
 
   @override
-  List<Object?> get props => [products, isLoading];
+  List<Object?> get props => [message];
 }

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:family_product_plan/app/mapper/app_product_mapper.dart';
+import 'package:family_product_plan/app/services/network/i_network_service.dart';
+import 'package:family_product_plan/app/services/pending_sync/i_pending_sync_service.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../app/services/family/i_current_family_provider.dart';
@@ -18,30 +20,39 @@ final class HomeRepository implements IHomeRepository {
     required IProductsLocalDataSource localDataSource,
     required IProductsRemoteDataSource remoteDataSource,
     required ICurrentFamilyProvider currentFamilyProvider,
+    required IPendingSyncService pendingSyncService,
+    required INetworkService networkService,
   }) : _localDataSource = localDataSource,
        _remoteDataSource = remoteDataSource,
-       _currentFamilyProvider = currentFamilyProvider {
-    _familySubscription = _currentFamilyProvider.watchCurrentFamilyId().listen((
-      familyId,
-    ) {
-      unawaited(_restartRemoteSync(familyId));
-    });
-  }
+       _currentFamilyProvider = currentFamilyProvider,
+       _pendingSyncService = pendingSyncService,
+       _networkService = networkService;
 
-  /// Реализация локального хранения продуктов
+  /// Локальный источник данных.
   final IProductsLocalDataSource _localDataSource;
 
-  /// Реализация удаленного хранения продуктов
+  /// Удалённый источник данных.
   final IProductsRemoteDataSource _remoteDataSource;
 
+  /// Провайдер текущей выбранной семьи.
   final ICurrentFamilyProvider _currentFamilyProvider;
 
+  /// Провайдер текущей выбранной семьи.
+  final INetworkService _networkService;
+
+  /// Провайдер текущей выбранной семьи.
+  final IPendingSyncService _pendingSyncService;
+
+  /// Подписка на изменения продуктов в удалённом хранилище.
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _remoteSubscription;
 
+  /// Подписка на изменение текущей семьи.
   StreamSubscription<String?>? _familySubscription;
 
+  /// Признак завершения инициализации репозитория.
   bool _initialized = false;
 
+  /// Генератор уникальных идентификаторов.
   static const _uuid = Uuid();
 
   @override
@@ -67,13 +78,21 @@ final class HomeRepository implements IHomeRepository {
     );
 
     await _localDataSource.addProduct(entity);
-    unawaited(_syncAdd(entity));
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncAdd(entity));
+    } else {
+      await _pendingSyncService.enqueueAdd(entity);
+    }
   }
 
   @override
   Future<void> deleteProduct(String id) async {
     await _localDataSource.deleteProduct(id);
-    unawaited(_syncDelete(id));
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncDelete(id));
+    } else {
+      await _pendingSyncService.enqueueDelete(id);
+    }
   }
 
   @override
@@ -91,7 +110,11 @@ final class HomeRepository implements IHomeRepository {
     );
 
     await _localDataSource.updateProduct(updatedProduct);
-    unawaited(_syncUpdate(updatedProduct));
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncUpdate(updatedProduct));
+    } else {
+      await _pendingSyncService.enqueueUpdate(updatedProduct);
+    }
   }
 
   @override
@@ -114,16 +137,19 @@ final class HomeRepository implements IHomeRepository {
     return _localDataSource.clearProducts();
   }
 
+  /// Возвращает идентификатор текущей семьи.
   Future<String?> _familyId() {
     return _currentFamilyProvider.getCurrentFamilyId();
   }
 
+  /// Перезапускает синхронизацию продуктов при смене семьи.
   Future<void> _restartRemoteSync(String? familyId) async {
     await _remoteSubscription?.cancel();
     _remoteSubscription = null;
 
     if (familyId == null) {
-      await _localDataSource.replaceProducts([]);
+      await _remoteSubscription?.cancel();
+      _remoteSubscription = null;
       return;
     }
 
@@ -157,6 +183,7 @@ final class HomeRepository implements IHomeRepository {
         );
   }
 
+  /// Синхронизирует добавление продукта с удалённым хранилищем.
   Future<void> _syncAdd(ProductEntity product) async {
     final familyId = await _familyId();
     if (familyId == null) return;
@@ -164,18 +191,21 @@ final class HomeRepository implements IHomeRepository {
     await _remoteDataSource.addProduct(familyId: familyId, product: product);
   }
 
+  /// Синхронизирует удаление продукта с удалённым хранилищем.
   Future<void> _syncDelete(String id) async {
     final familyId = await _familyId();
     if (familyId == null) return;
     await _remoteDataSource.deleteProduct(familyId: familyId, productId: id);
   }
 
+  /// Синхронизирует обновление продукта с удалённым хранилищем.
   Future<void> _syncUpdate(ProductEntity product) async {
     final familyId = await _familyId();
     if (familyId == null) return;
     await _remoteDataSource.updateProduct(familyId: familyId, product: product);
   }
 
+  /// Выполняет первоначальную инициализацию репозитория.
   Future<void> _ensureInitialized() async {
     if (_initialized) return;
 
@@ -188,6 +218,7 @@ final class HomeRepository implements IHomeRepository {
     });
   }
 
+  /// Освобождает ресурсы репозитория.
   Future<void> dispose() async {
     await _remoteSubscription?.cancel();
     await _familySubscription?.cancel();

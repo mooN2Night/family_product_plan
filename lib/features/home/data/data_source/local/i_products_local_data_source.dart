@@ -1,7 +1,7 @@
 import '../../../../../app/services/database/app_database.dart';
 import '../../../domain/entity/product_entity.dart';
 
-/// Интерфейс локальной БД
+/// Интерфейс локального источника данных для работы с продуктами.
 abstract interface class IProductsLocalDataSource {
   /// Поток всех продуктов.
   Stream<List<Product>> watchProducts();
@@ -21,9 +21,12 @@ abstract interface class IProductsLocalDataSource {
   /// метод полной синхронизации
   Future<void> replaceProducts(List<ProductEntity> products);
 
+  /// Добавляет новый продукт или обновляет существующий.
   Future<void> upsertProduct(ProductEntity product);
 
+  /// Возвращает список всех продуктов.
   Future<List<Product>> getProducts();
 
+  /// Удаляет все продукты.
   Future<void> clearProducts();
 }

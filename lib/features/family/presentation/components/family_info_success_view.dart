@@ -146,6 +146,7 @@ class FamilyInfoSuccessView extends StatelessWidget {
     );
   }
 
+  /// Метод для отображения дилогового окна удаления семьи
   Future<void> _showDeleteFamilyDialog(BuildContext context) async {
     await showDialog<void>(
       context: context,

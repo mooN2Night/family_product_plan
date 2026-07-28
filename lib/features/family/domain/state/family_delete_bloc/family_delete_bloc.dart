@@ -9,7 +9,7 @@ part 'family_delete_event.dart';
 
 part 'family_delete_state.dart';
 
-/// Блок управлением состоянием экрана семьи
+/// Блок управлением состоянием удаления семьи
 final class FamilyDeleteBloc
     extends Bloc<FamilyDeleteEvent, FamilyDeleteState> {
   FamilyDeleteBloc({required IFamilyRepository familyRepository})
@@ -21,7 +21,7 @@ final class FamilyDeleteBloc
   /// Репозиторий семьи
   final IFamilyRepository _familyRepository;
 
-  /// Метод для создания семьи.
+  /// Метод для удаления семьи.
   Future<void> _deleteFamily(
     FamilyDeleteRequestedEvent event,
     Emitter<FamilyDeleteState> emit,

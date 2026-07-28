@@ -25,9 +25,13 @@ class ProductEntity extends Equatable {
   /// Флаг необходимости покупки
   final bool isToBuy;
 
+  /// Дата создания продукта
   final DateTime createdAt;
+
+  /// Дата изменения продукта
   final DateTime updatedAt;
 
+  /// Преобразует сущность в DTO.
   ProductDto toDto() {
     return ProductDto(
       id: id,

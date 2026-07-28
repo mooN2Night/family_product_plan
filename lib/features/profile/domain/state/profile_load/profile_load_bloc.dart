@@ -10,7 +10,7 @@ part 'profile_load_event.dart';
 
 part 'profile_load_state.dart';
 
-/// Блок управлением состоянием экрана профиля
+/// Блок управлением состоянием экрана редактирования профиля
 final class ProfileLoadBloc extends Bloc<ProfileLoadEvent, ProfileLoadState> {
   ProfileLoadBloc({required IProfileRepository profileRepository})
     : _profileRepository = profileRepository,

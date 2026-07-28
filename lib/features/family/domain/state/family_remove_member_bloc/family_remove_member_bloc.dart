@@ -10,7 +10,7 @@ part 'family_remove_member_event.dart';
 
 part 'family_remove_member_state.dart';
 
-/// Блок управлением состоянием экрана семьи
+/// Блок управлением состоянием выхода/удаления пользователя из семьи
 final class FamilyRemoveMemberBloc
     extends Bloc<FamilyRemoveMemberEvent, FamilyRemoveMemberState> {
   FamilyRemoveMemberBloc({required IFamilyRepository familyRepository})
@@ -23,7 +23,7 @@ final class FamilyRemoveMemberBloc
   /// Репозиторий семьи
   final IFamilyRepository _familyRepository;
 
-  /// Метод для создания семьи.
+  /// Метод для выхода из семьи.
   Future<void> _leaveFamily(
     FamilyRemoveMemberYourselfEvent event,
     Emitter<FamilyRemoveMemberState> emit,
@@ -41,6 +41,7 @@ final class FamilyRemoveMemberBloc
     }
   }
 
+  /// Метод для удаления пользователя из семьи.
   Future<void> _removeMember(
     FamilyRemoveMemberOtherEvent event,
     Emitter<FamilyRemoveMemberState> emit,

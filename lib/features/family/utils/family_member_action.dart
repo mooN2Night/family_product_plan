@@ -1,1 +1,8 @@
-enum FamilyMemberAction { leave, remove }
+/// Действие, выполняемое над участником семьи.
+enum FamilyMemberAction {
+  /// Выход текущего пользователя из семьи.
+  leave,
+
+  /// Удаление участника из семьи.
+  remove,
+}

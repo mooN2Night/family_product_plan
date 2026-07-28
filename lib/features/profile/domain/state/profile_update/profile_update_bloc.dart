@@ -10,7 +10,7 @@ part 'profile_update_event.dart';
 
 part 'profile_update_state.dart';
 
-/// Блок управлением состоянием экрана профиля
+/// Блок управлением состоянием обновления настроек профиля
 final class ProfileUpdateBloc
     extends Bloc<ProfileUpdateEvent, ProfileUpdateState> {
   ProfileUpdateBloc({required IProfileRepository profileRepository})
