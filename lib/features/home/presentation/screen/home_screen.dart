@@ -1,9 +1,11 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/app/ui_kit/app_snack_bar.dart';
 import 'package:family_product_plan/features/home/presentation/components/home_products_list_view.dart';
+import 'package:family_product_plan/features/sync_status/domain/state/sync_status_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/dialog/product_add_dialog.dart';
+import '../../../../app/services/pending_sync/sync_status.dart';
 import '../../../../app/ui_kit/app_bar.dart';
 import '../../../current_family/domain/state/current_family_cubit.dart';
 import '../../domain/entity/product_entity.dart';
@@ -17,6 +19,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeRepository = context.di.repositories.homeRepository;
+    final pendingSyncService = context.di.business.pendingSyncService;
 
     return MultiBlocProvider(
       providers: [
@@ -28,6 +31,10 @@ class HomeScreen extends StatelessWidget {
         BlocProvider(
           create: (context) =>
               ProductsActionBloc(homeRepository: homeRepository),
+        ),
+        BlocProvider(
+          create: (context) =>
+              SyncCubit(pendingSyncService: pendingSyncService),
         ),
       ],
       child: const HomeScreenView(),
@@ -46,6 +53,10 @@ class HomeScreenView extends StatelessWidget {
       child: Scaffold(
         appBar: CustomAppBar.main(
           actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: SyncStatusIndicator(),
+            ),
             IconButton(
               onPressed: () => showAddProductDialog(context),
               icon: const Icon(Icons.add),
@@ -137,6 +148,45 @@ class _HomeTabBarListView extends StatelessWidget {
         HomeProductsListView(hasFamily: hasFamily, products: products),
         HomeProductsListView(hasFamily: hasFamily, products: productsToBuy),
       ],
+    );
+  }
+}
+
+class SyncStatusIndicator extends StatelessWidget {
+  const SyncStatusIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SyncCubit, SyncStatus>(
+      builder: (context, state) {
+        switch (state.state) {
+          case SyncState.idle:
+            if (state.pendingOperations == 0) {
+              return const Icon(Icons.cloud_done_outlined, color: Colors.green);
+            }
+
+            return Badge.count(
+              count: state.pendingOperations,
+              child: const Icon(Icons.cloud_upload_outlined),
+            );
+
+          case SyncState.syncing:
+            return const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            );
+
+          case SyncState.success:
+            return const Icon(Icons.cloud_done, color: Colors.green);
+
+          case SyncState.error:
+            return Badge.count(
+              count: state.pendingOperations,
+              child: const Icon(Icons.cloud_off_outlined, color: Colors.red),
+            );
+        }
+      },
     );
   }
 }

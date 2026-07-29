@@ -18,4 +18,7 @@ abstract interface class IPendingSyncLocalDataSource {
 
   /// Полностью очищает очередь.
   Future<void> clearOperations();
+
+  /// Получение оперции по id продукта
+  Future<PendingSyncEntity?> getOperationByEntityId(String entityId);
 }

@@ -21,15 +21,20 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   int get schemaVersion => 1;
 
   @override
-  Stream<List<Product>> watchAllProducts() => select(products).watch();
+  Stream<List<Product>> watchAllProducts() {
+    return (select(
+      products,
+    )..where((tbl) => tbl.isDeleted.equals(false))).watch();
+  }
 
   @override
   Future<int> insertProduct(ProductsCompanion entity) =>
       into(products).insert(entity);
 
   @override
-  Future<void> updateProduct(Product entity) =>
-      update(products).replace(entity);
+  Future<void> updateProduct(Product entity) async {
+    await update(products).replace(entity);
+  }
 
   @override
   Future<int> deleteProductById(String id) =>
@@ -67,23 +72,19 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
 
   @override
   Future<void> insertPendingSyncOperation(
-      PendingSyncOperationsCompanion entity,
-      ) {
+    PendingSyncOperationsCompanion entity,
+  ) {
     return into(pendingSyncOperations).insertOnConflictUpdate(entity);
   }
 
   @override
-  Future<void> updatePendingSyncOperation(
-      PendingSyncOperation entity,
-      ) {
+  Future<void> updatePendingSyncOperation(PendingSyncOperation entity) {
     return update(pendingSyncOperations).replace(entity);
   }
 
   @override
   Future<void> deletePendingSyncOperationById(String id) {
-    return (delete(
-      pendingSyncOperations,
-    )..where((t) => t.id.equals(id))).go();
+    return (delete(pendingSyncOperations)..where((t) => t.id.equals(id))).go();
   }
 
   @override
@@ -99,6 +100,15 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   @override
   Future<void> clearPendingSyncOperations() {
     return delete(pendingSyncOperations).go();
+  }
+
+  @override
+  Future<PendingSyncOperation?> getPendingSyncOperationByEntityId(
+    String entityId,
+  ) {
+    return (select(
+      pendingSyncOperations,
+    )..where((t) => t.entityId.equals(entityId))).getSingleOrNull();
   }
 }
 

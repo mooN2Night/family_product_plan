@@ -16,6 +16,7 @@ final class DiBusiness {
     pendingSyncService = PendingSyncService(
       localDataSource: diContainer.dataSource.pendingSyncLocalDataSource,
       remoteDataSource: diContainer.dataSource.productsRemoteDataSource,
+      productsLocalDataSource: diContainer.dataSource.productsLocalDataSource,
       currentFamilyProvider: diContainer.services.currentFamilyProvider,
       networkService: diContainer.services.networkService,
     );

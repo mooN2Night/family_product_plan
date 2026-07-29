@@ -72,6 +72,7 @@ class ProductsActionBloc
 
     try {
       await _homeRepository.toggleProductStatus(event.product);
+      emit(const ProductsActionSuccessState());
     } on AppException catch (error, stackTrace) {
       emit(ProductsActionErrorState(message: error.message));
       addError(error, stackTrace);

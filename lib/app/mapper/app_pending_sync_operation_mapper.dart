@@ -12,6 +12,9 @@ extension PendingSyncMapper on PendingSyncOperation {
       entityId: entityId,
       payload: payload,
       createdAt: createdAt,
+      retryCount: retryCount,
+      lastAttemptAt: lastAttemptAt,
+      lastError: lastError,
     );
   }
 }
@@ -24,6 +27,9 @@ extension PendingSyncEntityMapper on PendingSyncEntity {
       entityId: entityId,
       payload: payload,
       createdAt: createdAt,
+      retryCount: retryCount,
+      lastAttemptAt: lastAttemptAt,
+      lastError: lastError,
     );
   }
 
@@ -34,6 +40,9 @@ extension PendingSyncEntityMapper on PendingSyncEntity {
       entityId: entityId,
       payload: Value(payload),
       createdAt: createdAt,
+      retryCount: Value(retryCount),
+      lastAttemptAt: Value(lastAttemptAt),
+      lastError: Value(lastError),
     );
   }
 }

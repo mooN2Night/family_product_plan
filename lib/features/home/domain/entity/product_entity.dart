@@ -11,6 +11,7 @@ class ProductEntity extends Equatable {
     required this.isToBuy,
     required this.createdAt,
     required this.updatedAt,
+    required this.isDeleted,
   });
 
   /// Уникальный идентификатор.
@@ -31,6 +32,9 @@ class ProductEntity extends Equatable {
   /// Дата изменения продукта
   final DateTime updatedAt;
 
+  /// Флаг, было ли поле удалено из Firestore
+  final bool isDeleted;
+
   /// Преобразует сущность в DTO.
   ProductDto toDto() {
     return ProductDto(
@@ -40,6 +44,7 @@ class ProductEntity extends Equatable {
       isToBuy: isToBuy,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isDeleted: isDeleted,
     );
   }
 
@@ -51,6 +56,7 @@ class ProductEntity extends Equatable {
     bool? isToBuy,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isDeleted,
   }) {
     return ProductEntity(
       id: id ?? this.id,
@@ -59,6 +65,7 @@ class ProductEntity extends Equatable {
       isToBuy: isToBuy ?? this.isToBuy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -70,5 +77,6 @@ class ProductEntity extends Equatable {
     isToBuy,
     createdAt,
     updatedAt,
+    isDeleted,
   ];
 }

@@ -11,6 +11,7 @@ final class ProductDto {
     required this.isToBuy,
     required this.createdAt,
     required this.updatedAt,
+    required this.isDeleted,
   });
 
   /// Создает DTO из JSON.
@@ -22,6 +23,7 @@ final class ProductDto {
       isToBuy: json['isToBuy'] as bool,
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+      isDeleted: json['isDeleted'] as bool,
     );
   }
 
@@ -33,6 +35,7 @@ final class ProductDto {
       isToBuy: json['isToBuy'] as bool,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      isDeleted: json['isDeleted'] as bool,
     );
   }
 
@@ -54,6 +57,9 @@ final class ProductDto {
   /// Дата последнего обновления продукта.
   final DateTime updatedAt;
 
+  /// Флаг, было ли поле удалено из Firestore
+  final bool isDeleted;
+
   /// Преобразует DTO в доменную сущность.
   ProductEntity toEntity() {
     return ProductEntity(
@@ -63,6 +69,7 @@ final class ProductDto {
       isToBuy: isToBuy,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isDeleted: isDeleted,
     );
   }
 
@@ -75,6 +82,7 @@ final class ProductDto {
       'isToBuy': isToBuy,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
+      'isDeleted': isDeleted,
     };
   }
 
@@ -86,6 +94,7 @@ final class ProductDto {
       'isToBuy': isToBuy,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'isDeleted': isDeleted,
     };
   }
 }
