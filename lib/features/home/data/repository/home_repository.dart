@@ -60,7 +60,8 @@ final class HomeRepository implements IHomeRepository {
     unawaited(_ensureInitialized());
 
     return _localDataSource.watchProducts().map(
-      (e) => e.map((e) => e.toEntity()).toList(),
+      (products) =>
+          products.map((e) => e.toEntity()).where((e) => !e.isDeleted).toList(),
     );
   }
 
@@ -75,6 +76,7 @@ final class HomeRepository implements IHomeRepository {
       isToBuy: product.isToBuy,
       createdAt: now,
       updatedAt: now,
+      isDeleted: false,
     );
 
     await _localDataSource.addProduct(entity);
@@ -87,11 +89,17 @@ final class HomeRepository implements IHomeRepository {
 
   @override
   Future<void> deleteProduct(String id) async {
-    await _localDataSource.deleteProduct(id);
+    final product = await _localDataSource.getProduct(id);
+    final deletedProduct = product.toEntity().copyWith(
+      isDeleted: true,
+      updatedAt: DateTime.now(),
+    );
+
+    await _localDataSource.updateProduct(deletedProduct);
     if (await _networkService.hasInternet()) {
-      unawaited(_syncDelete(id));
+      unawaited(_syncDelete(deletedProduct));
     } else {
-      await _pendingSyncService.enqueueDelete(id);
+      await _pendingSyncService.enqueueDelete(deletedProduct);
     }
   }
 
@@ -164,15 +172,19 @@ final class HomeRepository implements IHomeRepository {
 
               switch (change.type) {
                 case DocumentChangeType.added:
-                  unawaited(_localDataSource.upsertProduct(product));
+                  if (!product.isDeleted) {
+                    unawaited(_localDataSource.upsertProduct(product));
+                  }
                   break;
 
                 case DocumentChangeType.modified:
-                  unawaited(_localDataSource.upsertProduct(product));
+                  if (product.isDeleted) {
+                    unawaited(_localDataSource.deleteProduct(product.id));
+                  } else {
+                    unawaited(_localDataSource.upsertProduct(product));
+                  }
                   break;
-
                 case DocumentChangeType.removed:
-                  unawaited(_localDataSource.deleteProduct(product.id));
                   break;
               }
             }
@@ -192,10 +204,14 @@ final class HomeRepository implements IHomeRepository {
   }
 
   /// Синхронизирует удаление продукта с удалённым хранилищем.
-  Future<void> _syncDelete(String id) async {
+  Future<void> _syncDelete(ProductEntity deletedProduct) async {
     final familyId = await _familyId();
     if (familyId == null) return;
-    await _remoteDataSource.deleteProduct(familyId: familyId, productId: id);
+    await _remoteDataSource.markDeleted(
+      familyId: familyId,
+      productId: deletedProduct.id,
+      updatedAt: deletedProduct.updatedAt,
+    );
   }
 
   /// Синхронизирует обновление продукта с удалённым хранилищем.

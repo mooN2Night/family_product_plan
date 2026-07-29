@@ -11,6 +11,7 @@ extension ProductMapper on Product {
       isToBuy: isToBuy,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isDeleted: isDeleted,
     );
   }
 }
@@ -25,6 +26,7 @@ extension ProductEntityMapper on ProductEntity {
       isToBuy: isToBuy,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isDeleted: isDeleted,
     );
   }
 }

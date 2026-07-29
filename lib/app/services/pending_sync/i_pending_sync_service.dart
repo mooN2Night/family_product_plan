@@ -1,3 +1,5 @@
+import 'package:family_product_plan/app/services/pending_sync/sync_status.dart';
+
 import '../../../features/home/domain/entity/product_entity.dart';
 
 abstract interface class IPendingSyncService {
@@ -8,8 +10,10 @@ abstract interface class IPendingSyncService {
   Future<void> enqueueUpdate(ProductEntity product);
 
   /// Добавляет операцию удаления продукта в очередь.
-  Future<void> enqueueDelete(String productId);
+  Future<void> enqueueDelete(ProductEntity product);
 
   /// Выполняет синхронизацию всех операций.
   Future<void> processQueue();
+
+  Stream<SyncStatus> watchStatus();
 }

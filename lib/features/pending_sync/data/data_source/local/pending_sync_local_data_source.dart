@@ -42,4 +42,11 @@ final class PendingSyncLocalDataSource implements IPendingSyncLocalDataSource {
   Future<void> clearOperations() {
     return _database.clearPendingSyncOperations();
   }
+
+  @override
+  Future<PendingSyncEntity?> getOperationByEntityId(String entityId) async {
+    final operation = await _database.getPendingSyncOperationByEntityId(entityId);
+
+    return operation?.toEntity();
+  }
 }

@@ -20,14 +20,15 @@ abstract interface class IProductsRemoteDataSource {
   });
 
   /// Обновляет продукт в удалённой базе данных.
-  Future<void> updateProduct({
+  Future<ProductEntity?> updateProduct({
     required String familyId,
     required ProductEntity product,
   });
 
   /// Удаляет продукт из удалённой базы данных.
-  Future<void> deleteProduct({
+  Future<void> markDeleted({
     required String familyId,
     required String productId,
+    required DateTime updatedAt,
   });
 }

@@ -6,7 +6,7 @@ import 'i_product_remote_data_source.dart';
 /// Реализация удалённого источника данных для работы с продуктами.
 final class ProductsRemoteDataSource implements IProductsRemoteDataSource {
   const ProductsRemoteDataSource({required FirebaseFirestore firestore})
-    : _firestore = firestore;
+      : _firestore = firestore;
 
   /// Сервис удаленной бд.
   final FirebaseFirestore _firestore;
@@ -30,24 +30,54 @@ final class ProductsRemoteDataSource implements IProductsRemoteDataSource {
   }) => _collection(familyId).doc(product.id).set(product.toDto().toJson());
 
   @override
-  Future<void> updateProduct({
+  Future<ProductEntity?> updateProduct({
     required String familyId,
     required ProductEntity product,
   }) async {
+    final remoteProduct = await _getProduct(
+      familyId: familyId,
+      productId: product.id,
+    );
+
+    if (remoteProduct == null) return null;
+    if (remoteProduct.updatedAt.isAfter(product.updatedAt)) {
+      return remoteProduct.toEntity();
+    }
+
     await _collection(familyId).doc(product.id).update({
       'productName': product.productName,
       'productManufacturer': product.productManufacturer,
       'isToBuy': product.isToBuy,
       'updatedAt': Timestamp.fromDate(product.updatedAt),
     });
+
+    return null;
   }
 
   @override
-  Future<void> deleteProduct({
+  Future<void> markDeleted({
     required String familyId,
     required String productId,
+    required DateTime updatedAt,
   }) {
-    return _collection(familyId).doc(productId).delete();
+    final now = DateTime.now();
+    return _collection(familyId).doc(productId).update({
+      'isDeleted': true,
+      'updatedAt': Timestamp.fromDate(now),
+    });
+  }
+
+  Future<ProductDto?> _getProduct({
+    required String familyId,
+    required String productId,
+  }) async {
+    final snapshot = await _collection(familyId).doc(productId).get();
+
+    if (!snapshot.exists) {
+      return null;
+    }
+
+    return ProductDto.fromJson(snapshot.data()!);
   }
 
   /// Возвращает коллекцию продуктов указанной семьи.

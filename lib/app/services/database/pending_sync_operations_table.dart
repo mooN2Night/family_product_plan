@@ -16,6 +16,12 @@ class PendingSyncOperations extends Table {
   /// Время создания операции.
   DateTimeColumn get createdAt => dateTime()();
 
+  IntColumn get retryCount => integer().withDefault(const Constant(0))();
+
+  DateTimeColumn get lastAttemptAt => dateTime().nullable()();
+
+  TextColumn get lastError => text().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

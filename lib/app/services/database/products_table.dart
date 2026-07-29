@@ -20,6 +20,8 @@ class Products extends Table {
   /// Дата последнего обновления.
   DateTimeColumn get updatedAt => dateTime()();
 
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
+
   @override
   Set<Column<Object>>? get primaryKey => {id};
 }

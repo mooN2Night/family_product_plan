@@ -75,6 +75,21 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -83,6 +98,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     isToBuy,
     createdAt,
     updatedAt,
+    isDeleted,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -140,6 +156,12 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('is_deleted')) {
+      context.handle(
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
     return context;
   }
 
@@ -173,6 +195,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
     );
   }
 
@@ -200,6 +226,7 @@ class Product extends DataClass implements Insertable<Product> {
 
   /// Дата последнего обновления.
   final DateTime updatedAt;
+  final bool isDeleted;
   const Product({
     required this.id,
     required this.name,
@@ -207,6 +234,7 @@ class Product extends DataClass implements Insertable<Product> {
     required this.isToBuy,
     required this.createdAt,
     required this.updatedAt,
+    required this.isDeleted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -217,6 +245,7 @@ class Product extends DataClass implements Insertable<Product> {
     map['is_to_buy'] = Variable<bool>(isToBuy);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['is_deleted'] = Variable<bool>(isDeleted);
     return map;
   }
 
@@ -228,6 +257,7 @@ class Product extends DataClass implements Insertable<Product> {
       isToBuy: Value(isToBuy),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      isDeleted: Value(isDeleted),
     );
   }
 
@@ -243,6 +273,7 @@ class Product extends DataClass implements Insertable<Product> {
       isToBuy: serializer.fromJson<bool>(json['isToBuy']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
     );
   }
   @override
@@ -255,6 +286,7 @@ class Product extends DataClass implements Insertable<Product> {
       'isToBuy': serializer.toJson<bool>(isToBuy),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
     };
   }
 
@@ -265,6 +297,7 @@ class Product extends DataClass implements Insertable<Product> {
     bool? isToBuy,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isDeleted,
   }) => Product(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -272,6 +305,7 @@ class Product extends DataClass implements Insertable<Product> {
     isToBuy: isToBuy ?? this.isToBuy,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    isDeleted: isDeleted ?? this.isDeleted,
   );
   Product copyWithCompanion(ProductsCompanion data) {
     return Product(
@@ -283,6 +317,7 @@ class Product extends DataClass implements Insertable<Product> {
       isToBuy: data.isToBuy.present ? data.isToBuy.value : this.isToBuy,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
     );
   }
 
@@ -294,14 +329,22 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('manufacturer: $manufacturer, ')
           ..write('isToBuy: $isToBuy, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, manufacturer, isToBuy, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    manufacturer,
+    isToBuy,
+    createdAt,
+    updatedAt,
+    isDeleted,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -311,7 +354,8 @@ class Product extends DataClass implements Insertable<Product> {
           other.manufacturer == this.manufacturer &&
           other.isToBuy == this.isToBuy &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.isDeleted == this.isDeleted);
 }
 
 class ProductsCompanion extends UpdateCompanion<Product> {
@@ -321,6 +365,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<bool> isToBuy;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> isDeleted;
   final Value<int> rowid;
   const ProductsCompanion({
     this.id = const Value.absent(),
@@ -329,6 +374,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.isToBuy = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.isDeleted = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProductsCompanion.insert({
@@ -338,6 +384,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.isToBuy = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
+    this.isDeleted = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -350,6 +397,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<bool>? isToBuy,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? isDeleted,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -359,6 +407,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (isToBuy != null) 'is_to_buy': isToBuy,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (isDeleted != null) 'is_deleted': isDeleted,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -370,6 +419,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<bool>? isToBuy,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? isDeleted,
     Value<int>? rowid,
   }) {
     return ProductsCompanion(
@@ -379,6 +429,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       isToBuy: isToBuy ?? this.isToBuy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -404,6 +455,9 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -419,6 +473,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('isToBuy: $isToBuy, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('isDeleted: $isDeleted, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -484,6 +539,41 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _retryCountMeta = const VerificationMeta(
+    'retryCount',
+  );
+  @override
+  late final GeneratedColumn<int> retryCount = GeneratedColumn<int>(
+    'retry_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lastAttemptAtMeta = const VerificationMeta(
+    'lastAttemptAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastAttemptAt =
+      GeneratedColumn<DateTime>(
+        'last_attempt_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _lastErrorMeta = const VerificationMeta(
+    'lastError',
+  );
+  @override
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+    'last_error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -491,6 +581,9 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
     entityId,
     payload,
     createdAt,
+    retryCount,
+    lastAttemptAt,
+    lastError,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -539,6 +632,27 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('retry_count')) {
+      context.handle(
+        _retryCountMeta,
+        retryCount.isAcceptableOrUnknown(data['retry_count']!, _retryCountMeta),
+      );
+    }
+    if (data.containsKey('last_attempt_at')) {
+      context.handle(
+        _lastAttemptAtMeta,
+        lastAttemptAt.isAcceptableOrUnknown(
+          data['last_attempt_at']!,
+          _lastAttemptAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(
+        _lastErrorMeta,
+        lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta),
+      );
+    }
     return context;
   }
 
@@ -568,6 +682,18 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      retryCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}retry_count'],
+      )!,
+      lastAttemptAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_attempt_at'],
+      ),
+      lastError: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_error'],
+      ),
     );
   }
 
@@ -593,12 +719,18 @@ class PendingSyncOperation extends DataClass
 
   /// Время создания операции.
   final DateTime createdAt;
+  final int retryCount;
+  final DateTime? lastAttemptAt;
+  final String? lastError;
   const PendingSyncOperation({
     required this.id,
     required this.operation,
     required this.entityId,
     this.payload,
     required this.createdAt,
+    required this.retryCount,
+    this.lastAttemptAt,
+    this.lastError,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -610,6 +742,13 @@ class PendingSyncOperation extends DataClass
       map['payload'] = Variable<String>(payload);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['retry_count'] = Variable<int>(retryCount);
+    if (!nullToAbsent || lastAttemptAt != null) {
+      map['last_attempt_at'] = Variable<DateTime>(lastAttemptAt);
+    }
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
     return map;
   }
 
@@ -622,6 +761,13 @@ class PendingSyncOperation extends DataClass
           ? const Value.absent()
           : Value(payload),
       createdAt: Value(createdAt),
+      retryCount: Value(retryCount),
+      lastAttemptAt: lastAttemptAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastAttemptAt),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
     );
   }
 
@@ -636,6 +782,9 @@ class PendingSyncOperation extends DataClass
       entityId: serializer.fromJson<String>(json['entityId']),
       payload: serializer.fromJson<String?>(json['payload']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      retryCount: serializer.fromJson<int>(json['retryCount']),
+      lastAttemptAt: serializer.fromJson<DateTime?>(json['lastAttemptAt']),
+      lastError: serializer.fromJson<String?>(json['lastError']),
     );
   }
   @override
@@ -647,6 +796,9 @@ class PendingSyncOperation extends DataClass
       'entityId': serializer.toJson<String>(entityId),
       'payload': serializer.toJson<String?>(payload),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'retryCount': serializer.toJson<int>(retryCount),
+      'lastAttemptAt': serializer.toJson<DateTime?>(lastAttemptAt),
+      'lastError': serializer.toJson<String?>(lastError),
     };
   }
 
@@ -656,12 +808,20 @@ class PendingSyncOperation extends DataClass
     String? entityId,
     Value<String?> payload = const Value.absent(),
     DateTime? createdAt,
+    int? retryCount,
+    Value<DateTime?> lastAttemptAt = const Value.absent(),
+    Value<String?> lastError = const Value.absent(),
   }) => PendingSyncOperation(
     id: id ?? this.id,
     operation: operation ?? this.operation,
     entityId: entityId ?? this.entityId,
     payload: payload.present ? payload.value : this.payload,
     createdAt: createdAt ?? this.createdAt,
+    retryCount: retryCount ?? this.retryCount,
+    lastAttemptAt: lastAttemptAt.present
+        ? lastAttemptAt.value
+        : this.lastAttemptAt,
+    lastError: lastError.present ? lastError.value : this.lastError,
   );
   PendingSyncOperation copyWithCompanion(PendingSyncOperationsCompanion data) {
     return PendingSyncOperation(
@@ -670,6 +830,13 @@ class PendingSyncOperation extends DataClass
       entityId: data.entityId.present ? data.entityId.value : this.entityId,
       payload: data.payload.present ? data.payload.value : this.payload,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      retryCount: data.retryCount.present
+          ? data.retryCount.value
+          : this.retryCount,
+      lastAttemptAt: data.lastAttemptAt.present
+          ? data.lastAttemptAt.value
+          : this.lastAttemptAt,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
     );
   }
 
@@ -680,13 +847,25 @@ class PendingSyncOperation extends DataClass
           ..write('operation: $operation, ')
           ..write('entityId: $entityId, ')
           ..write('payload: $payload, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('retryCount: $retryCount, ')
+          ..write('lastAttemptAt: $lastAttemptAt, ')
+          ..write('lastError: $lastError')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, operation, entityId, payload, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    operation,
+    entityId,
+    payload,
+    createdAt,
+    retryCount,
+    lastAttemptAt,
+    lastError,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -695,7 +874,10 @@ class PendingSyncOperation extends DataClass
           other.operation == this.operation &&
           other.entityId == this.entityId &&
           other.payload == this.payload &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.retryCount == this.retryCount &&
+          other.lastAttemptAt == this.lastAttemptAt &&
+          other.lastError == this.lastError);
 }
 
 class PendingSyncOperationsCompanion
@@ -705,6 +887,9 @@ class PendingSyncOperationsCompanion
   final Value<String> entityId;
   final Value<String?> payload;
   final Value<DateTime> createdAt;
+  final Value<int> retryCount;
+  final Value<DateTime?> lastAttemptAt;
+  final Value<String?> lastError;
   final Value<int> rowid;
   const PendingSyncOperationsCompanion({
     this.id = const Value.absent(),
@@ -712,6 +897,9 @@ class PendingSyncOperationsCompanion
     this.entityId = const Value.absent(),
     this.payload = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.retryCount = const Value.absent(),
+    this.lastAttemptAt = const Value.absent(),
+    this.lastError = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PendingSyncOperationsCompanion.insert({
@@ -720,6 +908,9 @@ class PendingSyncOperationsCompanion
     required String entityId,
     this.payload = const Value.absent(),
     required DateTime createdAt,
+    this.retryCount = const Value.absent(),
+    this.lastAttemptAt = const Value.absent(),
+    this.lastError = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        operation = Value(operation),
@@ -731,6 +922,9 @@ class PendingSyncOperationsCompanion
     Expression<String>? entityId,
     Expression<String>? payload,
     Expression<DateTime>? createdAt,
+    Expression<int>? retryCount,
+    Expression<DateTime>? lastAttemptAt,
+    Expression<String>? lastError,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -739,6 +933,9 @@ class PendingSyncOperationsCompanion
       if (entityId != null) 'entity_id': entityId,
       if (payload != null) 'payload': payload,
       if (createdAt != null) 'created_at': createdAt,
+      if (retryCount != null) 'retry_count': retryCount,
+      if (lastAttemptAt != null) 'last_attempt_at': lastAttemptAt,
+      if (lastError != null) 'last_error': lastError,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -749,6 +946,9 @@ class PendingSyncOperationsCompanion
     Value<String>? entityId,
     Value<String?>? payload,
     Value<DateTime>? createdAt,
+    Value<int>? retryCount,
+    Value<DateTime?>? lastAttemptAt,
+    Value<String?>? lastError,
     Value<int>? rowid,
   }) {
     return PendingSyncOperationsCompanion(
@@ -757,6 +957,9 @@ class PendingSyncOperationsCompanion
       entityId: entityId ?? this.entityId,
       payload: payload ?? this.payload,
       createdAt: createdAt ?? this.createdAt,
+      retryCount: retryCount ?? this.retryCount,
+      lastAttemptAt: lastAttemptAt ?? this.lastAttemptAt,
+      lastError: lastError ?? this.lastError,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -779,6 +982,15 @@ class PendingSyncOperationsCompanion
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (retryCount.present) {
+      map['retry_count'] = Variable<int>(retryCount.value);
+    }
+    if (lastAttemptAt.present) {
+      map['last_attempt_at'] = Variable<DateTime>(lastAttemptAt.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -793,6 +1005,9 @@ class PendingSyncOperationsCompanion
           ..write('entityId: $entityId, ')
           ..write('payload: $payload, ')
           ..write('createdAt: $createdAt, ')
+          ..write('retryCount: $retryCount, ')
+          ..write('lastAttemptAt: $lastAttemptAt, ')
+          ..write('lastError: $lastError, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -823,6 +1038,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<bool> isToBuy,
       required DateTime createdAt,
       required DateTime updatedAt,
+      Value<bool> isDeleted,
       Value<int> rowid,
     });
 typedef $$ProductsTableUpdateCompanionBuilder =
@@ -833,6 +1049,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<bool> isToBuy,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> isDeleted,
       Value<int> rowid,
     });
 
@@ -872,6 +1089,11 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -914,6 +1136,11 @@ class $$ProductsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProductsTableAnnotationComposer
@@ -944,6 +1171,9 @@ class $$ProductsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
 }
 
 class $$ProductsTableTableManager
@@ -980,6 +1210,7 @@ class $$ProductsTableTableManager
                 Value<bool> isToBuy = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductsCompanion(
                 id: id,
@@ -988,6 +1219,7 @@ class $$ProductsTableTableManager
                 isToBuy: isToBuy,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                isDeleted: isDeleted,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -998,6 +1230,7 @@ class $$ProductsTableTableManager
                 Value<bool> isToBuy = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
+                Value<bool> isDeleted = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductsCompanion.insert(
                 id: id,
@@ -1006,6 +1239,7 @@ class $$ProductsTableTableManager
                 isToBuy: isToBuy,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                isDeleted: isDeleted,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -1037,6 +1271,9 @@ typedef $$PendingSyncOperationsTableCreateCompanionBuilder =
       required String entityId,
       Value<String?> payload,
       required DateTime createdAt,
+      Value<int> retryCount,
+      Value<DateTime?> lastAttemptAt,
+      Value<String?> lastError,
       Value<int> rowid,
     });
 typedef $$PendingSyncOperationsTableUpdateCompanionBuilder =
@@ -1046,6 +1283,9 @@ typedef $$PendingSyncOperationsTableUpdateCompanionBuilder =
       Value<String> entityId,
       Value<String?> payload,
       Value<DateTime> createdAt,
+      Value<int> retryCount,
+      Value<DateTime?> lastAttemptAt,
+      Value<String?> lastError,
       Value<int> rowid,
     });
 
@@ -1080,6 +1320,21 @@ class $$PendingSyncOperationsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get retryCount => $composableBuilder(
+    column: $table.retryCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastAttemptAt => $composableBuilder(
+    column: $table.lastAttemptAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastError => $composableBuilder(
+    column: $table.lastError,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1117,6 +1372,21 @@ class $$PendingSyncOperationsTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get retryCount => $composableBuilder(
+    column: $table.retryCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastAttemptAt => $composableBuilder(
+    column: $table.lastAttemptAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PendingSyncOperationsTableAnnotationComposer
@@ -1142,6 +1412,19 @@ class $$PendingSyncOperationsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get retryCount => $composableBuilder(
+    column: $table.retryCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastAttemptAt => $composableBuilder(
+    column: $table.lastAttemptAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => column);
 }
 
 class $$PendingSyncOperationsTableTableManager
@@ -1195,6 +1478,9 @@ class $$PendingSyncOperationsTableTableManager
                 Value<String> entityId = const Value.absent(),
                 Value<String?> payload = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> retryCount = const Value.absent(),
+                Value<DateTime?> lastAttemptAt = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PendingSyncOperationsCompanion(
                 id: id,
@@ -1202,6 +1488,9 @@ class $$PendingSyncOperationsTableTableManager
                 entityId: entityId,
                 payload: payload,
                 createdAt: createdAt,
+                retryCount: retryCount,
+                lastAttemptAt: lastAttemptAt,
+                lastError: lastError,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -1211,6 +1500,9 @@ class $$PendingSyncOperationsTableTableManager
                 required String entityId,
                 Value<String?> payload = const Value.absent(),
                 required DateTime createdAt,
+                Value<int> retryCount = const Value.absent(),
+                Value<DateTime?> lastAttemptAt = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PendingSyncOperationsCompanion.insert(
                 id: id,
@@ -1218,6 +1510,9 @@ class $$PendingSyncOperationsTableTableManager
                 entityId: entityId,
                 payload: payload,
                 createdAt: createdAt,
+                retryCount: retryCount,
+                lastAttemptAt: lastAttemptAt,
+                lastError: lastError,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

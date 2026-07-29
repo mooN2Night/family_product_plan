@@ -43,4 +43,8 @@ abstract interface class IDatabase {
   Stream<List<PendingSyncOperation>> watchPendingSyncOperations();
 
   Future<void> clearPendingSyncOperations();
+
+  Future<PendingSyncOperation?> getPendingSyncOperationByEntityId(
+    String entityId,
+  );
 }

@@ -9,6 +9,9 @@ final class PendingSyncEntity extends Equatable {
     required this.entityId,
     required this.payload,
     required this.createdAt,
+    this.retryCount = 0,
+    this.lastAttemptAt,
+    this.lastError,
   });
 
   final String id;
@@ -21,6 +24,46 @@ final class PendingSyncEntity extends Equatable {
 
   final DateTime createdAt;
 
+  /// Количество неудачных попыток синхронизации.
+  final int retryCount;
+
+  /// Последняя попытка отправки.
+  final DateTime? lastAttemptAt;
+
+  /// Последняя ошибка.
+  final String? lastError;
+
+  PendingSyncEntity copyWith({
+    String? id,
+    SyncOperationType? type,
+    String? entityId,
+    String? payload,
+    DateTime? createdAt,
+    int? retryCount,
+    DateTime? lastAttemptAt,
+    String? lastError,
+  }) {
+    return PendingSyncEntity(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      entityId: entityId ?? this.entityId,
+      payload: payload ?? this.payload,
+      createdAt: createdAt ?? this.createdAt,
+      retryCount: retryCount ?? this.retryCount,
+      lastAttemptAt: lastAttemptAt ?? this.lastAttemptAt,
+      lastError: lastError ?? this.lastError,
+    );
+  }
+
   @override
-  List<Object?> get props => [id, type, entityId, payload, createdAt];
+  List<Object?> get props => [
+    id,
+    type,
+    entityId,
+    payload,
+    createdAt,
+    retryCount,
+    lastAttemptAt,
+    lastError,
+  ];
 }
