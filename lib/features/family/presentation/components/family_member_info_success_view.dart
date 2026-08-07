@@ -1,3 +1,4 @@
+import 'package:family_product_plan/app/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -46,6 +47,8 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formatedUserBirthday = AppUtils.formateDate(user.birthDate);
+
     return MultiBlocListener(
       listeners: [
         BlocListener<FamilyRemoveMemberBloc, FamilyRemoveMemberState>(
@@ -109,11 +112,11 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
             HBox(5),
           ],
           ProfileInfo(title: 'Пол:', description: user.gender.title),
-          if (user.formatedBirthDate != null) ...[
+          if (formatedUserBirthday != null) ...[
             HBox(5),
             ProfileInfo(
               title: 'Дата рождения:',
-              description: user.formatedBirthDate!,
+              description: formatedUserBirthday,
             ),
           ],
           if (user.age != null) ...[

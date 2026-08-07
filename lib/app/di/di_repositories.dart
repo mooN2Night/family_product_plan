@@ -8,6 +8,8 @@ import 'package:family_product_plan/features/home/data/repository/home_repositor
 import 'package:family_product_plan/features/home/domain/repository/i_home_repository.dart';
 import 'package:family_product_plan/features/profile/data/repository/profile_repository.dart';
 import 'package:family_product_plan/features/profile/domain/repository/i_profile_repository.dart';
+import 'package:family_product_plan/features/tasks/data/repository/tasks_repository.dart';
+import 'package:family_product_plan/features/tasks/domain/repository/i_tasks_repository.dart';
 import 'di_container.dart';
 
 /// Контейнер репозиториев приложения.
@@ -26,6 +28,9 @@ final class DiRepositories {
 
   /// Репозиторий для получения id семьи.
   late final ICurrentFamilyRepository currentFamilyRepository;
+
+  /// Репозиторий для работы с экраном задач.
+  late final ITasksRepository tasksRepository;
 
   /// Инициализирует репозитории приложения.
   void init({required DiContainer diContainer}) {
@@ -57,6 +62,10 @@ final class DiRepositories {
       provider: diContainer.services.currentFamilyProvider,
       firestore: diContainer.services.firestore,
       firebaseAuth: diContainer.services.firebaseAuth,
+    );
+
+    tasksRepository = TasksRepository(
+      localDataSource: diContainer.dataSource.tasksLocalDataSource,
     );
   }
 }

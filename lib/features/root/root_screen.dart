@@ -18,10 +18,10 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> {
   /// Кнопки меню
-  static const _buttonsIcon = [Icons.home, Icons.person];
+  static const _buttonsIcon = [Icons.home, Icons.task, Icons.person];
 
   /// Заголовки меню
-  static const _buttonsTitle = ['Главная', 'Профиль'];
+  static const _buttonsTitle = ['Главная', 'Задачи', 'Профиль'];
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +31,12 @@ class _RootScreenState extends State<RootScreen> {
       bottomNavigationBar: MediaQuery(
         data: MediaQuery.of(context).copyWith(
           viewPadding: MediaQuery.of(context).viewPadding.copyWith(
-            bottom: MediaQuery.of(context).viewPadding.bottom / 2,
+            bottom:
+                MediaQuery.of(context).viewPadding.bottom / _buttonsIcon.length,
           ),
         ),
         child: AppBottomNavigationBar(
-          navigationButtons: List.generate(2, (index) {
+          navigationButtons: List.generate(_buttonsIcon.length, (index) {
             return AppBottomNavigationButton(
               onTap: () => _onTap(index, context),
               isSelected: index == widget.navigationShell.currentIndex,

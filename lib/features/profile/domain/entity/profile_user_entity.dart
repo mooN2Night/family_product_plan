@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:family_product_plan/app/utils/app_utils.dart';
 import 'package:family_product_plan/features/profile/data/dto/profile_user_dto.dart';
-import 'package:intl/intl.dart';
 
 /// Перечисление гендеров
 enum Gender {
@@ -113,31 +113,15 @@ final class ProfileUserEntity extends Equatable {
     if (now.isBefore(birthdayThisYear)) {
       age--;
     }
-    return _yearsToString(age);
-  }
+    final pluralizeAge = AppUtils.pluralizeString(
+      age,
+      other: 'лет',
+      one: 'год',
+      few: 'года',
+      many: 'лет',
+    );
 
-  String? get formatedBirthDate {
-    if (birthDate != null) {
-      return DateFormat('dd MMMM yyyy', 'ru').format(birthDate!);
-    }
-
-    return null;
-  }
-
-  // TODO: добавить метод для множественного отображения значения
-  String _yearsToString(int years) {
-    final mod10 = years % 10;
-    final mod100 = years % 100;
-
-    if (mod10 == 1 && mod100 != 11) {
-      return '$years год';
-    }
-
-    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
-      return '$years года';
-    }
-
-    return '$years лет';
+    return '$age $pluralizeAge';
   }
 
   /// Метод для преобразования Entity в DTO
