@@ -47,4 +47,28 @@ abstract interface class IDatabase {
   Future<PendingSyncOperation?> getPendingSyncOperationByEntityId(
     String entityId,
   );
+
+  Stream<List<Task>> watchTodayTasks();
+
+  Future<List<Task>> getUrgentTasks();
+
+  Future<List<Task>> getHighPriorityTasks();
+
+  Future<List<Task>> getMediumPriorityTasks();
+
+  Future<List<Task>> getLowPriorityTasks();
+
+  Future<void> insertTask(TasksCompanion entity);
+
+  Future<void> updateTask(Task entity);
+
+  Future<void> upsertTask(Task entity);
+
+  Future<void> replaceTasks(List<Task> tasks);
+
+  Future<Task> getTaskById(String id);
+
+  Future<void> deleteTask(Task entity);
+
+  Future<void> clearTasks();
 }

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/ui_kit/app_box.dart';
+import '../../../../app/utils/app_utils.dart';
 import '../../../auth/domain/state/auth_bloc.dart';
 import '../../../family/presentation/family_routes.dart';
 
@@ -18,6 +19,8 @@ class ProfileSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formatedUserBirthday = AppUtils.formateDate(user.birthDate);
+
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       children: [
@@ -60,11 +63,11 @@ class ProfileSuccessView extends StatelessWidget {
           HBox(5),
         ],
         ProfileInfo(title: 'Пол:', description: user.gender.title),
-        if (user.formatedBirthDate != null) ...[
+        if (formatedUserBirthday != null) ...[
           HBox(5),
           ProfileInfo(
             title: 'Дата рождения:',
-            description: user.formatedBirthDate!,
+            description: formatedUserBirthday,
           ),
         ],
         if (user.age != null) ...[

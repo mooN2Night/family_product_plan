@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/app_context_ext.dart';
 import '../../../../app/ui_kit/app_bar.dart';
 import '../../../../app/ui_kit/app_box.dart';
+import '../../../../app/utils/app_utils.dart';
 import '../../domain/state/products_action_bloc/products_action_bloc.dart';
 
 /// Класс для отображения экрана детальной информации о продукте.
@@ -32,6 +33,7 @@ class _ProductDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fontStyle = const TextStyle(fontSize: 18);
     return BlocBuilder<ProductsActionBloc, ProductsActionState>(
       builder: (context, state) {
         final bloc = context.read<ProductsActionBloc>();
@@ -51,6 +53,8 @@ class _ProductDetailView extends StatelessWidget {
 
           case ProductsLoadedState():
             final product = state.product;
+            final formatedCreatedAt = AppUtils.formateDate(product.createdAt);
+            final formatedUpdatedAt = AppUtils.formateDate(product.updatedAt);
 
             return Scaffold(
               appBar: CustomAppBar.productDetail(
@@ -75,21 +79,31 @@ class _ProductDetailView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const HBox(16),
-
                     Row(
                       children: [
                         const Text('Статус:'),
                         const WBox(5),
                         Text(
-                          product.isToBuy ? 'Нужно купить' : 'Есть дома',
-                          style: const TextStyle(fontSize: 18),
+                          product.isToBuy
+                              ? 'Нужно купить'
+                              : 'Покупать не нужно',
+                          style: fontStyle,
+                        ),
+                      ],
+                    ),
+                    const HBox(8),
+                    Row(
+                      children: [
+                        const Text('Товар:'),
+                        const WBox(5),
+                        Expanded(
+                          child: Text(product.productName, style: fontStyle),
                         ),
                       ],
                     ),
 
                     if (product.productManufacturer.isNotEmpty) ...[
                       const HBox(8),
-
                       Row(
                         children: [
                           const Text('Производитель:'),
@@ -97,8 +111,34 @@ class _ProductDetailView extends StatelessWidget {
                           Expanded(
                             child: Text(
                               product.productManufacturer,
-                              style: const TextStyle(fontSize: 18),
+                              style: fontStyle,
                             ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    if (formatedCreatedAt != null) ...[
+                      const HBox(8),
+                      Row(
+                        children: [
+                          const Text('Дата создания:'),
+                          const WBox(5),
+                          Expanded(
+                            child: Text(formatedCreatedAt, style: fontStyle),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    if (formatedUpdatedAt != null) ...[
+                      const HBox(8),
+                      Row(
+                        children: [
+                          const Text('Дата обновления:'),
+                          const WBox(5),
+                          Expanded(
+                            child: Text(formatedUpdatedAt, style: fontStyle),
                           ),
                         ],
                       ),
@@ -111,65 +151,6 @@ class _ProductDetailView extends StatelessWidget {
           case ProductsActionSuccessState():
             return const SizedBox.shrink();
         }
-        // if (state.isLoading) {
-        //   return const Scaffold(
-        //     body: Center(child: CircularProgressIndicator()),
-        //   );
-        // }
-        //
-        // if (state.products.isEmpty) {
-        //   return const Scaffold(
-        //     body: Center(child: Text('Не нашли такого продукта')),
-        //   );
-        // }
-        //
-        // final products = state.products.first;
-        // return Scaffold(
-        //   appBar: CustomAppBar.productDetail(
-        //     actions: [
-        //       IconButton(
-        //         onPressed: () {},
-        //         icon: const Icon(Icons.edit, color: Colors.blue),
-        //       ),
-        //       IconButton(
-        //         onPressed: () {},
-        //         icon: const Icon(Icons.delete, color: Colors.red),
-        //       ),
-        //     ],
-        //     title: products.productName,
-        //   ),
-        //   body: Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        //     child: Column(
-        //       children: [
-        //         const HBox(16),
-        //         Row(
-        //           children: [
-        //             const Text('Статус:'),
-        //             const WBox(5),
-        //             Text(
-        //               products.isToBuy ? 'Нужно купить' : 'Есть дома',
-        //               style: const TextStyle(fontSize: 18),
-        //             ),
-        //           ],
-        //         ),
-        //         if (products.productManufacturer.isNotEmpty) ...[
-        //           const HBox(8),
-        //           Row(
-        //             children: [
-        //               const Text('Производитель:'),
-        //               const WBox(5),
-        //               Text(
-        //                 products.productManufacturer,
-        //                 style: const TextStyle(fontSize: 18),
-        //               ),
-        //             ],
-        //           ),
-        //         ],
-        //       ],
-        //     ),
-        //   ),
-        // );
       },
     );
   }
