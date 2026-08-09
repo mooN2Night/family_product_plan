@@ -13,10 +13,7 @@ enum TaskType {
   monthly,
 
   /// Ежегодная
-  yearly,
-
-  /// Кастомная настройка
-  custom;
+  yearly;
 
   @override
   String toString() {
@@ -26,7 +23,6 @@ enum TaskType {
       TaskType.weekly => 'weekly',
       TaskType.monthly => 'monthly',
       TaskType.yearly => 'yearly',
-      TaskType.custom => 'custom',
     };
   }
 
@@ -38,20 +34,18 @@ enum TaskType {
       'weekly' => TaskType.weekly,
       'monthly' => TaskType.monthly,
       'yearly' => TaskType.yearly,
-      'custom' => TaskType.custom,
-      _ => TaskType.custom,
+      _ => TaskType.oneTime,
     };
   }
 
   /// Получения текстовой метки.
   String get title {
     return switch (this) {
-      TaskType.oneTime => 'Единовременные',
+      TaskType.oneTime => 'Разовые',
       TaskType.daily => 'Ежедневные',
       TaskType.weekly => 'Еженедельные',
       TaskType.monthly => 'Ежемесячные',
       TaskType.yearly => 'Ежегодные',
-      TaskType.custom => 'custom',
     };
   }
 }

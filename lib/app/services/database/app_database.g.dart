@@ -1177,21 +1177,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     ),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _isActiveMeta = const VerificationMeta(
-    'isActive',
-  );
-  @override
-  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
-    'is_active',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_active" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
-  );
   static const VerificationMeta _assignedUserIdMeta = const VerificationMeta(
     'assignedUserId',
   );
@@ -1230,7 +1215,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     nextExecutionAt,
     isCompleted,
     isDeleted,
-    isActive,
     assignedUserId,
     createdBy,
   ];
@@ -1356,12 +1340,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
       );
     }
-    if (data.containsKey('is_active')) {
-      context.handle(
-        _isActiveMeta,
-        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
-      );
-    }
     if (data.containsKey('assigned_user_id')) {
       context.handle(
         _assignedUserIdMeta,
@@ -1444,10 +1422,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.bool,
         data['${effectivePrefix}is_deleted'],
       )!,
-      isActive: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_active'],
-      )!,
       assignedUserId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}assigned_user_id'],
@@ -1508,9 +1482,6 @@ class Task extends DataClass implements Insertable<Task> {
   /// Tombstone-флаг.
   final bool isDeleted;
 
-  /// Показывать ли задачу в общем списке.
-  final bool isActive;
-
   /// Идентификатор назначенного пользователя.
   final String? assignedUserId;
 
@@ -1531,7 +1502,6 @@ class Task extends DataClass implements Insertable<Task> {
     this.nextExecutionAt,
     required this.isCompleted,
     required this.isDeleted,
-    required this.isActive,
     this.assignedUserId,
     required this.createdBy,
   });
@@ -1562,7 +1532,6 @@ class Task extends DataClass implements Insertable<Task> {
     }
     map['is_completed'] = Variable<bool>(isCompleted);
     map['is_deleted'] = Variable<bool>(isDeleted);
-    map['is_active'] = Variable<bool>(isActive);
     if (!nullToAbsent || assignedUserId != null) {
       map['assigned_user_id'] = Variable<String>(assignedUserId);
     }
@@ -1596,7 +1565,6 @@ class Task extends DataClass implements Insertable<Task> {
           : Value(nextExecutionAt),
       isCompleted: Value(isCompleted),
       isDeleted: Value(isDeleted),
-      isActive: Value(isActive),
       assignedUserId: assignedUserId == null && nullToAbsent
           ? const Value.absent()
           : Value(assignedUserId),
@@ -1624,7 +1592,6 @@ class Task extends DataClass implements Insertable<Task> {
       nextExecutionAt: serializer.fromJson<DateTime?>(json['nextExecutionAt']),
       isCompleted: serializer.fromJson<bool>(json['isCompleted']),
       isDeleted: serializer.fromJson<bool>(json['isDeleted']),
-      isActive: serializer.fromJson<bool>(json['isActive']),
       assignedUserId: serializer.fromJson<String?>(json['assignedUserId']),
       createdBy: serializer.fromJson<String>(json['createdBy']),
     );
@@ -1647,7 +1614,6 @@ class Task extends DataClass implements Insertable<Task> {
       'nextExecutionAt': serializer.toJson<DateTime?>(nextExecutionAt),
       'isCompleted': serializer.toJson<bool>(isCompleted),
       'isDeleted': serializer.toJson<bool>(isDeleted),
-      'isActive': serializer.toJson<bool>(isActive),
       'assignedUserId': serializer.toJson<String?>(assignedUserId),
       'createdBy': serializer.toJson<String>(createdBy),
     };
@@ -1668,7 +1634,6 @@ class Task extends DataClass implements Insertable<Task> {
     Value<DateTime?> nextExecutionAt = const Value.absent(),
     bool? isCompleted,
     bool? isDeleted,
-    bool? isActive,
     Value<String?> assignedUserId = const Value.absent(),
     String? createdBy,
   }) => Task(
@@ -1690,7 +1655,6 @@ class Task extends DataClass implements Insertable<Task> {
         : this.nextExecutionAt,
     isCompleted: isCompleted ?? this.isCompleted,
     isDeleted: isDeleted ?? this.isDeleted,
-    isActive: isActive ?? this.isActive,
     assignedUserId: assignedUserId.present
         ? assignedUserId.value
         : this.assignedUserId,
@@ -1722,7 +1686,6 @@ class Task extends DataClass implements Insertable<Task> {
           ? data.isCompleted.value
           : this.isCompleted,
       isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
-      isActive: data.isActive.present ? data.isActive.value : this.isActive,
       assignedUserId: data.assignedUserId.present
           ? data.assignedUserId.value
           : this.assignedUserId,
@@ -1747,7 +1710,6 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('nextExecutionAt: $nextExecutionAt, ')
           ..write('isCompleted: $isCompleted, ')
           ..write('isDeleted: $isDeleted, ')
-          ..write('isActive: $isActive, ')
           ..write('assignedUserId: $assignedUserId, ')
           ..write('createdBy: $createdBy')
           ..write(')'))
@@ -1770,7 +1732,6 @@ class Task extends DataClass implements Insertable<Task> {
     nextExecutionAt,
     isCompleted,
     isDeleted,
-    isActive,
     assignedUserId,
     createdBy,
   );
@@ -1792,7 +1753,6 @@ class Task extends DataClass implements Insertable<Task> {
           other.nextExecutionAt == this.nextExecutionAt &&
           other.isCompleted == this.isCompleted &&
           other.isDeleted == this.isDeleted &&
-          other.isActive == this.isActive &&
           other.assignedUserId == this.assignedUserId &&
           other.createdBy == this.createdBy);
 }
@@ -1812,7 +1772,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<DateTime?> nextExecutionAt;
   final Value<bool> isCompleted;
   final Value<bool> isDeleted;
-  final Value<bool> isActive;
   final Value<String?> assignedUserId;
   final Value<String> createdBy;
   final Value<int> rowid;
@@ -1831,7 +1790,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.nextExecutionAt = const Value.absent(),
     this.isCompleted = const Value.absent(),
     this.isDeleted = const Value.absent(),
-    this.isActive = const Value.absent(),
     this.assignedUserId = const Value.absent(),
     this.createdBy = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1851,7 +1809,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.nextExecutionAt = const Value.absent(),
     this.isCompleted = const Value.absent(),
     this.isDeleted = const Value.absent(),
-    this.isActive = const Value.absent(),
     this.assignedUserId = const Value.absent(),
     required String createdBy,
     this.rowid = const Value.absent(),
@@ -1878,7 +1835,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<DateTime>? nextExecutionAt,
     Expression<bool>? isCompleted,
     Expression<bool>? isDeleted,
-    Expression<bool>? isActive,
     Expression<String>? assignedUserId,
     Expression<String>? createdBy,
     Expression<int>? rowid,
@@ -1898,7 +1854,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (nextExecutionAt != null) 'next_execution_at': nextExecutionAt,
       if (isCompleted != null) 'is_completed': isCompleted,
       if (isDeleted != null) 'is_deleted': isDeleted,
-      if (isActive != null) 'is_active': isActive,
       if (assignedUserId != null) 'assigned_user_id': assignedUserId,
       if (createdBy != null) 'created_by': createdBy,
       if (rowid != null) 'rowid': rowid,
@@ -1920,7 +1875,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Value<DateTime?>? nextExecutionAt,
     Value<bool>? isCompleted,
     Value<bool>? isDeleted,
-    Value<bool>? isActive,
     Value<String?>? assignedUserId,
     Value<String>? createdBy,
     Value<int>? rowid,
@@ -1940,7 +1894,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
       nextExecutionAt: nextExecutionAt ?? this.nextExecutionAt,
       isCompleted: isCompleted ?? this.isCompleted,
       isDeleted: isDeleted ?? this.isDeleted,
-      isActive: isActive ?? this.isActive,
       assignedUserId: assignedUserId ?? this.assignedUserId,
       createdBy: createdBy ?? this.createdBy,
       rowid: rowid ?? this.rowid,
@@ -1992,9 +1945,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (isDeleted.present) {
       map['is_deleted'] = Variable<bool>(isDeleted.value);
     }
-    if (isActive.present) {
-      map['is_active'] = Variable<bool>(isActive.value);
-    }
     if (assignedUserId.present) {
       map['assigned_user_id'] = Variable<String>(assignedUserId.value);
     }
@@ -2024,7 +1974,6 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('nextExecutionAt: $nextExecutionAt, ')
           ..write('isCompleted: $isCompleted, ')
           ..write('isDeleted: $isDeleted, ')
-          ..write('isActive: $isActive, ')
           ..write('assignedUserId: $assignedUserId, ')
           ..write('createdBy: $createdBy, ')
           ..write('rowid: $rowid')
@@ -2581,7 +2530,6 @@ typedef $$TasksTableCreateCompanionBuilder =
       Value<DateTime?> nextExecutionAt,
       Value<bool> isCompleted,
       Value<bool> isDeleted,
-      Value<bool> isActive,
       Value<String?> assignedUserId,
       required String createdBy,
       Value<int> rowid,
@@ -2602,7 +2550,6 @@ typedef $$TasksTableUpdateCompanionBuilder =
       Value<DateTime?> nextExecutionAt,
       Value<bool> isCompleted,
       Value<bool> isDeleted,
-      Value<bool> isActive,
       Value<String?> assignedUserId,
       Value<String> createdBy,
       Value<int> rowid,
@@ -2683,11 +2630,6 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
 
   ColumnFilters<bool> get isDeleted => $composableBuilder(
     column: $table.isDeleted,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2781,11 +2723,6 @@ class $$TasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get assignedUserId => $composableBuilder(
     column: $table.assignedUserId,
     builder: (column) => ColumnOrderings(column),
@@ -2858,9 +2795,6 @@ class $$TasksTableAnnotationComposer
   GeneratedColumn<bool> get isDeleted =>
       $composableBuilder(column: $table.isDeleted, builder: (column) => column);
 
-  GeneratedColumn<bool> get isActive =>
-      $composableBuilder(column: $table.isActive, builder: (column) => column);
-
   GeneratedColumn<String> get assignedUserId => $composableBuilder(
     column: $table.assignedUserId,
     builder: (column) => column,
@@ -2912,7 +2846,6 @@ class $$TasksTableTableManager
                 Value<DateTime?> nextExecutionAt = const Value.absent(),
                 Value<bool> isCompleted = const Value.absent(),
                 Value<bool> isDeleted = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
                 Value<String?> assignedUserId = const Value.absent(),
                 Value<String> createdBy = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -2931,7 +2864,6 @@ class $$TasksTableTableManager
                 nextExecutionAt: nextExecutionAt,
                 isCompleted: isCompleted,
                 isDeleted: isDeleted,
-                isActive: isActive,
                 assignedUserId: assignedUserId,
                 createdBy: createdBy,
                 rowid: rowid,
@@ -2952,7 +2884,6 @@ class $$TasksTableTableManager
                 Value<DateTime?> nextExecutionAt = const Value.absent(),
                 Value<bool> isCompleted = const Value.absent(),
                 Value<bool> isDeleted = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
                 Value<String?> assignedUserId = const Value.absent(),
                 required String createdBy,
                 Value<int> rowid = const Value.absent(),
@@ -2971,7 +2902,6 @@ class $$TasksTableTableManager
                 nextExecutionAt: nextExecutionAt,
                 isCompleted: isCompleted,
                 isDeleted: isDeleted,
-                isActive: isActive,
                 assignedUserId: assignedUserId,
                 createdBy: createdBy,
                 rowid: rowid,

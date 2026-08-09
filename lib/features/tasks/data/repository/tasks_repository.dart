@@ -17,23 +17,28 @@ final class TasksRepository implements ITasksRepository {
   }
 
   @override
-  Future<List<TaskEntity>> getUrgentTasks() {
-    return _localDataSource.getUrgentTasks();
+  Future<List<TaskEntity>> getOneTimeTasks() {
+    return _localDataSource.getOneTimeTasks();
   }
 
   @override
-  Future<List<TaskEntity>> getHighPriorityTasks() {
-    return _localDataSource.getHighPriorityTasks();
+  Future<List<TaskEntity>> getDailyTasks() {
+    return _localDataSource.getDailyTasks();
   }
 
   @override
-  Future<List<TaskEntity>> getMediumPriorityTasks() {
-    return _localDataSource.getMediumPriorityTasks();
+  Future<List<TaskEntity>> getWeaklyTasks() {
+    return _localDataSource.getWeaklyTasks();
   }
 
   @override
-  Future<List<TaskEntity>> getLowPriorityTasks() {
-    return _localDataSource.getLowPriorityTasks();
+  Future<List<TaskEntity>> getMonthlyTasks() {
+    return _localDataSource.getMonthlyTasks();
+  }
+
+  @override
+  Future<List<TaskEntity>> getYearlyTasks() {
+    return _localDataSource.getYearlyTasks();
   }
 
   @override
@@ -46,6 +51,7 @@ final class TasksRepository implements ITasksRepository {
     final task = TaskEntity(
       id: const Uuid().v4(),
       title: createTask.title,
+      description: createTask.description,
       type: createTask.type,
       priority: createTask.priority,
       createdAt: DateTime.now(),
@@ -56,7 +62,6 @@ final class TasksRepository implements ITasksRepository {
       nextExecutionAt: createTask.dueDate,
       isCompleted: false,
       isDeleted: false,
-      isActive: createTask.isActive,
       sortOrder: 0,
       assignedUserId: createTask.assignedUserId,
       createdBy: createTask.createdBy,

@@ -5,17 +5,20 @@ abstract interface class ITasksRepository {
   /// Блок "Сегодня"
   Stream<List<TaskEntity>> watchTodayTasks();
 
-  /// Срочные задачи
-  Future<List<TaskEntity>> getUrgentTasks();
+  /// Разовые задачи
+  Future<List<TaskEntity>> getOneTimeTasks();
 
-  /// Высокий приоритет
-  Future<List<TaskEntity>> getHighPriorityTasks();
+  /// Ежедневные задачи
+  Future<List<TaskEntity>> getDailyTasks();
 
-  /// Средний приоритет
-  Future<List<TaskEntity>> getMediumPriorityTasks();
+  /// Еженедельные задачи
+  Future<List<TaskEntity>> getWeaklyTasks();
 
-  /// Низкий приоритет
-  Future<List<TaskEntity>> getLowPriorityTasks();
+  /// Ежемесячные задачи
+  Future<List<TaskEntity>> getMonthlyTasks();
+
+  /// Ежегодные задачи
+  Future<List<TaskEntity>> getYearlyTasks();
 
   /// Получение задачи
   Future<TaskEntity> getTask(String id);

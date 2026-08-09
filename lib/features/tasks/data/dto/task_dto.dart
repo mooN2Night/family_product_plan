@@ -15,7 +15,6 @@ final class TaskDto {
     required this.updatedAt,
     required this.isCompleted,
     required this.isDeleted,
-    required this.isActive,
     required this.sortOrder,
     required this.createdBy,
     this.description,
@@ -42,7 +41,6 @@ final class TaskDto {
       nextExecutionAt: (json['nextExecutionAt'] as Timestamp?)?.toDate(),
       isCompleted: json['isCompleted'] as bool,
       isDeleted: json['isDeleted'] as bool,
-      isActive: json['isActive'] as bool,
       sortOrder: json['sortOrder'] as int,
       assignedUserId: json['assignedUserId'] as String?,
       createdBy: json['createdBy'] as String,
@@ -72,7 +70,6 @@ final class TaskDto {
           : DateTime.parse(json['nextExecutionAt'] as String),
       isCompleted: json['isCompleted'] as bool,
       isDeleted: json['isDeleted'] as bool,
-      isActive: json['isActive'] as bool,
       sortOrder: json['sortOrder'] as int,
       assignedUserId: json['assignedUserId'] as String?,
       createdBy: json['createdBy'] as String,
@@ -118,9 +115,6 @@ final class TaskDto {
   /// Флаг, были ли задача удалена
   final bool isDeleted;
 
-  /// Показывать ли задачу в общем списке
-  final bool isActive;
-
   /// Порядок отображения
   final int sortOrder;
 
@@ -146,7 +140,6 @@ final class TaskDto {
       nextExecutionAt: nextExecutionAt,
       isCompleted: isCompleted,
       isDeleted: isDeleted,
-      isActive: isActive,
       sortOrder: sortOrder,
       assignedUserId: assignedUserId,
       createdBy: createdBy,
@@ -175,7 +168,6 @@ final class TaskDto {
           : Timestamp.fromDate(nextExecutionAt!),
       'isCompleted': isCompleted,
       'isDeleted': isDeleted,
-      'isActive': isActive,
       'sortOrder': sortOrder,
       'assignedUserId': assignedUserId,
       'createdBy': createdBy,
@@ -197,7 +189,6 @@ final class TaskDto {
       'nextExecutionAt': nextExecutionAt?.toIso8601String(),
       'isCompleted': isCompleted,
       'isDeleted': isDeleted,
-      'isActive': isActive,
       'sortOrder': sortOrder,
       'assignedUserId': assignedUserId,
       'createdBy': createdBy,

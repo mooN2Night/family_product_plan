@@ -50,13 +50,15 @@ abstract interface class IDatabase {
 
   Stream<List<Task>> watchTodayTasks();
 
-  Future<List<Task>> getUrgentTasks();
+  Future<List<Task>> getOneTimeTasks();
 
-  Future<List<Task>> getHighPriorityTasks();
+  Future<List<Task>> getDailyTasks();
 
-  Future<List<Task>> getMediumPriorityTasks();
+  Future<List<Task>> getWeaklyTasks();
 
-  Future<List<Task>> getLowPriorityTasks();
+  Future<List<Task>> getMonthlyTasks();
+
+  Future<List<Task>> getYearlyTasks();
 
   Future<void> insertTask(TasksCompanion entity);
 

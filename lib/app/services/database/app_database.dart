@@ -6,9 +6,8 @@ import 'package:family_product_plan/app/services/database/i_database.dart';
 import 'package:family_product_plan/app/services/database/pending_sync_operations_table.dart';
 import 'package:family_product_plan/app/services/database/products_table.dart';
 import 'package:family_product_plan/app/services/database/tasks_table.dart';
+import 'package:family_product_plan/features/tasks/utils/task_type.dart';
 import 'package:path/path.dart' as p;
-
-import '../../../features/tasks/utils/task_priority.dart';
 
 part 'app_database.g.dart';
 
@@ -126,7 +125,6 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
           ..where(
             (t) =>
                 t.isDeleted.equals(false) &
-                t.isActive.equals(true) &
                 t.nextExecutionAt.isBiggerOrEqualValue(start) &
                 t.nextExecutionAt.isSmallerThanValue(end),
           )
@@ -138,48 +136,57 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   }
 
   @override
-  Future<List<Task>> getUrgentTasks() {
+  Future<List<Task>> getOneTimeTasks() {
     return (select(tasks)
           ..where(
             (t) =>
                 t.isDeleted.equals(false) &
-                t.priority.equals(TaskPriority.urgent.name),
+                t.type.equals(TaskType.oneTime.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
         .get();
   }
 
   @override
-  Future<List<Task>> getHighPriorityTasks() {
+  Future<List<Task>> getDailyTasks() {
     return (select(tasks)
           ..where(
             (t) =>
-                t.isDeleted.equals(false) &
-                t.priority.equals(TaskPriority.high.name),
+                t.isDeleted.equals(false) & t.type.equals(TaskType.daily.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
         .get();
   }
 
   @override
-  Future<List<Task>> getMediumPriorityTasks() {
+  Future<List<Task>> getWeaklyTasks() {
     return (select(tasks)
           ..where(
             (t) =>
-                t.isDeleted.equals(false) &
-                t.priority.equals(TaskPriority.medium.name),
+                t.isDeleted.equals(false) & t.type.equals(TaskType.weekly.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
         .get();
   }
 
   @override
-  Future<List<Task>> getLowPriorityTasks() {
+  Future<List<Task>> getMonthlyTasks() {
     return (select(tasks)
           ..where(
             (t) =>
                 t.isDeleted.equals(false) &
-                t.priority.equals(TaskPriority.low.name),
+                t.type.equals(TaskType.monthly.name),
+          )
+          ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
+        .get();
+  }
+
+  @override
+  Future<List<Task>> getYearlyTasks() {
+    return (select(tasks)
+          ..where(
+            (t) =>
+                t.isDeleted.equals(false) & t.type.equals(TaskType.yearly.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
         .get();
@@ -219,11 +226,7 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   @override
   Future<void> deleteTask(Task entity) async {
     await updateTask(
-      entity.copyWith(
-        isDeleted: true,
-        isActive: false,
-        updatedAt: DateTime.now(),
-      ),
+      entity.copyWith(isDeleted: true, updatedAt: DateTime.now()),
     );
   }
 
