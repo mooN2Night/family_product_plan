@@ -18,29 +18,36 @@ final class TasksLocalDataSource implements ITasksLocalDataSource {
   }
 
   @override
-  Future<List<TaskEntity>> getUrgentTasks() async {
-    final tasks = await _database.getUrgentTasks();
+  Future<List<TaskEntity>> getOneTimeTasks() async {
+    final tasks = await _database.getOneTimeTasks();
 
     return tasks.map((e) => e.toEntity()).toList();
   }
 
   @override
-  Future<List<TaskEntity>> getHighPriorityTasks() async {
-    final tasks = await _database.getHighPriorityTasks();
+  Future<List<TaskEntity>> getDailyTasks() async {
+    final tasks = await _database.getDailyTasks();
 
     return tasks.map((e) => e.toEntity()).toList();
   }
 
   @override
-  Future<List<TaskEntity>> getMediumPriorityTasks() async {
-    final tasks = await _database.getMediumPriorityTasks();
+  Future<List<TaskEntity>> getWeaklyTasks() async {
+    final tasks = await _database.getWeaklyTasks();
 
     return tasks.map((e) => e.toEntity()).toList();
   }
 
   @override
-  Future<List<TaskEntity>> getLowPriorityTasks() async {
-    final tasks = await _database.getLowPriorityTasks();
+  Future<List<TaskEntity>> getMonthlyTasks() async {
+    final tasks = await _database.getMonthlyTasks();
+
+    return tasks.map((e) => e.toEntity()).toList();
+  }
+
+  @override
+  Future<List<TaskEntity>> getYearlyTasks() async {
+    final tasks = await _database.getYearlyTasks();
 
     return tasks.map((e) => e.toEntity()).toList();
   }

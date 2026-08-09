@@ -22,7 +22,6 @@ extension TaskMapper on Task {
       nextExecutionAt: nextExecutionAt,
       isCompleted: isCompleted,
       isDeleted: isDeleted,
-      isActive: isActive,
       sortOrder: sortOrder,
       assignedUserId: assignedUserId,
       createdBy: createdBy,
@@ -47,7 +46,6 @@ extension TaskEntityMapper on TaskEntity {
       nextExecutionAt: nextExecutionAt,
       isCompleted: isCompleted,
       isDeleted: isDeleted,
-      isActive: isActive,
       sortOrder: sortOrder,
       assignedUserId: assignedUserId,
       createdBy: createdBy,
@@ -71,7 +69,6 @@ extension TaskEntityMapper on TaskEntity {
       nextExecutionAt: Value(nextExecutionAt),
       isCompleted: Value(isCompleted),
       isDeleted: Value(isDeleted),
-      isActive: Value(isActive),
       assignedUserId: Value(assignedUserId),
     );
   }

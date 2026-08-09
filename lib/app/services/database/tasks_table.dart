@@ -44,9 +44,6 @@ class Tasks extends Table {
   /// Tombstone-флаг.
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
 
-  /// Показывать ли задачу в общем списке.
-  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
-
   /// Идентификатор назначенного пользователя.
   TextColumn get assignedUserId => text().nullable()();
 

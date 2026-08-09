@@ -15,7 +15,6 @@ final class TaskEntity extends Equatable {
     required this.updatedAt,
     required this.isCompleted,
     required this.isDeleted,
-    required this.isActive,
     required this.sortOrder,
     required this.createdBy,
     this.description,
@@ -65,9 +64,6 @@ final class TaskEntity extends Equatable {
   /// Флаг, были ли задача удалена
   final bool isDeleted;
 
-  /// Показывать ли задачу в общем списке
-  final bool isActive;
-
   /// Порядок отображения
   final int sortOrder;
 
@@ -93,7 +89,6 @@ final class TaskEntity extends Equatable {
       nextExecutionAt: nextExecutionAt,
       isCompleted: isCompleted,
       isDeleted: isDeleted,
-      isActive: isActive,
       sortOrder: sortOrder,
       assignedUserId: assignedUserId,
       createdBy: createdBy,
@@ -115,7 +110,6 @@ final class TaskEntity extends Equatable {
     DateTime? nextExecutionAt,
     bool? isCompleted,
     bool? isDeleted,
-    bool? isActive,
     int? sortOrder,
     String? assignedUserId,
     String? createdBy,
@@ -134,7 +128,6 @@ final class TaskEntity extends Equatable {
       nextExecutionAt: nextExecutionAt ?? this.nextExecutionAt,
       isCompleted: isCompleted ?? this.isCompleted,
       isDeleted: isDeleted ?? this.isDeleted,
-      isActive: isActive ?? this.isActive,
       sortOrder: sortOrder ?? this.sortOrder,
       assignedUserId: assignedUserId ?? this.assignedUserId,
       createdBy: createdBy ?? this.createdBy,
@@ -156,7 +149,6 @@ final class TaskEntity extends Equatable {
     nextExecutionAt,
     isCompleted,
     isDeleted,
-    isActive,
     sortOrder,
     assignedUserId,
     createdBy,

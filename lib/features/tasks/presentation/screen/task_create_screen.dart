@@ -40,8 +40,6 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
   DateTime? _dueDate;
   String? _assignedUserId;
 
-  bool _isActive = true;
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<TasksActionBloc, TasksActionState>(
@@ -104,16 +102,6 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
               trailing: const Icon(Icons.calendar_month),
               onTap: _selectDate,
             ),
-            const SizedBox(height: 8),
-            SwitchListTile(
-              value: _isActive,
-              title: const Text('Показывать в общем списке'),
-              onChanged: (value) {
-                setState(() {
-                  _isActive = value;
-                });
-              },
-            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _createTask,
@@ -133,7 +121,6 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
       priority: _priority,
       dueDate: _dueDate,
       nextExecutionAt: _dueDate,
-      isActive: _isActive,
       assignedUserId: _assignedUserId,
       createdBy: '',
     );
