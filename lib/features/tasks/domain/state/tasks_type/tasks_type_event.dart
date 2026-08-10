@@ -16,3 +16,16 @@ final class TasksTypeRequestedEvent extends TasksTypeEvent {
   @override
   List<Object?> get props => [type];
 }
+
+final class TasksTypeUpdatedEvent extends TasksTypeEvent {
+  const TasksTypeUpdatedEvent({required this.tasks});
+
+  final List<TaskEntity> tasks;
+
+  @override
+  List<Object?> get props => [tasks];
+}
+
+final class TasksTypeClosedEvent extends TasksTypeEvent {
+  const TasksTypeClosedEvent();
+}

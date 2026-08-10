@@ -3,15 +3,15 @@ import '../../../domain/entity/task_entity.dart';
 abstract interface class ITasksLocalDataSource {
   Stream<List<TaskEntity>> watchTodayTasks();
 
-  Future<List<TaskEntity>> getOneTimeTasks();
+  Stream<List<TaskEntity>> watchOneTimeTasks();
 
-  Future<List<TaskEntity>> getDailyTasks();
+  Stream<List<TaskEntity>> watchDailyTasks();
 
-  Future<List<TaskEntity>> getWeaklyTasks();
+  Stream<List<TaskEntity>> watchWeaklyTasks();
 
-  Future<List<TaskEntity>> getMonthlyTasks();
+  Stream<List<TaskEntity>> watchMonthlyTasks();
 
-  Future<List<TaskEntity>> getYearlyTasks();
+  Stream<List<TaskEntity>> watchYearlyTasks();
 
   Future<void> insertTask(TaskEntity entity);
 
@@ -26,4 +26,6 @@ abstract interface class ITasksLocalDataSource {
   Future<void> clearTasks();
 
   Future<TaskEntity> getTaskById(String id);
+
+  Future<List<TaskEntity>> getRecurringTasks();
 }

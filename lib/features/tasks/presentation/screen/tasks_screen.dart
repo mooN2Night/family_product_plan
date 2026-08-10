@@ -1,7 +1,10 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/app/ui_kit/app_bar.dart';
+import 'package:family_product_plan/app/ui_kit/app_box.dart';
+import 'package:family_product_plan/app/utils/app_expansion_tile.dart';
 import 'package:family_product_plan/features/tasks/domain/state/task_action/tasks_action_bloc.dart';
 import 'package:family_product_plan/features/tasks/domain/state/tasks_today/today_tasks_bloc.dart';
+import 'package:family_product_plan/features/tasks/presentation/components/task_list_tile.dart';
 import 'package:family_product_plan/features/tasks/presentation/tasks_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,8 +41,6 @@ class _TasksView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskRepository = context.di.repositories.tasksRepository;
-
     return Scaffold(
       appBar: CustomAppBar.profile(
         actions: [
@@ -50,16 +51,10 @@ class _TasksView extends StatelessWidget {
         ],
       ),
       body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 140),
         children: [
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Сегодня',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-          const SizedBox(height: 8),
+          HBox(16),
+          Text('Сегодня', style: Theme.of(context).textTheme.titleLarge),
           BlocBuilder<TodayTasksBloc, TodayTasksState>(
             builder: (context, state) {
               switch (state) {
@@ -82,284 +77,65 @@ class _TasksView extends StatelessWidget {
                   }
 
                   return Column(
-                    children: List.generate(tasks.length, (index) {
-                      final task = tasks[index];
-
-                      return Card(
-                        child: ListTile(
-                          title: Text(task.title),
-                          subtitle: task.description == null
-                              ? null
-                              : Text(task.description!),
-                          trailing: Checkbox(
-                            value: task.isCompleted,
-                            onChanged: (_) {},
-                          ),
-                        ),
-                      );
-                    }),
+                    children: tasks
+                        .map((task) => TaskListTile(task: task))
+                        .toList(),
                   );
               }
             },
           ),
-
-          BlocProvider(
-            create: (context) =>
-                TasksTypeBloc(taskRepository: taskRepository)
-                  ..add(TasksTypeRequestedEvent(type: TaskType.oneTime)),
-            child: BlocBuilder<TasksTypeBloc, TasksTypeState>(
-              builder: (context, state) {
-                if (state is! TasksTypeSuccessState) {
-                  return Container(height: 50, width: 50, color: Colors.red);
-                }
-
-                final tasks = state.tasks;
-
-                return Column(
-                  children: [
-                    Text(
-                      TaskType.oneTime.title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Column(
-                      children: List.generate(tasks.length, (index) {
-                        final task = tasks[index];
-                        debugPrint('debugPrint task: $task');
-
-                        return Card(
-                          child: ListTile(
-                            title: Text(task.title),
-                            subtitle: task.description == null
-                                ? null
-                                : Text(task.description!),
-                            trailing: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (_) {},
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          BlocProvider(
-            create: (context) =>
-                TasksTypeBloc(taskRepository: taskRepository)
-                  ..add(TasksTypeRequestedEvent(type: TaskType.daily)),
-            child: BlocBuilder<TasksTypeBloc, TasksTypeState>(
-              builder: (context, state) {
-                if (state is! TasksTypeSuccessState) {
-                  return Container(height: 50, width: 50, color: Colors.red);
-                }
-
-                final tasks = state.tasks;
-
-                return Column(
-                  children: [
-                    Text(
-                      TaskType.daily.title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Column(
-                      children: List.generate(tasks.length, (index) {
-                        final task = tasks[index];
-
-                        return Card(
-                          child: ListTile(
-                            title: Text(task.title),
-                            subtitle: task.description == null
-                                ? null
-                                : Text(task.description!),
-                            trailing: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (_) {},
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          BlocProvider(
-            create: (context) =>
-                TasksTypeBloc(taskRepository: taskRepository)
-                  ..add(TasksTypeRequestedEvent(type: TaskType.weekly)),
-            child: BlocBuilder<TasksTypeBloc, TasksTypeState>(
-              builder: (context, state) {
-                if (state is! TasksTypeSuccessState) {
-                  return Container(height: 50, width: 50, color: Colors.red);
-                }
-
-                final tasks = state.tasks;
-
-                return Column(
-                  children: [
-                    Text(
-                      TaskType.weekly.title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Column(
-                      children: List.generate(tasks.length, (index) {
-                        final task = tasks[index];
-
-                        return Card(
-                          child: ListTile(
-                            title: Text(task.title),
-                            subtitle: task.description == null
-                                ? null
-                                : Text(task.description!),
-                            trailing: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (_) {},
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          BlocProvider(
-            create: (context) =>
-                TasksTypeBloc(taskRepository: taskRepository)
-                  ..add(TasksTypeRequestedEvent(type: TaskType.monthly)),
-            child: BlocBuilder<TasksTypeBloc, TasksTypeState>(
-              builder: (context, state) {
-                if (state is! TasksTypeSuccessState) {
-                  return Container(height: 50, width: 50, color: Colors.red);
-                }
-
-                final tasks = state.tasks;
-
-                return Column(
-                  children: [
-                    Text(
-                      TaskType.monthly.title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Column(
-                      children: List.generate(tasks.length, (index) {
-                        final task = tasks[index];
-
-                        return Card(
-                          child: ListTile(
-                            title: Text(task.title),
-                            subtitle: task.description == null
-                                ? null
-                                : Text(task.description!),
-                            trailing: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (_) {},
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          BlocProvider(
-            create: (context) =>
-            TasksTypeBloc(taskRepository: taskRepository)
-              ..add(TasksTypeRequestedEvent(type: TaskType.yearly)),
-            child: BlocBuilder<TasksTypeBloc, TasksTypeState>(
-              builder: (context, state) {
-                if (state is! TasksTypeSuccessState) {
-                  return Container(height: 50, width: 50, color: Colors.red);
-                }
-
-                final tasks = state.tasks;
-
-                return Column(
-                  children: [
-                    Text(
-                      TaskType.yearly.title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Column(
-                      children: List.generate(tasks.length, (index) {
-                        final task = tasks[index];
-
-                        return Card(
-                          child: ListTile(
-                            title: Text(task.title),
-                            subtitle: task.description == null
-                                ? null
-                                : Text(task.description!),
-                            trailing: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (_) {},
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          // Expanded(
-          //   child: BlocBuilder<TodayTasksBloc, TodayTasksState>(
-          //     builder: (context, state) {
-          //       switch (state) {
-          //         case TodayTasksInitialState():
-          //         case TodayTasksLoadingState():
-          //           return const Center(child: CircularProgressIndicator());
-          //
-          //         case TodayTasksErrorState():
-          //           return Center(child: Text(state.message));
-          //
-          //         case TodayTasksSuccessState():
-          //           if (state.tasks.isEmpty) {
-          //             return const Center(
-          //               child: Text('На сегодня задач нет 🎉'),
-          //             );
-          //           }
-          //
-          //           return ListView.separated(
-          //             padding: const EdgeInsets.all(16),
-          //             itemCount: state.tasks.length,
-          //             separatorBuilder: (_, _) {
-          //               return const SizedBox(height: 8);
-          //             },
-          //             itemBuilder: (_, index) {
-          //               final task = state.tasks[index];
-          //
-          //               return Card(
-          //                 child: ListTile(
-          //                   title: Text(task.title),
-          //                   subtitle: task.description == null
-          //                       ? null
-          //                       : Text(task.description!),
-          //                   trailing: Checkbox(
-          //                     value: task.isCompleted,
-          //                     onChanged: (_) {},
-          //                   ),
-          //                 ),
-          //               );
-          //             },
-          //           );
-          //       }
-          //     },
-          //   ),
-          // ),
+          HBox(20),
+          _TasksWrapper(type: TaskType.oneTime),
+          HBox(16),
+          _TasksWrapper(type: TaskType.daily),
+          HBox(16),
+          _TasksWrapper(type: TaskType.weekly),
+          HBox(16),
+          _TasksWrapper(type: TaskType.monthly),
+          HBox(16),
+          _TasksWrapper(type: TaskType.yearly),
         ],
+      ),
+    );
+  }
+}
+
+class _TasksWrapper extends StatelessWidget {
+  const _TasksWrapper({required this.type});
+
+  final TaskType type;
+
+  @override
+  Widget build(BuildContext context) {
+    final taskRepository = context.di.repositories.tasksRepository;
+
+    return BlocProvider(
+      create: (context) =>
+          TasksTypeBloc(taskRepository: taskRepository)
+            ..add(TasksTypeRequestedEvent(type: type)),
+      child: BlocBuilder<TasksTypeBloc, TasksTypeState>(
+        builder: (context, state) {
+          if (state is! TasksTypeSuccessState) {
+            return Container(height: 50, width: 50, color: Colors.red);
+          }
+
+          final tasks = state.tasks;
+
+          return AppExpansionWrapper.borderless(
+            context,
+            title: type.title,
+            subtitle: tasks.length.toString(),
+            isEnabled: tasks.isNotEmpty,
+            expandedContent: Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Column(
+                children: tasks
+                    .map((task) => TaskListTile(task: task))
+                    .toList(),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

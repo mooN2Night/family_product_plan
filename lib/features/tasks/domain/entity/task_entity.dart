@@ -46,7 +46,10 @@ final class TaskEntity extends Equatable {
   /// Дата обновления
   final DateTime updatedAt;
 
-  /// Срок выполенения задачи
+  /// Для одноразовой задачи — конкретный срок.
+  ///
+  /// Для повторяющейся — выбранная календарная дата,
+  /// по которой определяется расписание.
   final DateTime? dueDate;
 
   /// Когда задача была выполнена
@@ -55,7 +58,7 @@ final class TaskEntity extends Equatable {
   /// Дата последнего выполнения.
   final DateTime? lastExecutionAt;
 
-  /// Дата следующего выполнения.
+  /// Ближайшая дата, когда задача должна быть выполнена.
   final DateTime? nextExecutionAt;
 
   /// Флаг, выполенена ли одноразовая задача

@@ -6,19 +6,19 @@ abstract interface class ITasksRepository {
   Stream<List<TaskEntity>> watchTodayTasks();
 
   /// Разовые задачи
-  Future<List<TaskEntity>> getOneTimeTasks();
+  Stream<List<TaskEntity>> watchOneTimeTasks();
 
   /// Ежедневные задачи
-  Future<List<TaskEntity>> getDailyTasks();
+  Stream<List<TaskEntity>> watchDailyTasks();
 
   /// Еженедельные задачи
-  Future<List<TaskEntity>> getWeaklyTasks();
+  Stream<List<TaskEntity>> watchWeaklyTasks();
 
   /// Ежемесячные задачи
-  Future<List<TaskEntity>> getMonthlyTasks();
+  Stream<List<TaskEntity>> watchMonthlyTasks();
 
   /// Ежегодные задачи
-  Future<List<TaskEntity>> getYearlyTasks();
+  Stream<List<TaskEntity>> watchYearlyTasks();
 
   /// Получение задачи
   Future<TaskEntity> getTask(String id);

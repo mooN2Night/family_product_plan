@@ -1,5 +1,4 @@
 import 'package:family_product_plan/app/mapper/app_task_mapper.dart';
-import 'package:flutter/material.dart';
 import '../../../../../app/services/database/i_database.dart';
 import '../../../domain/entity/task_entity.dart';
 import 'i_tasks_local_data_source.dart';
@@ -18,43 +17,42 @@ final class TasksLocalDataSource implements ITasksLocalDataSource {
   }
 
   @override
-  Future<List<TaskEntity>> getOneTimeTasks() async {
-    final tasks = await _database.getOneTimeTasks();
-
-    return tasks.map((e) => e.toEntity()).toList();
+  Stream<List<TaskEntity>> watchOneTimeTasks() {
+    return _database.watchOneTimeTasks().map(
+      (tasks) => tasks.map((e) => e.toEntity()).toList(),
+    );
   }
 
   @override
-  Future<List<TaskEntity>> getDailyTasks() async {
-    final tasks = await _database.getDailyTasks();
-
-    return tasks.map((e) => e.toEntity()).toList();
+  Stream<List<TaskEntity>> watchDailyTasks() {
+    return _database.watchDailyTasks().map(
+      (tasks) => tasks.map((e) => e.toEntity()).toList(),
+    );
   }
 
   @override
-  Future<List<TaskEntity>> getWeaklyTasks() async {
-    final tasks = await _database.getWeaklyTasks();
-
-    return tasks.map((e) => e.toEntity()).toList();
+  Stream<List<TaskEntity>> watchWeaklyTasks() {
+    return _database.watchWeaklyTasks().map(
+      (tasks) => tasks.map((e) => e.toEntity()).toList(),
+    );
   }
 
   @override
-  Future<List<TaskEntity>> getMonthlyTasks() async {
-    final tasks = await _database.getMonthlyTasks();
-
-    return tasks.map((e) => e.toEntity()).toList();
+  Stream<List<TaskEntity>> watchMonthlyTasks() {
+    return _database.watchMonthlyTasks().map(
+      (tasks) => tasks.map((e) => e.toEntity()).toList(),
+    );
   }
 
   @override
-  Future<List<TaskEntity>> getYearlyTasks() async {
-    final tasks = await _database.getYearlyTasks();
-
-    return tasks.map((e) => e.toEntity()).toList();
+  Stream<List<TaskEntity>> watchYearlyTasks() {
+    return _database.watchYearlyTasks().map(
+      (tasks) => tasks.map((e) => e.toEntity()).toList(),
+    );
   }
 
   @override
   Future<void> insertTask(TaskEntity entity) {
-    debugPrint('debugPrint TasksLocalDataSource $entity');
     return _database.insertTask(entity.toCompanion());
   }
 
@@ -90,5 +88,11 @@ final class TasksLocalDataSource implements ITasksLocalDataSource {
     final task = await _database.getTaskById(id);
 
     return task.toEntity();
+  }
+
+  @override
+  Future<List<TaskEntity>> getRecurringTasks() async {
+    final tasks = await _database.getRecurringTasks();
+    return tasks.map((e) => e.toEntity()).toList();
   }
 }

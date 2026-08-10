@@ -136,7 +136,7 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   }
 
   @override
-  Future<List<Task>> getOneTimeTasks() {
+  Stream<List<Task>> watchOneTimeTasks() {
     return (select(tasks)
           ..where(
             (t) =>
@@ -144,33 +144,33 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
                 t.type.equals(TaskType.oneTime.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
-        .get();
+        .watch();
   }
 
   @override
-  Future<List<Task>> getDailyTasks() {
+  Stream<List<Task>> watchDailyTasks() {
     return (select(tasks)
           ..where(
             (t) =>
                 t.isDeleted.equals(false) & t.type.equals(TaskType.daily.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
-        .get();
+        .watch();
   }
 
   @override
-  Future<List<Task>> getWeaklyTasks() {
+  Stream<List<Task>> watchWeaklyTasks() {
     return (select(tasks)
           ..where(
             (t) =>
                 t.isDeleted.equals(false) & t.type.equals(TaskType.weekly.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
-        .get();
+        .watch();
   }
 
   @override
-  Future<List<Task>> getMonthlyTasks() {
+  Stream<List<Task>> watchMonthlyTasks() {
     return (select(tasks)
           ..where(
             (t) =>
@@ -178,17 +178,27 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
                 t.type.equals(TaskType.monthly.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
-        .get();
+        .watch();
   }
 
   @override
-  Future<List<Task>> getYearlyTasks() {
+  Stream<List<Task>> watchYearlyTasks() {
     return (select(tasks)
           ..where(
             (t) =>
                 t.isDeleted.equals(false) & t.type.equals(TaskType.yearly.name),
           )
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
+        .watch();
+  }
+
+  @override
+  Future<List<Task>> getRecurringTasks() {
+    return (select(tasks)..where(
+          (t) =>
+              t.isDeleted.equals(false) &
+              t.type.isNotIn([TaskType.oneTime.name]),
+        ))
         .get();
   }
 

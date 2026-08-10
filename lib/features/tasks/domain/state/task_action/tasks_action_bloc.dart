@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:family_product_plan/app/error/app_exception.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../entity/create_task_entity.dart';
+import '../../entity/task_entity.dart';
 import '../../repository/i_tasks_repository.dart';
 
 part 'tasks_action_event.dart';
@@ -15,6 +16,8 @@ final class TasksActionBloc extends Bloc<TasksActionEvent, TasksActionState> {
     : _taskRepository = taskRepository,
       super(const TasksActionInitialState()) {
     on<TasksActionAddEvent>(_addTask);
+    on<TasksActionCompleteEvent>(_completeTask);
+    on<TasksActionRestoreEvent>(_restoreTask);
   }
 
   /// Репозиторий задач
@@ -30,6 +33,38 @@ final class TasksActionBloc extends Bloc<TasksActionEvent, TasksActionState> {
 
     try {
       await _taskRepository.createTask(event.task);
+      emit(const TasksActionSuccessState());
+    } on AppException catch (error, stackTrace) {
+      emit(TasksActionErrorState(message: error.message));
+      addError(error, stackTrace);
+    }
+  }
+
+  Future<void> _completeTask(
+    TasksActionCompleteEvent event,
+    Emitter<TasksActionState> emit,
+  ) async {
+    if (state is TasksActionLoadingState) return;
+    emit(const TasksActionLoadingState());
+
+    try {
+      await _taskRepository.completeTask(event.task);
+      emit(const TasksActionSuccessState());
+    } on AppException catch (error, stackTrace) {
+      emit(TasksActionErrorState(message: error.message));
+      addError(error, stackTrace);
+    }
+  }
+
+  Future<void> _restoreTask(
+    TasksActionRestoreEvent event,
+    Emitter<TasksActionState> emit,
+  ) async {
+    if (state is TasksActionLoadingState) return;
+    emit(const TasksActionLoadingState());
+
+    try {
+      await _taskRepository.restoreTask(event.task);
       emit(const TasksActionSuccessState());
     } on AppException catch (error, stackTrace) {
       emit(TasksActionErrorState(message: error.message));

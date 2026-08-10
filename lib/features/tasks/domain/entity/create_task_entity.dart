@@ -10,7 +10,6 @@ final class CreateTaskEntity extends Equatable {
     required this.createdBy,
     this.description,
     this.dueDate,
-    this.nextExecutionAt,
     this.assignedUserId,
   });
 
@@ -26,11 +25,12 @@ final class CreateTaskEntity extends Equatable {
   /// Тип приоритета задачи
   final TaskPriority priority;
 
-  /// Срок выполенения задачи
+  /// - одноразовой задачи — конкретная дата;
+  /// - ежедневной — дата, определяющая начало/выбранный день;
+  /// - еженедельной — день недели;
+  /// - ежемесячной — день месяца;
+  /// - ежегодной — день и месяц.
   final DateTime? dueDate;
-
-  /// Дата следующего выполнения.
-  final DateTime? nextExecutionAt;
 
   /// Кому адресована задача
   final String? assignedUserId;
@@ -45,7 +45,6 @@ final class CreateTaskEntity extends Equatable {
     type,
     priority,
     dueDate,
-    nextExecutionAt,
     assignedUserId,
     createdBy,
   ];
