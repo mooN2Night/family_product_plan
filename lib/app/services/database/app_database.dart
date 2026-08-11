@@ -125,8 +125,11 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
           ..where(
             (t) =>
                 t.isDeleted.equals(false) &
-                t.nextExecutionAt.isBiggerOrEqualValue(start) &
-                t.nextExecutionAt.isSmallerThanValue(end),
+                ((t.nextExecutionAt.isBiggerOrEqualValue(start) &
+                        t.nextExecutionAt.isSmallerThanValue(end)) |
+                    (t.isCompleted.equals(true) &
+                        t.completedAt.isBiggerOrEqualValue(start) &
+                        t.completedAt.isSmallerThanValue(end))),
           )
           ..orderBy([
             (t) => OrderingTerm(expression: t.priority),

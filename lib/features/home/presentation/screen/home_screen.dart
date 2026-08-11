@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/dialog/product_add_dialog.dart';
 import '../../../../app/services/pending_sync/sync_status.dart';
 import '../../../../app/ui_kit/app_bar.dart';
+import '../../../../app/utils/app_colors.dart';
 import '../../../current_family/domain/state/current_family_cubit.dart';
 import '../../domain/entity/product_entity.dart';
 import '../../domain/state/products_action_bloc/products_action_bloc.dart';
@@ -53,24 +54,14 @@ class HomeScreenView extends StatelessWidget {
       child: Scaffold(
         appBar: CustomAppBar.main(
           actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 16),
-              child: SyncStatusIndicator(),
-            ),
+            const SyncStatusIndicator(),
             IconButton(
               onPressed: () => showAddProductDialog(context),
-              icon: const Icon(Icons.add),
+              tooltip: 'Добавить продукт',
+              icon: const Icon(Icons.add_rounded, size: 28),
             ),
           ],
-          bottom: const TabBar(
-            dividerHeight: 0,
-            indicatorColor: Colors.lightBlueAccent,
-            labelStyle: TextStyle(color: Colors.lightBlueAccent),
-            tabs: [
-              Tab(child: Text('Список всех продуктов')),
-              Tab(child: Text('Нужно купить')),
-            ],
-          ),
+          bottom: const HomeProductsTabBar(),
         ),
         body: BlocListener<ProductsActionBloc, ProductsActionState>(
           listener: (context, actionState) {
@@ -128,6 +119,39 @@ class HomeScreenView extends StatelessWidget {
       ),
     );
   }
+}
+
+class HomeProductsTabBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  const HomeProductsTabBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const TabBar(
+      dividerColor: Colors.transparent,
+      indicatorSize: TabBarIndicatorSize.tab,
+      indicator: UnderlineTabIndicator(
+        borderSide: BorderSide(color: AppColors.primary, width: 3),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        insets: EdgeInsets.symmetric(horizontal: 28),
+      ),
+      labelColor: AppColors.primary,
+      unselectedLabelColor: AppColors.textSecondary,
+      labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+      unselectedLabelStyle: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      splashBorderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      tabs: [
+        Tab(child: Text('Все продукты')),
+        Tab(child: Text('Нужно купить')),
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(48);
 }
 
 class _HomeTabBarListView extends StatelessWidget {

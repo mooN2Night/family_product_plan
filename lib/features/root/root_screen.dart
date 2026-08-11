@@ -18,33 +18,32 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> {
   /// Кнопки меню
-  static const _buttonsIcon = [Icons.home, Icons.task, Icons.person];
+  static const _buttonsIcon = [
+    Icons.home_rounded,
+    Icons.checklist_rounded,
+    Icons.person_rounded,
+  ];
 
   /// Заголовки меню
   static const _buttonsTitle = ['Главная', 'Задачи', 'Профиль'];
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = widget.navigationShell.currentIndex;
+
     return Scaffold(
       extendBody: true,
       body: widget.navigationShell,
-      bottomNavigationBar: MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          viewPadding: MediaQuery.of(context).viewPadding.copyWith(
-            bottom:
-                MediaQuery.of(context).viewPadding.bottom / _buttonsIcon.length,
-          ),
-        ),
-        child: AppBottomNavigationBar(
-          navigationButtons: List.generate(_buttonsIcon.length, (index) {
-            return AppBottomNavigationButton(
-              onTap: () => _onTap(index, context),
-              isSelected: index == widget.navigationShell.currentIndex,
-              icon: _buttonsIcon[index],
-              title: _buttonsTitle[index],
-            );
-          }),
-        ),
+      bottomNavigationBar: AppBottomNavigationBar(
+        currentIndex: currentIndex,
+        navigationButtons: List.generate(_buttonsIcon.length, (index) {
+          return AppBottomNavigationButton(
+            onTap: () => _onTap(index, context),
+            isSelected: index == widget.navigationShell.currentIndex,
+            icon: _buttonsIcon[index],
+            title: _buttonsTitle[index],
+          );
+        }),
       ),
     );
   }

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/ui_kit/app_box.dart';
 import '../../../../app/ui_kit/app_snack_bar.dart';
-import '../../../../app/utils/family_remove_member_dialog.dart';
+import '../../../../app/dialog/family_remove_member_dialog.dart';
 import '../../../profile/domain/entity/profile_user_entity.dart';
 import '../../../profile/presentation/components/profile_info.dart';
 import '../../../profile/presentation/profile_routes.dart';

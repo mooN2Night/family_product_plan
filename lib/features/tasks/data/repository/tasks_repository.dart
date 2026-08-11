@@ -14,7 +14,7 @@ final class TasksRepository implements ITasksRepository {
 
   @override
   Stream<List<TaskEntity>> watchTodayTasks() async* {
-    await _prepareRecurringTasksForToday();
+    await _prepareTasksForToday();
 
     yield* _localDataSource.watchTodayTasks();
   }
@@ -94,38 +94,48 @@ final class TasksRepository implements ITasksRepository {
   Future<void> completeTask(TaskEntity task) async {
     final now = DateTime.now();
 
-    final executionDate = DateTime(now.year, now.month, now.day);
+    final executionDate = _dateOnly(now);
 
-    final nextExecutionDate = _calculateNextExecutionDateForComplete(
-      task: task,
-      executionDate: executionDate,
-    );
+    final nextExecutionAt = _calculateNextExecutionDate(task: task);
 
     await _localDataSource.updateTask(
       task.copyWith(
         isCompleted: true,
         completedAt: executionDate,
         updatedAt: executionDate,
-        lastExecutionAt: executionDate,
-        nextExecutionAt: nextExecutionDate,
+        nextExecutionAt: nextExecutionAt,
+        lastExecutionAt: task.nextExecutionAt,
       ),
     );
   }
 
   @override
   Future<void> restoreTask(TaskEntity task) async {
+    final now = DateTime.now();
+
+    final today = DateTime(now.year, now.month, now.day);
+
+    final nextExecutionAt = switch (task.type) {
+      TaskType.oneTime => task.dueDate,
+      TaskType.daily => today,
+      TaskType.weekly => task.lastExecutionAt,
+      TaskType.monthly => task.lastExecutionAt,
+      TaskType.yearly => task.lastExecutionAt,
+    };
+
     await _localDataSource.updateTask(
       task.copyWith(
         isCompleted: false,
         completedAt: null,
-        updatedAt: DateTime.now(),
+        nextExecutionAt: nextExecutionAt,
+        updatedAt: today,
       ),
     );
   }
 
   @override
   Future<void> syncTasks() {
-    // Firebase реализуем позже
+    // Firebase реализуем позжеtask.lastExecutionAt
     throw UnimplementedError();
   }
 
@@ -133,96 +143,40 @@ final class TasksRepository implements ITasksRepository {
     required TaskType type,
     required DateTime? dueDate,
   }) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
     switch (type) {
       case TaskType.oneTime:
-        return dueDate;
+        return null;
       case TaskType.daily:
-        return today;
+        return _dateOnly(DateTime.now());
       case TaskType.weekly:
-        if (dueDate == null) return null;
-
-        final daysUntilTarget = (dueDate.weekday - today.weekday + 7) % 7;
-
-        return today.add(Duration(days: daysUntilTarget));
       case TaskType.monthly:
-        if (dueDate == null) return null;
-
-        final day = dueDate.day;
-
-        final daysInCurrentMonth = DateTime(today.year, today.month + 1, 0).day;
-
-        if (day <= daysInCurrentMonth) {
-          final candidate = DateTime(today.year, today.month, day);
-
-          if (!candidate.isBefore(today)) return candidate;
-        }
-
-        final nextMonth = DateTime(today.year, today.month + 1, 1);
-
-        final daysInNextMonth = DateTime(
-          nextMonth.year,
-          nextMonth.month + 1,
-          0,
-        ).day;
-
-        return DateTime(
-          nextMonth.year,
-          nextMonth.month,
-          day > daysInNextMonth ? daysInNextMonth : day,
-        );
       case TaskType.yearly:
-        if (dueDate == null) return null;
-
-        final month = dueDate.month;
-        final day = dueDate.day;
-
-        var candidate = DateTime(today.year, month, day);
-
-        if (candidate.isBefore(today)) {
-          candidate = DateTime(today.year + 1, month, day);
-        }
-
-        return candidate;
+        return dueDate;
     }
   }
 
-  DateTime? _calculateNextExecutionDateForComplete({
-    required TaskEntity task,
-    required DateTime executionDate,
-  }) {
-    final currentDate = DateTime(
-      executionDate.year,
-      executionDate.month,
-      executionDate.day,
-    );
+  DateTime? _calculateNextExecutionDate({required TaskEntity task}) {
+    final nextExecutionAt = task.nextExecutionAt;
+
+    if (nextExecutionAt == null) return null;
 
     switch (task.type) {
       case TaskType.oneTime:
         return null;
-
       case TaskType.daily:
-        return currentDate.add(const Duration(days: 1));
-
+        return nextExecutionAt.add(const Duration(days: 1));
       case TaskType.weekly:
-        final dueDate = task.dueDate;
-
-        if (dueDate == null) {
-          return null;
-        }
-
-        return currentDate.add(const Duration(days: 7));
-
+        return nextExecutionAt.add(const Duration(days: 7));
       case TaskType.monthly:
         final dueDate = task.dueDate;
 
-        if (dueDate == null) {
-          return null;
-        }
+        if (dueDate == null) return null;
 
-        final nextMonth = DateTime(currentDate.year, currentDate.month + 1, 1);
+        final nextMonth = DateTime(
+          nextExecutionAt.year,
+          nextExecutionAt.month + 1,
+          1,
+        );
 
         final lastDayOfNextMonth = DateTime(
           nextMonth.year,
@@ -235,15 +189,12 @@ final class TasksRepository implements ITasksRepository {
           nextMonth.month,
           dueDate.day > lastDayOfNextMonth ? lastDayOfNextMonth : dueDate.day,
         );
-
       case TaskType.yearly:
         final dueDate = task.dueDate;
 
-        if (dueDate == null) {
-          return null;
-        }
+        if (dueDate == null) return null;
 
-        final nextYear = DateTime(currentDate.year + 1, dueDate.month, 1);
+        final nextYear = DateTime(nextExecutionAt.year + 1, dueDate.month, 1);
 
         final lastDayOfMonth = DateTime(
           nextYear.year,
@@ -259,48 +210,115 @@ final class TasksRepository implements ITasksRepository {
     }
   }
 
-  Future<void> _prepareRecurringTasksForToday() async {
-    final now = DateTime.now();
+  DateTime? _calculateNextExecutionDateAfter({
+    required TaskEntity task,
+    required DateTime from,
+    required DateTime today,
+  }) {
+    var nextDate = from;
 
-    final today = DateTime(now.year, now.month, now.day);
+    switch (task.type) {
+      case TaskType.oneTime:
+        return null;
+      case TaskType.daily:
+        do {
+          nextDate = nextDate.add(const Duration(days: 1));
+        } while (nextDate.isBefore(today));
+
+        return nextDate;
+      case TaskType.weekly:
+        do {
+          nextDate = nextDate.add(const Duration(days: 7));
+        } while (nextDate.isBefore(today));
+
+        return nextDate;
+      case TaskType.monthly:
+        final dueDate = task.dueDate;
+        if (dueDate == null) return null;
+
+        do {
+          final nextMonth = DateTime(nextDate.year, nextDate.month + 1, 1);
+
+          final lastDayOfMonth = DateTime(
+            nextMonth.year,
+            nextMonth.month + 1,
+            0,
+          ).day;
+
+          nextDate = DateTime(
+            nextMonth.year,
+            nextMonth.month,
+            dueDate.day > lastDayOfMonth ? lastDayOfMonth : dueDate.day,
+          );
+        } while (nextDate.isBefore(today));
+
+        return nextDate;
+      case TaskType.yearly:
+        final dueDate = task.dueDate;
+        if (dueDate == null) return null;
+
+        do {
+          final nextYear = DateTime(nextDate.year + 1, dueDate.month, 1);
+
+          final lastDayOfMonth = DateTime(
+            nextYear.year,
+            dueDate.month + 1,
+            0,
+          ).day;
+
+          nextDate = DateTime(
+            nextYear.year,
+            dueDate.month,
+            dueDate.day > lastDayOfMonth ? lastDayOfMonth : dueDate.day,
+          );
+        } while (nextDate.isBefore(today));
+
+        return nextDate;
+    }
+  }
+
+  Future<void> _prepareTasksForToday() async {
+    final today = _dateOnly(DateTime.now());
 
     final tasks = await _localDataSource.getRecurringTasks();
 
     for (final task in tasks) {
-      if (task.nextExecutionAt == null) {
-        continue;
-      }
+      final nextExecutionAt = task.nextExecutionAt;
+      if (nextExecutionAt == null) continue;
 
-      final nextExecutionDate = DateTime(
-        task.nextExecutionAt!.year,
-        task.nextExecutionAt!.month,
-        task.nextExecutionAt!.day,
-      );
+      final nextExecutionDate = _dateOnly(nextExecutionAt);
+      // Следующее выполнение ещё не наступило.
+      if (nextExecutionDate.isAfter(today)) continue;
 
-      if (nextExecutionDate.isAfter(today)) {
-        continue;
-      }
-
+      // Если задача уже выполнена сегодня,
+      // ничего с ней не делаем.
       if (task.isCompleted &&
-          task.lastExecutionAt != null &&
-          _isSameDate(task.lastExecutionAt!, today)) {
+          task.completedAt != null &&
+          _isSameDate(task.completedAt!, today)) {
         continue;
       }
 
-      final nextExecutionAt = _calculateNextExecutionDateForComplete(
+      final nextDate = _calculateNextExecutionDateAfter(
         task: task,
-        executionDate: today,
+        from: nextExecutionDate,
+        today: today,
       );
+
+      if (nextDate == null) continue;
 
       await _localDataSource.updateTask(
         task.copyWith(
           isCompleted: false,
           completedAt: null,
-          nextExecutionAt: nextExecutionAt,
+          nextExecutionAt: nextDate,
           updatedAt: today,
         ),
       );
     }
+  }
+
+  DateTime _dateOnly(DateTime date) {
+    return DateTime(date.year, date.month, date.day);
   }
 
   bool _isSameDate(DateTime first, DateTime second) {

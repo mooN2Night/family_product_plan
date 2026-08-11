@@ -39,13 +39,3 @@ class AppProviders extends StatelessWidget {
     );
   }
 }
-
-// BlocProvider.value(
-//   value: authBloc,
-//   child: Provider.value(value: diContainer, child: child),
-// );
-// TODO: если в будущем потребуется несколько провайдеров (для смены языка например)
-//   MultiProvider(
-//   providers: [Provider.value(value: diContainer)],
-//   child: child,
-// );

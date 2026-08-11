@@ -3,7 +3,7 @@ import 'package:family_product_plan/features/family/presentation/family_routes.d
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/utils/family_remove_member_dialog.dart';
+import '../../../../app/dialog/family_remove_member_dialog.dart';
 import '../../domain/entity/family_member_info_entity.dart';
 import '../../domain/entity/family_role.dart';
 import '../../utils/family_member_action.dart';
