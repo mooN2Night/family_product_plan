@@ -16,14 +16,20 @@ final class CurrentFamilyCubit extends Cubit<CurrentFamilyState> {
 
   StreamSubscription<String?>? _subscription;
 
+  bool _initialized = false;
+
   Future<void> initialize() async {
-    final familyId = await _repository.getCurrentFamily();
-
-    _emitState(familyId);
-
-    _subscription ??= _repository.watchCurrentFamily().listen(_emitState);
-
+    _subscription ??= _repository.watchCurrentFamily().listen(_onFamilyChanged);
     await _repository.refresh();
+    _initialized = true;
+
+    final familyId = await _repository.getCurrentFamily();
+    _emitState(familyId);
+  }
+
+  void _onFamilyChanged(String? familyId) {
+    if (!_initialized) return;
+    _emitState(familyId);
   }
 
   void _emitState(String? familyId) {

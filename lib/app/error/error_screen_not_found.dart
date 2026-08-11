@@ -69,6 +69,7 @@ class _ErrorScreenBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBottomNavigationBar(
+      currentIndex: 1,
       navigationButtons: List.generate(_buttons.length, (index) {
         return AppBottomNavigationButton(
           onTap: () => context.go(_paths[index]),

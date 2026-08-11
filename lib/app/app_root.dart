@@ -1,4 +1,5 @@
 import 'package:family_product_plan/app/app_providers.dart';
+import 'package:family_product_plan/app/theme/app_theme.dart';
 import 'package:family_product_plan/features/auth/domain/state/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -32,6 +33,8 @@ class AppRoot extends StatelessWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: router,
+        theme: AppTheme.light(),
+        themeMode: ThemeMode.light,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
