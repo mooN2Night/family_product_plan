@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
+import '../../utils/app_colors.dart';
 
 /// Виджет кнопок нижнего навигационного меню.
 class AppBottomNavigationButton extends StatelessWidget {

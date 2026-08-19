@@ -1,9 +1,9 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
 import 'package:family_product_plan/features/family/domain/entity/family_relation.dart';
 import 'package:family_product_plan/features/family/domain/entity/family_role.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../app/presentation/ui_kit/app_bar.dart';
 import '../../domain/state/family_member_bloc/family_member_info_bloc.dart';
 import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
 import '../components/family_member_info_success_view.dart';
@@ -95,7 +95,7 @@ class _FamilyMemberInfoScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar.profile(actions: []),
+      appBar: CustomAppBar.secondary(title: 'Информация о участнике'),
       body: BlocBuilder<FamilyMemberInfoBloc, FamilyMemberInfoState>(
         builder: (context, state) {
           if (state is! FamilyMemberInfoLoadedState) {

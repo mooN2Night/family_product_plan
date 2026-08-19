@@ -1,11 +1,11 @@
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
-import 'package:family_product_plan/app/ui_kit/app_box.dart';
-import 'package:family_product_plan/app/ui_kit/app_snack_bar.dart';
 import 'package:family_product_plan/features/auth/presentation/auth_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_box.dart';
+import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../domain/state/auth_bloc.dart';
 
 /// Экран авторизации
@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
       child: Scaffold(
-        appBar: CustomAppBar.login(),
+        appBar: CustomAppBar.secondary(title: 'Авторизация'),
         body: Stack(
           children: [
             Center(

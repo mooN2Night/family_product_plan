@@ -96,6 +96,9 @@ final class ProfileUserEntity extends Equatable {
   /// Идентификатор семьи.
   final String? familyId;
 
+  String get fullName =>
+      [firstName, lastName].where((value) => value.isNotEmpty).join(' ');
+
   /// Возраст пользователя в годах.
   String? get age {
     if (birthDate == null) return null;

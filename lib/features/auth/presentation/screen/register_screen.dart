@@ -2,8 +2,8 @@ import 'package:family_product_plan/features/auth/domain/state/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../app/ui_kit/app_bar.dart';
-import '../../../../app/ui_kit/app_box.dart';
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_box.dart';
 
 /// Экран регистрации
 class RegisterScreen extends StatefulWidget {
@@ -42,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       },
       child: Scaffold(
-        appBar: CustomAppBar.register(),
+        appBar: CustomAppBar.secondary(title: 'Регистрация'),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),

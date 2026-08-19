@@ -12,6 +12,8 @@ final class ProductDto {
     required this.createdAt,
     required this.updatedAt,
     required this.isDeleted,
+    this.quantity,
+    this.description,
   });
 
   /// Создает DTO из JSON.
@@ -20,6 +22,8 @@ final class ProductDto {
       id: json['id'] as String,
       productName: json['productName'] as String,
       productManufacturer: json['productManufacturer'] as String,
+      quantity: json['quantity'] as String?,
+      description: json['description'] as String?,
       isToBuy: json['isToBuy'] as bool,
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
@@ -32,6 +36,8 @@ final class ProductDto {
       id: json['id'] as String,
       productName: json['productName'] as String,
       productManufacturer: json['productManufacturer'] as String,
+      quantity: json['quantity'] as String?,
+      description: json['description'] as String?,
       isToBuy: json['isToBuy'] as bool,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -47,6 +53,14 @@ final class ProductDto {
 
   /// Производитель продукта.
   final String productManufacturer;
+
+  /// Количество продукта.
+  ///
+  /// Например: `2 л`, `3 шт`, `500 г`.
+  final String? quantity;
+
+  /// Дополнительное описание продукта.
+  final String? description;
 
   /// Признак необходимости покупки продукта.
   final bool isToBuy;
@@ -66,6 +80,8 @@ final class ProductDto {
       id: id,
       productName: productName,
       productManufacturer: productManufacturer,
+      quantity: quantity ?? '',
+      description: description ?? '',
       isToBuy: isToBuy,
       createdAt: createdAt,
       updatedAt: updatedAt,
@@ -79,6 +95,8 @@ final class ProductDto {
       'id': id,
       'productName': productName,
       'productManufacturer': productManufacturer,
+      'quantity': quantity,
+      'description': description,
       'isToBuy': isToBuy,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
@@ -91,6 +109,8 @@ final class ProductDto {
       'id': id,
       'productName': productName,
       'productManufacturer': productManufacturer,
+      'quantity': quantity,
+      'description': description,
       'isToBuy': isToBuy,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),

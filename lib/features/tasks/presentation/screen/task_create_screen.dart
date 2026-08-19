@@ -1,12 +1,12 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
-import 'package:family_product_plan/app/ui_kit/app_snack_bar.dart';
 import 'package:family_product_plan/features/tasks/domain/state/task_action/tasks_action_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../domain/entity/create_task_entity.dart';
 import '../../utils/task_priority.dart';
 import '../../utils/task_type.dart';
@@ -60,7 +60,7 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
         if (state is TasksActionSuccessState) context.pop();
       },
       child: Scaffold(
-        appBar: CustomAppBar.productDetail(actions: [], title: 'Новая задача'),
+        appBar: CustomAppBar.secondary(title: 'Новая задача'),
         body: ListView(
           padding: const EdgeInsets.all(16),
           children: [

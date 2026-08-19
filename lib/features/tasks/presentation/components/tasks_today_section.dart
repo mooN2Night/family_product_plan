@@ -1,4 +1,3 @@
-import 'package:family_product_plan/app/ui_kit/app_box.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_list_tile.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_type_error.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_type_loading.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/presentation/ui_kit/app_box.dart';
 import '../../../../app/utils/app_colors.dart';
 import '../../domain/entity/task_entity.dart';
 import '../../domain/state/tasks_today/today_tasks_bloc.dart';
@@ -18,15 +18,18 @@ class TasksTodaySection extends StatelessWidget {
     return BlocBuilder<TodayTasksBloc, TodayTasksState>(
       builder: (context, state) {
         switch (state) {
-          case TodayTasksInitialState():
           case TodayTasksLoadingState():
-            return const TaskTypeLoading();
-
+            return const TodayTaskLoadingView();
           case TodayTasksErrorState():
-            return TasksErrorCard(message: state.message);
-
+            return TasksErrorCard(
+              message: 'Ошибка загрузки задач на сегодня, попробуйте обновить',
+              onTap: () =>
+                  context.read<TodayTasksBloc>().add(TodayTasksStartedEvent()),
+            );
           case TodayTasksSuccessState():
             return _TasksTodaySectionContent(tasks: state.tasks);
+          case TodayTasksInitialState():
+            return SizedBox.shrink();
         }
       },
     );

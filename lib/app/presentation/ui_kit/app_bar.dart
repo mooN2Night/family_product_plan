@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
+import '../../utils/app_colors.dart';
 
 /// Типы пользовательского AppBar, используемые в приложении.
 enum CustomAppBarType {
-  /// AppBar главного экрана.
+  /// AppBar основных экранов приложения.
   main,
 
-  /// AppBar экрана профиля.
-  profile,
-
-  /// AppBar экрана детальной информации о продукте.
-  productDetail,
-
-  /// Авторизация
-  login,
-
-  /// Регистрация
-  register,
+  /// AppBar вторичных экранов.
+  secondary,
 }
 
 /// Пользовательская реализация AppBar.
@@ -32,48 +23,26 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// Создает AppBar для главного экрана.
   factory CustomAppBar.main({
-    required PreferredSizeWidget bottom,
-    required List<Widget> actions,
+    List<Widget>? actions,
+    PreferredSizeWidget? bottom,
   }) {
     return CustomAppBar._(
       type: CustomAppBarType.main,
+      title: 'Семья Гавриловых',
       bottom: bottom,
       actions: actions,
-      title: 'Семья Гавриловых',
     );
   }
 
   /// Создает AppBar для экрана профиля.
-  factory CustomAppBar.profile({required List<Widget> actions}) {
-    return CustomAppBar._(
-      type: CustomAppBarType.profile,
-      actions: actions,
-      title: 'Семья Гавриловых',
-    );
-  }
-
-  /// Создает AppBar для экрана детальной информации о продукте.
-  factory CustomAppBar.productDetail({
-    required List<Widget> actions,
+  factory CustomAppBar.secondary({
     required String title,
+    List<Widget>? actions,
   }) {
     return CustomAppBar._(
-      type: CustomAppBarType.productDetail,
-      actions: actions,
+      type: CustomAppBarType.secondary,
       title: title,
-    );
-  }
-
-  /// Создает AppBar для экрана авторизации.
-  factory CustomAppBar.login() {
-    return CustomAppBar._(type: CustomAppBarType.login, title: 'Авторизация');
-  }
-
-  /// Создает AppBar для экрана регистрации.
-  factory CustomAppBar.register() {
-    return CustomAppBar._(
-      type: CustomAppBarType.register,
-      title: 'Регистрация',
+      actions: actions,
     );
   }
 
@@ -81,7 +50,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final PreferredSizeWidget? bottom;
 
   /// Набор действий, отображаемых справа в AppBar.
-  final List<Widget> actions;
+  final List<Widget>? actions;
 
   /// Тип текущей конфигурации AppBar.
   final CustomAppBarType type;
@@ -145,11 +114,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   List<Widget> _buildActions(BuildContext context) {
     return actions
-        .map(
-          (action) =>
-              Padding(padding: const EdgeInsets.only(right: 8), child: action),
-        )
-        .toList();
+            ?.map(
+              (action) => Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: action,
+              ),
+            )
+            .toList() ??
+        [];
   }
 
   @override

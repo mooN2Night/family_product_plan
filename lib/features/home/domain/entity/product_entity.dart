@@ -8,6 +8,8 @@ class ProductEntity extends Equatable {
     required this.id,
     required this.productName,
     required this.productManufacturer,
+    required this.quantity,
+    required this.description,
     required this.isToBuy,
     required this.createdAt,
     required this.updatedAt,
@@ -22,6 +24,14 @@ class ProductEntity extends Equatable {
 
   /// Производитель продукта
   final String productManufacturer;
+
+  /// Количество продукта.
+  ///
+  /// Например: `2 л`, `3 шт`, `500 г`.
+  final String quantity;
+
+  /// Дополнительное описание продукта.
+  final String description;
 
   /// Флаг необходимости покупки
   final bool isToBuy;
@@ -41,6 +51,8 @@ class ProductEntity extends Equatable {
       id: id,
       productName: productName,
       productManufacturer: productManufacturer,
+      quantity: quantity,
+      description: description,
       isToBuy: isToBuy,
       createdAt: createdAt,
       updatedAt: updatedAt,
@@ -53,6 +65,8 @@ class ProductEntity extends Equatable {
     String? id,
     String? productName,
     String? productManufacturer,
+    String? quantity,
+    String? description,
     bool? isToBuy,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -62,6 +76,8 @@ class ProductEntity extends Equatable {
       id: id ?? this.id,
       productName: productName ?? this.productName,
       productManufacturer: productManufacturer ?? this.productManufacturer,
+      quantity: quantity ?? this.quantity,
+      description: description ?? this.description,
       isToBuy: isToBuy ?? this.isToBuy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -74,6 +90,8 @@ class ProductEntity extends Equatable {
     id,
     productName,
     productManufacturer,
+    quantity,
+    description,
     isToBuy,
     createdAt,
     updatedAt,

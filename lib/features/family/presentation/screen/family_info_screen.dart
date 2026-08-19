@@ -2,7 +2,7 @@ import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../app/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_bar.dart';
 import '../../domain/state/family_bloc/family_bloc.dart';
 import '../../domain/state/family_delete_bloc/family_delete_bloc.dart';
 import '../../domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
@@ -50,7 +50,7 @@ class FamilyInfoScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar.profile(actions: []),
+      appBar: CustomAppBar.secondary(title: 'Информация о семье'),
       body: BlocBuilder<FamilyBloc, FamilyState>(
         builder: (context, state) {
           switch (state) {

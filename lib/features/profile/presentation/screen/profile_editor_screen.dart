@@ -1,12 +1,12 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
-import 'package:family_product_plan/app/ui_kit/app_lost_focus_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_lost_focus_wrapper.dart';
 import '../../domain/state/profile_load/profile_load_bloc.dart';
 import '../../domain/state/profile_update/profile_update_bloc.dart';
-import '../components/profile_editor_success_view.dart';
+import '../components/views/profile_editor_success_view.dart';
 
 /// Экрана профиля пользователя.
 class ProfileEditorScreen extends StatelessWidget {
@@ -40,7 +40,7 @@ class _ProfileEditorScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar.profile(actions: []),
+      appBar: CustomAppBar.secondary(title: 'Редактирование профиля'),
       body: BlocBuilder<ProfileLoadBloc, ProfileLoadState>(
         builder: (context, state) {
           if (state is! ProfileLoadSuccessState) {

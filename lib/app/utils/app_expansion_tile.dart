@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../ui_kit/app_box.dart';
+import '../presentation/ui_kit/app_box.dart';
 
 /// Класс для реализации виджета, отвечающего за отображение открывающейся панели и контента
 class AppExpansionWrapper extends StatefulWidget {

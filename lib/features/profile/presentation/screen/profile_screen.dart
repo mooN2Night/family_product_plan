@@ -1,11 +1,11 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
 import 'package:family_product_plan/features/profile/domain/state/profile/profile_bloc.dart';
 import 'package:family_product_plan/features/profile/presentation/profile_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../components/profile_success_view.dart';
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../components/views/profile_success_view.dart';
 
 /// Экран профиля пользователя.
 class ProfileScreen extends StatelessWidget {
@@ -31,14 +31,15 @@ class _ProfileScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar.profile(
+      appBar: CustomAppBar.secondary(
+        title: 'Профиль',
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
               onTap: () =>
                   context.pushNamed(ProfileRoutes.profileEditorScreenName),
-              child: Icon(Icons.settings),
+              child: Icon(Icons.settings_outlined),
             ),
           ),
           // WBox(16),
@@ -46,17 +47,19 @@ class _ProfileScreenView extends StatelessWidget {
       ),
       body: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
-          if (state is! ProfileSuccessState) {
-            return Center(
-              child: Column(
-                children: [Container(width: 50, height: 50, color: Colors.red)],
+          return switch (state) {
+            ProfileLoadingState() => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            ProfileErrorState() => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(state.message, textAlign: TextAlign.center),
               ),
-            );
-          }
-
-          final user = state.user;
-
-          return ProfileSuccessView(user: user);
+            ),
+            ProfileSuccessState() => ProfileSuccessView(user: state.user),
+            _ => const SizedBox.shrink(),
+          };
         },
       ),
     );

@@ -1,9 +1,9 @@
-import 'package:family_product_plan/app/ui_kit/app_box.dart';
 import 'package:family_product_plan/features/family/presentation/family_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/dialog/family_remove_member_dialog.dart';
+import '../../../../app/presentation/dialog/family_remove_member_dialog.dart';
+import '../../../../app/presentation/ui_kit/app_box.dart';
 import '../../domain/entity/family_member_info_entity.dart';
 import '../../domain/entity/family_role.dart';
 import '../../utils/family_member_action.dart';

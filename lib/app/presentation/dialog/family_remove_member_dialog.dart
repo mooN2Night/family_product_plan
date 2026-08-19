@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/family/domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
-import '../../features/family/utils/family_member_action.dart';
+import '../../../features/family/domain/state/family_remove_member_bloc/family_remove_member_bloc.dart';
+import '../../../features/family/utils/family_member_action.dart';
 
 Future<bool?> showLeaveFamilyDialog(
     BuildContext context, {

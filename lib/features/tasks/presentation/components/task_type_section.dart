@@ -1,10 +1,12 @@
-import 'package:family_product_plan/app/ui_kit/app_box.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_list_tile.dart';
+import 'package:family_product_plan/features/tasks/presentation/components/task_type_error.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_type_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../app/presentation/ui_kit/app_box.dart';
 import '../../../../app/utils/app_colors.dart';
+import '../../domain/entity/task_entity.dart';
 import '../../domain/state/tasks_type/tasks_type_bloc.dart';
 import '../../utils/task_type.dart';
 
@@ -18,6 +20,50 @@ class TaskTypeSection extends StatefulWidget {
 }
 
 class _TaskTypeSectionState extends State<TaskTypeSection> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksTypeBloc, TasksTypeState>(
+      builder: (context, state) {
+        switch (state) {
+          case TasksTypeLoadingState():
+            return const RepeatingTaskLoadingView();
+          case TasksTypeErrorState():
+            return TasksErrorCard(
+              message:
+                  'Ошибка загрузки повторяющихся задач, попробуйте обновить',
+              onTap: () => context.read<TasksTypeBloc>().add(
+                TasksTypeRequestedEvent(type: widget.type),
+              ),
+            );
+          case TasksTypeSuccessState():
+            return _RepeatingTasksSectionContent(
+              type: widget.type,
+              tasks: state.tasks,
+            );
+          case TasksTypeInitialState():
+            return SizedBox.shrink();
+        }
+      },
+    );
+  }
+}
+
+class _RepeatingTasksSectionContent extends StatefulWidget {
+  const _RepeatingTasksSectionContent({
+    required this.type,
+    required this.tasks,
+  });
+
+  final TaskType type;
+  final List<TaskEntity> tasks;
+
+  @override
+  State<_RepeatingTasksSectionContent> createState() =>
+      _RepeatingTasksSectionContentState();
+}
+
+class _RepeatingTasksSectionContentState
+    extends State<_RepeatingTasksSectionContent> {
   late final ValueNotifier<bool> _isExpanded;
 
   @override
@@ -28,102 +74,91 @@ class _TaskTypeSectionState extends State<TaskTypeSection> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TasksTypeBloc, TasksTypeState>(
-      builder: (context, state) {
-        if (state is! TasksTypeSuccessState) {
-          return const TaskTypeLoading();
-        }
+    final tasks = widget.tasks;
+    final title = _titleForType(widget.type);
 
-        final tasks = state.tasks;
-        final title = _titleForType(widget.type);
-
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          decoration: BoxDecoration(
-            color: Colors.white,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: tasks.isEmpty
+                ? null
+                : () => _isExpanded.value = !_isExpanded.value,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Column(
-            children: [
-              InkWell(
-                onTap: tasks.isEmpty
-                    ? null
-                    : () => _isExpanded.value = !_isExpanded.value,
-                borderRadius: BorderRadius.circular(20),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 15,
-                  ),
-                  child: Row(
-                    children: [
-                      _TaskTypeIcon(type: widget.type),
-                      const WBox(12),
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: tasks.isEmpty
-                                ? AppColors.textDisabled
-                                : AppColors.textPrimary,
-                          ),
-                        ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+              child: Row(
+                children: [
+                  _TaskTypeIcon(type: widget.type),
+                  const WBox(12),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: tasks.isEmpty
+                            ? AppColors.textDisabled
+                            : AppColors.textPrimary,
                       ),
-                      _TaskCount(count: tasks.length),
-                      const WBox(8),
-                      ValueListenableBuilder(
-                        valueListenable: _isExpanded,
-                        builder: (context, isExpanded, _) {
-                          return AnimatedRotation(
-                            turns: isExpanded ? 0.5 : 0,
-                            duration: const Duration(milliseconds: 250),
-                            child: Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: tasks.isEmpty
-                                  ? AppColors.textDisabled
-                                  : AppColors.textSecondary,
+                    ),
+                  ),
+                  _TaskCount(count: tasks.length),
+                  const WBox(8),
+                  ValueListenableBuilder(
+                    valueListenable: _isExpanded,
+                    builder: (context, isExpanded, _) {
+                      return AnimatedRotation(
+                        turns: isExpanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 250),
+                        child: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: tasks.isEmpty
+                              ? AppColors.textDisabled
+                              : AppColors.textSecondary,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          ClipRect(
+            child: ValueListenableBuilder(
+              valueListenable: _isExpanded,
+              builder: (context, isExpanded, _) {
+                return AnimatedAlign(
+                  alignment: Alignment.topCenter,
+                  heightFactor: isExpanded ? 1 : 0,
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    child: Column(
+                      children: tasks
+                          .map(
+                            (task) => Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: TaskListTile(task: task),
                             ),
-                          );
-                        },
-                      ),
-                    ],
+                          )
+                          .toList(),
+                    ),
                   ),
-                ),
-              ),
-              ClipRect(
-                child: ValueListenableBuilder(
-                  valueListenable: _isExpanded,
-                  builder: (context, isExpanded, _) {
-                    return AnimatedAlign(
-                      alignment: Alignment.topCenter,
-                      heightFactor: isExpanded ? 1 : 0,
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeOutCubic,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                        child: Column(
-                          children: tasks
-                              .map(
-                                (task) => Padding(
-                                  padding: const EdgeInsets.only(top: 6),
-                                  child: TaskListTile(task: task),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+                );
+              },
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 

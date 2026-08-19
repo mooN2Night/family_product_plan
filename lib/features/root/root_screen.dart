@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/ui_kit/app_bottom_navigation_bar.dart';
-import '../../app/ui_kit/app_bottom_navigation_button.dart';
+import '../../app/presentation/ui_kit/app_bottom_navigation_bar.dart';
+import '../../app/presentation/ui_kit/app_bottom_navigation_button.dart';
 
 /// Корневой экран приложения с навигационной структурой.
 class RootScreen extends StatefulWidget {

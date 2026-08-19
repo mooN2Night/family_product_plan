@@ -1,12 +1,12 @@
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
-import 'package:family_product_plan/app/ui_kit/app_box.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/home/presentation/home_routes.dart';
 import '../../features/profile/presentation/profile_routes.dart';
-import '../ui_kit/app_bottom_navigation_bar.dart';
-import '../ui_kit/app_bottom_navigation_button.dart';
+import '../presentation/ui_kit/app_bar.dart';
+import '../presentation/ui_kit/app_bottom_navigation_bar.dart';
+import '../presentation/ui_kit/app_bottom_navigation_button.dart';
+import '../presentation/ui_kit/app_box.dart';
 
 /// Класс для реализации виджета отображения страницы ошибки 404
 class ErrorScreenNotFound extends StatelessWidget {
@@ -16,7 +16,7 @@ class ErrorScreenNotFound extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: CustomAppBar.profile(actions: []),
+      appBar: CustomAppBar.main(),
       body: Padding(
         padding: const EdgeInsets.only(bottom: 90),
         child: Center(
