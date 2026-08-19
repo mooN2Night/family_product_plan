@@ -11,6 +11,12 @@ class Products extends Table {
   /// Производитель продукта.
   TextColumn get manufacturer => text().withDefault(const Constant(''))();
 
+  /// Количетсво продукта.
+  TextColumn get quantity => text().nullable()();
+
+  /// Описание продукта.
+  TextColumn get description => text().nullable()();
+
   /// Флаг необходимости покупки продукта.
   BoolColumn get isToBuy => boolean().withDefault(const Constant(false))();
 

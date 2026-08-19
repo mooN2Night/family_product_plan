@@ -38,6 +38,28 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<String> quantity = GeneratedColumn<String>(
+    'quantity',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isToBuyMeta = const VerificationMeta(
     'isToBuy',
   );
@@ -95,6 +117,8 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     id,
     name,
     manufacturer,
+    quantity,
+    description,
     isToBuy,
     createdAt,
     updatedAt,
@@ -131,6 +155,21 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         manufacturer.isAcceptableOrUnknown(
           data['manufacturer']!,
           _manufacturerMeta,
+        ),
+      );
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
         ),
       );
     }
@@ -183,6 +222,14 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}manufacturer'],
       )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quantity'],
+      ),
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
       isToBuy: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_to_buy'],
@@ -218,6 +265,12 @@ class Product extends DataClass implements Insertable<Product> {
   /// Производитель продукта.
   final String manufacturer;
 
+  /// Количетсво продукта.
+  final String? quantity;
+
+  /// Описание продукта.
+  final String? description;
+
   /// Флаг необходимости покупки продукта.
   final bool isToBuy;
 
@@ -231,6 +284,8 @@ class Product extends DataClass implements Insertable<Product> {
     required this.id,
     required this.name,
     required this.manufacturer,
+    this.quantity,
+    this.description,
     required this.isToBuy,
     required this.createdAt,
     required this.updatedAt,
@@ -242,6 +297,12 @@ class Product extends DataClass implements Insertable<Product> {
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['manufacturer'] = Variable<String>(manufacturer);
+    if (!nullToAbsent || quantity != null) {
+      map['quantity'] = Variable<String>(quantity);
+    }
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
     map['is_to_buy'] = Variable<bool>(isToBuy);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -254,6 +315,12 @@ class Product extends DataClass implements Insertable<Product> {
       id: Value(id),
       name: Value(name),
       manufacturer: Value(manufacturer),
+      quantity: quantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(quantity),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
       isToBuy: Value(isToBuy),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -270,6 +337,8 @@ class Product extends DataClass implements Insertable<Product> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       manufacturer: serializer.fromJson<String>(json['manufacturer']),
+      quantity: serializer.fromJson<String?>(json['quantity']),
+      description: serializer.fromJson<String?>(json['description']),
       isToBuy: serializer.fromJson<bool>(json['isToBuy']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -283,6 +352,8 @@ class Product extends DataClass implements Insertable<Product> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'manufacturer': serializer.toJson<String>(manufacturer),
+      'quantity': serializer.toJson<String?>(quantity),
+      'description': serializer.toJson<String?>(description),
       'isToBuy': serializer.toJson<bool>(isToBuy),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -294,6 +365,8 @@ class Product extends DataClass implements Insertable<Product> {
     String? id,
     String? name,
     String? manufacturer,
+    Value<String?> quantity = const Value.absent(),
+    Value<String?> description = const Value.absent(),
     bool? isToBuy,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -302,6 +375,8 @@ class Product extends DataClass implements Insertable<Product> {
     id: id ?? this.id,
     name: name ?? this.name,
     manufacturer: manufacturer ?? this.manufacturer,
+    quantity: quantity.present ? quantity.value : this.quantity,
+    description: description.present ? description.value : this.description,
     isToBuy: isToBuy ?? this.isToBuy,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -314,6 +389,10 @@ class Product extends DataClass implements Insertable<Product> {
       manufacturer: data.manufacturer.present
           ? data.manufacturer.value
           : this.manufacturer,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
       isToBuy: data.isToBuy.present ? data.isToBuy.value : this.isToBuy,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -327,6 +406,8 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('manufacturer: $manufacturer, ')
+          ..write('quantity: $quantity, ')
+          ..write('description: $description, ')
           ..write('isToBuy: $isToBuy, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -340,6 +421,8 @@ class Product extends DataClass implements Insertable<Product> {
     id,
     name,
     manufacturer,
+    quantity,
+    description,
     isToBuy,
     createdAt,
     updatedAt,
@@ -352,6 +435,8 @@ class Product extends DataClass implements Insertable<Product> {
           other.id == this.id &&
           other.name == this.name &&
           other.manufacturer == this.manufacturer &&
+          other.quantity == this.quantity &&
+          other.description == this.description &&
           other.isToBuy == this.isToBuy &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
@@ -362,6 +447,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<String> id;
   final Value<String> name;
   final Value<String> manufacturer;
+  final Value<String?> quantity;
+  final Value<String?> description;
   final Value<bool> isToBuy;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -371,6 +458,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.manufacturer = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.description = const Value.absent(),
     this.isToBuy = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -381,6 +470,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     required String id,
     required String name,
     this.manufacturer = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.description = const Value.absent(),
     this.isToBuy = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -394,6 +485,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? manufacturer,
+    Expression<String>? quantity,
+    Expression<String>? description,
     Expression<bool>? isToBuy,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -404,6 +497,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (manufacturer != null) 'manufacturer': manufacturer,
+      if (quantity != null) 'quantity': quantity,
+      if (description != null) 'description': description,
       if (isToBuy != null) 'is_to_buy': isToBuy,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -416,6 +511,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<String>? id,
     Value<String>? name,
     Value<String>? manufacturer,
+    Value<String?>? quantity,
+    Value<String?>? description,
     Value<bool>? isToBuy,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -426,6 +523,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       id: id ?? this.id,
       name: name ?? this.name,
       manufacturer: manufacturer ?? this.manufacturer,
+      quantity: quantity ?? this.quantity,
+      description: description ?? this.description,
       isToBuy: isToBuy ?? this.isToBuy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -445,6 +544,12 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     }
     if (manufacturer.present) {
       map['manufacturer'] = Variable<String>(manufacturer.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<String>(quantity.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
     }
     if (isToBuy.present) {
       map['is_to_buy'] = Variable<bool>(isToBuy.value);
@@ -470,6 +575,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('manufacturer: $manufacturer, ')
+          ..write('quantity: $quantity, ')
+          ..write('description: $description, ')
           ..write('isToBuy: $isToBuy, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -2005,6 +2112,8 @@ typedef $$ProductsTableCreateCompanionBuilder =
       required String id,
       required String name,
       Value<String> manufacturer,
+      Value<String?> quantity,
+      Value<String?> description,
       Value<bool> isToBuy,
       required DateTime createdAt,
       required DateTime updatedAt,
@@ -2016,6 +2125,8 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> name,
       Value<String> manufacturer,
+      Value<String?> quantity,
+      Value<String?> description,
       Value<bool> isToBuy,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -2044,6 +2155,16 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<String> get manufacturer => $composableBuilder(
     column: $table.manufacturer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2092,6 +2213,16 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isToBuy => $composableBuilder(
     column: $table.isToBuy,
     builder: (column) => ColumnOrderings(column),
@@ -2130,6 +2261,14 @@ class $$ProductsTableAnnotationComposer
 
   GeneratedColumn<String> get manufacturer => $composableBuilder(
     column: $table.manufacturer,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
     builder: (column) => column,
   );
 
@@ -2177,6 +2316,8 @@ class $$ProductsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> manufacturer = const Value.absent(),
+                Value<String?> quantity = const Value.absent(),
+                Value<String?> description = const Value.absent(),
                 Value<bool> isToBuy = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -2186,6 +2327,8 @@ class $$ProductsTableTableManager
                 id: id,
                 name: name,
                 manufacturer: manufacturer,
+                quantity: quantity,
+                description: description,
                 isToBuy: isToBuy,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -2197,6 +2340,8 @@ class $$ProductsTableTableManager
                 required String id,
                 required String name,
                 Value<String> manufacturer = const Value.absent(),
+                Value<String?> quantity = const Value.absent(),
+                Value<String?> description = const Value.absent(),
                 Value<bool> isToBuy = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
@@ -2206,6 +2351,8 @@ class $$ProductsTableTableManager
                 id: id,
                 name: name,
                 manufacturer: manufacturer,
+                quantity: quantity,
+                description: description,
                 isToBuy: isToBuy,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

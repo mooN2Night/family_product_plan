@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/home/domain/entity/product_create_entity.dart';
-import '../../features/home/domain/state/products_action_bloc/products_action_bloc.dart';
+import '../../../features/home/domain/entity/product_create_entity.dart';
+import '../../../features/home/domain/state/products_action_bloc/products_action_bloc.dart';
 import '../ui_kit/app_box.dart';
 import '../ui_kit/app_snack_bar.dart';
 

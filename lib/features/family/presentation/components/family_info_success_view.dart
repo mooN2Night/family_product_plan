@@ -1,10 +1,10 @@
-import 'package:family_product_plan/app/ui_kit/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/ui_kit/app_box.dart';
+import '../../../../app/presentation/ui_kit/app_box.dart';
+import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../../profile/presentation/profile_routes.dart';
 import '../../domain/entity/family_entity.dart';
 import '../../domain/entity/family_member_info_entity.dart';
@@ -75,6 +75,7 @@ class FamilyInfoSuccessView extends StatelessWidget {
         ),
       ],
       child: ListView(
+        physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
           Row(

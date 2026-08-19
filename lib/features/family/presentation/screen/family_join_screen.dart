@@ -1,11 +1,11 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
-import 'package:family_product_plan/app/ui_kit/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/ui_kit/app_box.dart';
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_box.dart';
+import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../domain/state/family_join_bloc/family_join_bloc.dart';
 
 /// Класс для реализация экрана присоединения к семье.
@@ -48,7 +48,7 @@ class _FamilyJoinScreenViewState extends State<FamilyJoinScreenView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar.profile(actions: []),
+      appBar: CustomAppBar.secondary(title: 'Вступить в семью'),
       body: BlocListener<FamilyJoinBloc, FamilyJoinState>(
         listener: (context, state) {
           switch (state) {

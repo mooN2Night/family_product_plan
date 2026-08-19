@@ -1,9 +1,9 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
 import 'package:family_product_plan/features/tasks/domain/state/task_info/task_info_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../app/presentation/ui_kit/app_bar.dart';
 import '../../domain/state/task_action/tasks_action_bloc.dart';
 import '../components/task_info_success_view.dart';
 
@@ -38,7 +38,7 @@ class _TaskInfoView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar.profile(actions: []),
+      appBar: CustomAppBar.secondary(title: 'Информация о задаче'),
       body: BlocBuilder<TaskInfoBloc, TaskInfoState>(
         builder: (context, state) {
           switch (state) {

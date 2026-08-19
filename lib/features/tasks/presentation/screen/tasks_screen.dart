@@ -1,6 +1,4 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_bar.dart';
-import 'package:family_product_plan/app/ui_kit/app_box.dart';
 import 'package:family_product_plan/features/tasks/domain/state/task_action/tasks_action_bloc.dart';
 import 'package:family_product_plan/features/tasks/domain/state/tasks_today/today_tasks_bloc.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/tasks_today_section.dart';
@@ -9,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_box.dart';
+import '../../../../app/utils/app_colors.dart';
 import '../../domain/state/tasks_type/tasks_type_bloc.dart';
 import '../../utils/task_type.dart';
 import '../components/task_type_section.dart';
 import '../components/tasks_one_time_section.dart';
-import '../components/tasks_recurring_header.dart';
 
 class TasksScreen extends StatelessWidget {
   const TasksScreen({super.key});
@@ -44,7 +44,7 @@ class _TasksView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar.profile(
+      appBar: CustomAppBar.main(
         actions: [
           IconButton(
             onPressed: () => context.goNamed(TasksRoutes.taskCreateScreenName),
@@ -57,10 +57,18 @@ class _TasksView extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 140),
         children: [
-          HBox(16),
           TasksTodaySection(),
           HBox(28),
-          TasksRecurringHeader(),
+          TasksOneTimeSection(),
+          HBox(28),
+          const Text(
+            'Повторяющиеся',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
           HBox(12),
           _TasksWrapper(type: TaskType.daily),
           HBox(8),
@@ -69,8 +77,6 @@ class _TasksView extends StatelessWidget {
           _TasksWrapper(type: TaskType.monthly),
           HBox(8),
           _TasksWrapper(type: TaskType.yearly),
-          HBox(28),
-          TasksOneTimeSection(),
         ],
       ),
     );

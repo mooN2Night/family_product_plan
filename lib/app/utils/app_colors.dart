@@ -25,4 +25,10 @@ abstract final class AppColors {
   // Bottom navigation
   static const bottomBar = Color(0xFFF1ECFA);
   static const bottomBarActive = Color(0xFFE3D8F8);
+
+  /// Базовый цвет skeleton-блоков.
+  static const skeleton = Color(0xFFEAE7F1);
+
+  /// Цвет светлой shimmer-анимации.
+  static const skeletonHighlight = Color(0xFFF8F6FC);
 }

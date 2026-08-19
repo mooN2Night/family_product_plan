@@ -1,11 +1,13 @@
+import 'package:family_product_plan/app/presentation/ui_kit/app_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/app_context_ext.dart';
-import '../../../../app/ui_kit/app_bar.dart';
-import '../../../../app/ui_kit/app_box.dart';
-import '../../../../app/utils/app_utils.dart';
+import '../../../../app/presentation/dialog/poduct_delete_dialog.dart';
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_skeleton.dart';
 import '../../domain/state/products_action_bloc/products_action_bloc.dart';
+import '../components/home_product_success_view.dart';
 
 /// Класс для отображения экрана детальной информации о продукте.
 class ProductDetailScreen extends StatelessWidget {
@@ -33,125 +35,106 @@ class _ProductDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fontStyle = const TextStyle(fontSize: 18);
     return BlocBuilder<ProductsActionBloc, ProductsActionState>(
       builder: (context, state) {
-        final bloc = context.read<ProductsActionBloc>();
-
         switch (state) {
-          case ProductsActionInitialState():
           case ProductsActionLoadingState():
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+            return Scaffold(
+              appBar: CustomAppBar.secondary(title: 'Информация о продукте'),
+              body: _ProductDetailLoadingView(),
             );
 
           case ProductsActionErrorState():
             return Scaffold(
-              appBar: CustomAppBar.productDetail(actions: [], title: 'asd'),
+              appBar: CustomAppBar.secondary(title: 'Информация о продукте'),
               body: Center(child: Text(state.message)),
             );
 
           case ProductsLoadedState():
             final product = state.product;
-            final formatedCreatedAt = AppUtils.formateDate(product.createdAt);
-            final formatedUpdatedAt = AppUtils.formateDate(product.updatedAt);
 
             return Scaffold(
-              appBar: CustomAppBar.productDetail(
-                title: product.productName,
+              appBar: CustomAppBar.secondary(
+                title: 'Информация о продукте',
                 actions: [
                   IconButton(
                     onPressed: () {
                       // TODO: перейти на экран редактирования
                     },
-                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    icon: const Icon(Icons.edit_rounded, color: Colors.blue),
                   ),
                   IconButton(
-                    onPressed: () =>
-                        bloc.add(ProductActionDeleteEvent(id: product.id)),
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => showDeleteProductDialog(
+                      context,
+                      productName: product.productName,
+                      onDeletePressed: () => context
+                          .read<ProductsActionBloc>()
+                          .add(ProductActionDeleteEvent(id: product.id)),
+                    ),
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
-              body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const HBox(16),
-                    Row(
-                      children: [
-                        const Text('Статус:'),
-                        const WBox(5),
-                        Text(
-                          product.isToBuy
-                              ? 'Нужно купить'
-                              : 'Покупать не нужно',
-                          style: fontStyle,
-                        ),
-                      ],
-                    ),
-                    const HBox(8),
-                    Row(
-                      children: [
-                        const Text('Товар:'),
-                        const WBox(5),
-                        Expanded(
-                          child: Text(product.productName, style: fontStyle),
-                        ),
-                      ],
-                    ),
-
-                    if (product.productManufacturer.isNotEmpty) ...[
-                      const HBox(8),
-                      Row(
-                        children: [
-                          const Text('Производитель:'),
-                          const WBox(5),
-                          Expanded(
-                            child: Text(
-                              product.productManufacturer,
-                              style: fontStyle,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-
-                    if (formatedCreatedAt != null) ...[
-                      const HBox(8),
-                      Row(
-                        children: [
-                          const Text('Дата создания:'),
-                          const WBox(5),
-                          Expanded(
-                            child: Text(formatedCreatedAt, style: fontStyle),
-                          ),
-                        ],
-                      ),
-                    ],
-
-                    if (formatedUpdatedAt != null) ...[
-                      const HBox(8),
-                      Row(
-                        children: [
-                          const Text('Дата обновления:'),
-                          const WBox(5),
-                          Expanded(
-                            child: Text(formatedUpdatedAt, style: fontStyle),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
+              body: HomeProductSuccessView(product: state.product),
             );
 
           case ProductsActionSuccessState():
+          case ProductsActionInitialState():
             return const SizedBox.shrink();
         }
       },
+    );
+  }
+}
+
+class _ProductDetailLoadingView extends StatelessWidget {
+  const _ProductDetailLoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 140),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const AppSkeleton(width: 56, height: 56, borderRadius: 18),
+                  const WBox(16),
+                  Expanded(child: AppSkeleton(height: 28, borderRadius: 10)),
+                ],
+              ),
+              const HBox(20),
+              const AppSkeleton(width: 140, height: 36, borderRadius: 12),
+              const HBox(18),
+              const AppSkeleton(width: 220, height: 42, borderRadius: 10),
+              const HBox(12),
+              const AppSkeleton(width: 250, height: 42, borderRadius: 10),
+            ],
+          ),
+        ),
+        const HBox(20),
+        const AppSkeleton(
+          width: double.infinity,
+          height: 120,
+          borderRadius: 20,
+        ),
+        const HBox(28),
+        const AppSkeleton(width: double.infinity, height: 16, borderRadius: 8),
+        const HBox(8),
+        const AppSkeleton(width: double.infinity, height: 16, borderRadius: 8),
+      ],
     );
   }
 }

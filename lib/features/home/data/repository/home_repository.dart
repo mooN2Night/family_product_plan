@@ -73,6 +73,8 @@ final class HomeRepository implements IHomeRepository {
       id: id,
       productName: product.productName,
       productManufacturer: product.productManufacturer,
+      quantity: product.quantity ?? '',
+      description: product.description ?? '',
       isToBuy: product.isToBuy,
       createdAt: now,
       updatedAt: now,

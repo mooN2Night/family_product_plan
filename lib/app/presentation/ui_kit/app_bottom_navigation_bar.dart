@@ -2,8 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
-import '../utils/app_colors.dart';
+import '../../utils/app_colors.dart';
 import 'app_bottom_navigation_button.dart';
 
 /// Виджет нижнего навигационного меню.

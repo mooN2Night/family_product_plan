@@ -8,6 +8,8 @@ class ProductCreateEntity extends Equatable {
     required this.productName,
     required this.productManufacturer,
     required this.isToBuy,
+    this.quantity,
+    this.description,
   });
 
   /// Название продукта.
@@ -16,6 +18,14 @@ class ProductCreateEntity extends Equatable {
   /// Производитель продукта.
   final String productManufacturer;
 
+  /// Количество продукта.
+  ///
+  /// Например: `2 л`, `3 шт`, `500 г`.
+  final String? quantity;
+
+  /// Дополнительное описание продукта.
+  final String? description;
+
   /// Признак необходимости покупки.
   final bool isToBuy;
 
@@ -23,11 +33,15 @@ class ProductCreateEntity extends Equatable {
   ProductCreateEntity copyWith({
     String? productName,
     String? productManufacturer,
+    String? quantity,
+    String? description,
     bool? isToBuy,
   }) {
     return ProductCreateEntity(
       productName: productName ?? this.productName,
       productManufacturer: productManufacturer ?? this.productManufacturer,
+      quantity: quantity ?? this.quantity,
+      description: description ?? this.description,
       isToBuy: isToBuy ?? this.isToBuy,
     );
   }
@@ -37,10 +51,18 @@ class ProductCreateEntity extends Equatable {
     return ProductCreateDto(
       productName: productName,
       productManufacturer: productManufacturer,
+      quantity: quantity,
+      description: description,
       isToBuy: isToBuy,
     );
   }
 
   @override
-  List<Object?> get props => [productName, productManufacturer, isToBuy];
+  List<Object?> get props => [
+    productName,
+    productManufacturer,
+    quantity,
+    description,
+    isToBuy,
+  ];
 }

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/ui_kit/app_box.dart';
-import '../../../../app/ui_kit/app_snack_bar.dart';
-import '../../../../app/dialog/family_remove_member_dialog.dart';
+import '../../../../app/presentation/dialog/family_remove_member_dialog.dart';
+import '../../../../app/presentation/ui_kit/app_box.dart';
+import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../../profile/domain/entity/profile_user_entity.dart';
-import '../../../profile/presentation/components/profile_info.dart';
+import '../../../profile/presentation/components/widgets/profile_info.dart';
 import '../../../profile/presentation/profile_routes.dart';
 import '../../domain/entity/family_relation.dart';
 import '../../domain/entity/family_role.dart';
@@ -94,6 +94,7 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
         children: [
           HBox(40),
           ProfileInfo(
+            icon: Icons.badge_outlined,
             title: 'Фамилия:',
             description: user.lastName.isNotEmpty
                 ? user.lastName
@@ -101,6 +102,7 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
           ),
           HBox(5),
           ProfileInfo(
+            icon: Icons.person_outline,
             title: 'Имя:',
             description: user.firstName.isNotEmpty
                 ? user.firstName
@@ -108,23 +110,40 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
           ),
           HBox(5),
           if (user.middleName.isNotEmpty) ...[
-            ProfileInfo(title: 'Отчество:', description: user.middleName),
+            ProfileInfo(
+              icon: Icons.person_outline,
+              title: 'Отчество:',
+              description: user.middleName,
+            ),
             HBox(5),
           ],
-          ProfileInfo(title: 'Пол:', description: user.gender.title),
+          ProfileInfo(
+            icon: Icons.wc_outlined,
+            title: 'Пол:',
+            description: user.gender.title,
+          ),
           if (formatedUserBirthday != null) ...[
             HBox(5),
             ProfileInfo(
+              icon: Icons.cake_outlined,
               title: 'Дата рождения:',
               description: formatedUserBirthday,
             ),
           ],
           if (user.age != null) ...[
             HBox(5),
-            ProfileInfo(title: 'Возраст:', description: user.age!),
+            ProfileInfo(
+              icon: Icons.calendar_today_outlined,
+              title: 'Возраст:',
+              description: user.age!,
+            ),
           ],
           HBox(5),
-          ProfileInfo(title: 'Почта:', description: user.email),
+          ProfileInfo(
+            icon: Icons.email_outlined,
+            title: 'Почта:',
+            description: user.email,
+          ),
           HBox(5),
           _FamilyRelationField(
             relation: relation,
@@ -184,7 +203,11 @@ class _FamilyRelationField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!canEdit) {
-      return ProfileInfo(title: 'Статус в семье:', description: relation.title);
+      return ProfileInfo(
+        icon: Icons.family_restroom,
+        title: 'Статус в семье:',
+        description: relation.title,
+      );
     }
 
     return Column(

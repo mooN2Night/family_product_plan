@@ -29,11 +29,11 @@ final class ProfileUpdateBloc
   ) async {
     final currentState = state;
     if (currentState is ProfileUpdateLoadingState) return;
-
     emit(ProfileUpdateLoadingState());
 
     try {
       await _profileRepository.saveProfile(event.user);
+      emit(ProfileUpdateSuccessState());
     } on AppException catch (error, stackTrace) {
       emit(ProfileUpdateErrorState(message: error.message));
       addError(error, stackTrace);

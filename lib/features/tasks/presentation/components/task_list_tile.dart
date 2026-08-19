@@ -1,10 +1,10 @@
-import 'package:family_product_plan/app/ui_kit/app_box.dart';
 import 'package:family_product_plan/features/tasks/presentation/tasks_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/presentation/ui_kit/app_box.dart';
 import '../../../../app/utils/app_colors.dart';
 import '../../domain/entity/task_entity.dart';
 import '../../domain/state/task_action/tasks_action_bloc.dart';

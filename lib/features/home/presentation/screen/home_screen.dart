@@ -1,15 +1,16 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
-import 'package:family_product_plan/app/ui_kit/app_snack_bar.dart';
+import 'package:family_product_plan/app/presentation/ui_kit/app_box.dart';
+import 'package:family_product_plan/app/presentation/ui_kit/app_skeleton.dart';
 import 'package:family_product_plan/features/home/presentation/components/home_products_list_view.dart';
 import 'package:family_product_plan/features/sync_status/domain/state/sync_status_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../app/dialog/product_add_dialog.dart';
+import '../../../../app/presentation/dialog/product_add_dialog.dart';
+import '../../../../app/presentation/ui_kit/app_bar.dart';
+import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../../../app/services/pending_sync/sync_status.dart';
-import '../../../../app/ui_kit/app_bar.dart';
 import '../../../../app/utils/app_colors.dart';
 import '../../../current_family/domain/state/current_family_cubit.dart';
-import '../../domain/entity/product_entity.dart';
 import '../../domain/state/products_action_bloc/products_action_bloc.dart';
 import '../../domain/state/products_bloc/products_bloc.dart';
 
@@ -54,14 +55,14 @@ class HomeScreenView extends StatelessWidget {
       child: Scaffold(
         appBar: CustomAppBar.main(
           actions: [
-            const SyncStatusIndicator(),
+            const _SyncStatusIndicator(),
             IconButton(
               onPressed: () => showAddProductDialog(context),
               tooltip: 'Добавить продукт',
               icon: const Icon(Icons.add_rounded, size: 28),
             ),
           ],
-          bottom: const HomeProductsTabBar(),
+          bottom: const _HomeProductsTabBar(),
         ),
         body: BlocListener<ProductsActionBloc, ProductsActionState>(
           listener: (context, actionState) {
@@ -73,7 +74,7 @@ class HomeScreenView extends StatelessWidget {
             builder: (context, state) {
               switch (state) {
                 case ProductsLoadingState():
-                  return const Center(child: CircularProgressIndicator());
+                  return _HomeScreenLoadingView();
                 case ProductsErrorState():
                   return Center(child: Text(state.message));
                 case ProductsSuccessState():
@@ -86,9 +87,7 @@ class HomeScreenView extends StatelessWidget {
                     builder: (context, familyState) {
                       switch (familyState) {
                         case CurrentFamilyLoadingState():
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
+                          return _HomeScreenLoadingView();
                         case CurrentFamilyErrorState():
                           return const Center(
                             child: Text(
@@ -96,13 +95,13 @@ class HomeScreenView extends StatelessWidget {
                             ),
                           );
                         case CurrentFamilyWithoutFamilyState():
-                          return _HomeTabBarListView(
+                          return HomeTabBarListView(
                             hasFamily: false,
                             products: products,
                             productsToBuy: productsToBuy,
                           );
                         case CurrentFamilyWithFamilyState():
-                          return _HomeTabBarListView(
+                          return HomeTabBarListView(
                             hasFamily: true,
                             products: products,
                             productsToBuy: productsToBuy,
@@ -121,9 +120,9 @@ class HomeScreenView extends StatelessWidget {
   }
 }
 
-class HomeProductsTabBar extends StatelessWidget
+class _HomeProductsTabBar extends StatelessWidget
     implements PreferredSizeWidget {
-  const HomeProductsTabBar({super.key});
+  const _HomeProductsTabBar();
 
   @override
   Widget build(BuildContext context) {
@@ -154,30 +153,8 @@ class HomeProductsTabBar extends StatelessWidget
   Size get preferredSize => const Size.fromHeight(48);
 }
 
-class _HomeTabBarListView extends StatelessWidget {
-  const _HomeTabBarListView({
-    required this.hasFamily,
-    required this.products,
-    required this.productsToBuy,
-  });
-
-  final bool hasFamily;
-  final List<ProductEntity> products;
-  final List<ProductEntity> productsToBuy;
-
-  @override
-  Widget build(BuildContext context) {
-    return TabBarView(
-      children: [
-        HomeProductsListView(hasFamily: hasFamily, products: products),
-        HomeProductsListView(hasFamily: hasFamily, products: productsToBuy),
-      ],
-    );
-  }
-}
-
-class SyncStatusIndicator extends StatelessWidget {
-  const SyncStatusIndicator({super.key});
+class _SyncStatusIndicator extends StatelessWidget {
+  const _SyncStatusIndicator();
 
   @override
   Widget build(BuildContext context) {
@@ -211,6 +188,40 @@ class SyncStatusIndicator extends StatelessWidget {
             );
         }
       },
+    );
+  }
+}
+
+class _HomeScreenLoadingView extends StatelessWidget {
+  const _HomeScreenLoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 25, 16, 140),
+      children: List.generate(
+        7,
+        (index) => Padding(
+          padding: index == 7
+              ? EdgeInsets.zero
+              : const EdgeInsets.only(bottom: 16.0),
+          child: Row(
+            children: [
+              AppSkeleton(width: 25, height: 25, borderRadius: 5),
+              WBox(20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppSkeleton(width: 200, height: 20),
+                  HBox(10),
+                  AppSkeleton(width: 100, height: 20),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
