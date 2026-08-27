@@ -9,10 +9,12 @@ import 'package:family_product_plan/app/services/database/tasks_table.dart';
 import 'package:family_product_plan/features/tasks/utils/task_type.dart';
 import 'package:path/path.dart' as p;
 
+import 'cards_table.dart';
+
 part 'app_database.g.dart';
 
 /// Основная база данных приложения.
-@DriftDatabase(tables: [Products, PendingSyncOperations, Tasks])
+@DriftDatabase(tables: [Products, PendingSyncOperations, Tasks, Cards])
 class AppDatabase extends _$AppDatabase implements IDatabase {
   AppDatabase(this.path) : super(_openConnection(path));
 
@@ -29,6 +31,7 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
     )..where((tbl) => tbl.isDeleted.equals(false))).watch();
   }
 
+  /// Продукты
   @override
   Future<int> insertProduct(ProductsCompanion entity) =>
       into(products).insert(entity);
@@ -72,6 +75,7 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
     return delete(products).go();
   }
 
+  /// Кеширование операций
   @override
   Future<void> insertPendingSyncOperation(
     PendingSyncOperationsCompanion entity,
@@ -113,6 +117,7 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
     )..where((t) => t.entityId.equals(entityId))).getSingleOrNull();
   }
 
+  /// Задачи
   @override
   Stream<List<Task>> watchTodayTasks() {
     final now = DateTime.now();
@@ -280,6 +285,26 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   @override
   Future<void> clearTasks() async {
     await delete(tasks).go();
+  }
+
+  @override
+  Future<void> deleteCard(String id) async {
+    await (delete(cards)..where((t) => t.id.equals(id))).go();
+  }
+
+  @override
+  Future<Card> getCard(String id) {
+    return (select(cards)..where((t) => t.id.equals(id))).getSingle();
+  }
+
+  @override
+  Future<List<Card>> getCards() async {
+    return await (select(cards)).get();
+  }
+
+  @override
+  Future<void> insertCard(CardsCompanion card) async {
+    await into(cards).insert(card);
   }
 }
 

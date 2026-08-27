@@ -1,3 +1,4 @@
+import 'package:family_product_plan/features/card/data/data_source/local/card_local_data_source.dart';
 import 'package:family_product_plan/features/pending_sync/data/data_source/local/i_pending_sync_local_data_source.dart';
 import 'package:family_product_plan/features/pending_sync/data/data_source/local/pending_sync_local_data_source.dart';
 import 'package:family_product_plan/features/tasks/data/data_source/local/i_tasks_local_data_source.dart';
@@ -7,6 +8,7 @@ import 'package:family_product_plan/features/tasks/data/data_source/remote/tasks
 
 import '../../features/auth/data/data_source/remote/auth_remote_data_source.dart';
 import '../../features/auth/data/data_source/remote/i_auth_remote_data_source.dart';
+import '../../features/card/data/data_source/local/i_card_local_data_source.dart';
 import '../../features/home/data/data_source/local/i_products_local_data_source.dart';
 import '../../features/home/data/data_source/local/products_local_data_source.dart';
 import '../../features/home/data/data_source/remote/i_product_remote_data_source.dart';
@@ -36,6 +38,9 @@ final class DiDataSources {
   /// Удаленный источник данных для работы с продуктами.
   late final IPendingSyncLocalDataSource pendingSyncLocalDataSource;
 
+  /// Удаленный источник данных для работы с задачами.
+  late final ICardLocalDataSource cardLocalDataSource;
+
   /// Инициализирует источники данных приложения.
   void init({required DiContainer diContainer}) {
     authRemoteDataSource = AuthRemoteDataSource(
@@ -61,6 +66,10 @@ final class DiDataSources {
     );
 
     pendingSyncLocalDataSource = PendingSyncLocalDataSource(
+      database: diContainer.services.database,
+    );
+
+    cardLocalDataSource = CardLocalDataSource(
       database: diContainer.services.database,
     );
   }

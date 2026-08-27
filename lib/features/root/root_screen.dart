@@ -21,11 +21,12 @@ class _RootScreenState extends State<RootScreen> {
   static const _buttonsIcon = [
     Icons.home_rounded,
     Icons.checklist_rounded,
+    Icons.credit_card_outlined,
     Icons.person_rounded,
   ];
 
   /// Заголовки меню
-  static const _buttonsTitle = ['Главная', 'Задачи', 'Профиль'];
+  static const _buttonsTitle = ['Главная', 'Задачи', 'Карты', 'Профиль'];
 
   @override
   Widget build(BuildContext context) {

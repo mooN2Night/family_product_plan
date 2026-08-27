@@ -7,7 +7,8 @@ import 'i_products_local_data_source.dart';
 
 /// Реализация локального хранения продуктов
 final class ProductsLocalDataSource implements IProductsLocalDataSource {
-  ProductsLocalDataSource({required IDatabase database}) : _database = database;
+  const ProductsLocalDataSource({required IDatabase database})
+    : _database = database;
 
   /// Экземпляр локальной базы данных.
   final IDatabase _database;
