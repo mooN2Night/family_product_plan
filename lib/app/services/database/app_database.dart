@@ -116,17 +116,22 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   @override
   Stream<List<Task>> watchTodayTasks() {
     final now = DateTime.now();
-
     final start = DateTime(now.year, now.month, now.day);
-
     final end = start.add(const Duration(days: 1));
 
     return (select(tasks)
           ..where(
             (t) =>
                 t.isDeleted.equals(false) &
-                ((t.nextExecutionAt.isBiggerOrEqualValue(start) &
+                (
+                // Задача назначена на сегодня.
+                (t.nextExecutionAt.isBiggerOrEqualValue(start) &
                         t.nextExecutionAt.isSmallerThanValue(end)) |
+                    // Разовая задача имеет срок сегодня.
+                    (t.dueDate.isBiggerOrEqualValue(start) &
+                        t.dueDate.isSmallerThanValue(end) &
+                        t.type.equals(TaskType.oneTime.toString())) |
+                    // Задача была выполнена сегодня.
                     (t.isCompleted.equals(true) &
                         t.completedAt.isBiggerOrEqualValue(start) &
                         t.completedAt.isSmallerThanValue(end))),
@@ -140,13 +145,42 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
 
   @override
   Stream<List<Task>> watchOneTimeTasks() {
+    final today = DateTime.now();
+    final start = DateTime(today.year, today.month, today.day);
+
     return (select(tasks)
           ..where(
             (t) =>
                 t.isDeleted.equals(false) &
-                t.type.equals(TaskType.oneTime.name),
+                t.type.equals(TaskType.oneTime.name) &
+                t.dueDate.isBiggerOrEqualValue(start),
           )
-          ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.priority),
+            (t) => OrderingTerm(expression: t.dueDate),
+            (t) => OrderingTerm(expression: t.sortOrder),
+          ]))
+        .watch();
+  }
+
+  @override
+  Stream<List<Task>> watchOverdueTasks() {
+    final today = DateTime.now();
+    final start = DateTime(today.year, today.month, today.day);
+
+    return (select(tasks)
+          ..where(
+            (t) =>
+                t.isDeleted.equals(false) &
+                t.isCompleted.equals(false) &
+                t.type.equals(TaskType.oneTime.name) &
+                t.dueDate.isSmallerThanValue(start),
+          )
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.priority),
+            (t) => OrderingTerm(expression: t.dueDate),
+            (t) => OrderingTerm(expression: t.sortOrder),
+          ]))
         .watch();
   }
 

@@ -20,6 +20,8 @@ abstract interface class ITasksRepository {
   /// Ежегодные задачи
   Stream<List<TaskEntity>> watchYearlyTasks();
 
+  Stream<List<TaskEntity>> watchOverdueTasks();
+
   /// Получение задачи
   Future<TaskEntity> getTask(String id);
 
@@ -40,4 +42,7 @@ abstract interface class ITasksRepository {
 
   /// Синхронизация задач
   Future<void> syncTasks();
+
+  /// Подготовка задач на "Сегодня" для обновления
+  Future<void> prepareTasksForToday();
 }

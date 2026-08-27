@@ -1,19 +1,50 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../app/services/family/i_current_family_provider.dart';
+import '../../../../app/services/network/i_network_service.dart';
+import '../../../../app/services/pending_sync/i_pending_sync_service.dart';
 import '../../domain/entity/create_task_entity.dart';
 import '../../domain/entity/task_entity.dart';
 import '../../domain/repository/i_tasks_repository.dart';
 import '../../utils/task_type.dart';
 import '../data_source/local/i_tasks_local_data_source.dart';
+import '../data_source/remote/i_tasks_remote_data_source.dart';
+import '../dto/task_dto.dart';
 
 final class TasksRepository implements ITasksRepository {
-  const TasksRepository({required ITasksLocalDataSource localDataSource})
-    : _localDataSource = localDataSource;
+  TasksRepository({
+    required ITasksLocalDataSource localDataSource,
+    required ITasksRemoteDataSource remoteDataSource,
+    required ICurrentFamilyProvider currentFamilyProvider,
+    required IPendingSyncService pendingSyncService,
+    required INetworkService networkService,
+  }) : _localDataSource = localDataSource,
+       _remoteDataSource = remoteDataSource,
+       _currentFamilyProvider = currentFamilyProvider,
+       _pendingSyncService = pendingSyncService,
+       _networkService = networkService;
 
   final ITasksLocalDataSource _localDataSource;
+  final ITasksRemoteDataSource _remoteDataSource;
+  final ICurrentFamilyProvider _currentFamilyProvider;
+  final IPendingSyncService _pendingSyncService;
+  final INetworkService _networkService;
+
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _remoteSubscription;
+
+  StreamSubscription<String?>? _familySubscription;
+
+  bool _initialized = false;
+
+  static const _uuid = Uuid();
 
   @override
   Stream<List<TaskEntity>> watchTodayTasks() async* {
+    unawaited(_ensureInitialized());
     await _prepareTasksForToday();
 
     yield* _localDataSource.watchTodayTasks();
@@ -21,26 +52,43 @@ final class TasksRepository implements ITasksRepository {
 
   @override
   Stream<List<TaskEntity>> watchOneTimeTasks() {
+    unawaited(_ensureInitialized());
+
     return _localDataSource.watchOneTimeTasks();
   }
 
   @override
+  Stream<List<TaskEntity>> watchOverdueTasks() {
+    unawaited(_ensureInitialized());
+
+    return _localDataSource.watchOverdueTasks();
+  }
+
+  @override
   Stream<List<TaskEntity>> watchDailyTasks() {
+    unawaited(_ensureInitialized());
+
     return _localDataSource.watchDailyTasks();
   }
 
   @override
   Stream<List<TaskEntity>> watchWeaklyTasks() {
+    unawaited(_ensureInitialized());
+
     return _localDataSource.watchWeaklyTasks();
   }
 
   @override
   Stream<List<TaskEntity>> watchMonthlyTasks() {
+    unawaited(_ensureInitialized());
+
     return _localDataSource.watchMonthlyTasks();
   }
 
   @override
   Stream<List<TaskEntity>> watchYearlyTasks() {
+    unawaited(_ensureInitialized());
+
     return _localDataSource.watchYearlyTasks();
   }
 
@@ -50,16 +98,15 @@ final class TasksRepository implements ITasksRepository {
   }
 
   @override
-  Future<void> createTask(CreateTaskEntity createTask) {
+  Future<void> createTask(CreateTaskEntity createTask) async {
     final now = DateTime.now();
-
     final nextExecutionAt = _calculateInitialNextExecutionAt(
       type: createTask.type,
       dueDate: createTask.dueDate,
     );
 
     final task = TaskEntity(
-      id: const Uuid().v4(),
+      id: _uuid.v4(),
       title: createTask.title,
       description: createTask.description,
       type: createTask.type,
@@ -77,44 +124,68 @@ final class TasksRepository implements ITasksRepository {
       createdBy: createTask.createdBy,
     );
 
-    return _localDataSource.insertTask(task);
+    await _localDataSource.insertTask(task);
+
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncAdd(task));
+    } else {
+      await _pendingSyncService.enqueueTaskAdd(task);
+    }
   }
 
   @override
-  Future<void> updateTask(TaskEntity task) {
-    return _localDataSource.updateTask(task);
+  Future<void> updateTask(TaskEntity task) async {
+    final updatedTask = task.copyWith(updatedAt: DateTime.now());
+    await _localDataSource.updateTask(updatedTask);
+
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncUpdate(updatedTask));
+    } else {
+      await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+    }
   }
 
   @override
-  Future<void> deleteTask(TaskEntity task) {
-    return _localDataSource.deleteTask(task);
+  Future<void> deleteTask(TaskEntity task) async {
+    final deletedTask = task.copyWith(
+      isDeleted: true,
+      updatedAt: DateTime.now(),
+    );
+    await _localDataSource.updateTask(deletedTask);
+
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncDelete(deletedTask));
+    } else {
+      await _pendingSyncService.enqueueTaskDelete(deletedTask);
+    }
   }
 
   @override
   Future<void> completeTask(TaskEntity task) async {
     final now = DateTime.now();
-
     final executionDate = _dateOnly(now);
-
     final nextExecutionAt = _calculateNextExecutionDate(task: task);
 
-    await _localDataSource.updateTask(
-      task.copyWith(
-        isCompleted: true,
-        completedAt: executionDate,
-        updatedAt: executionDate,
-        nextExecutionAt: nextExecutionAt,
-        lastExecutionAt: task.nextExecutionAt,
-      ),
+    final updatedTask = task.copyWith(
+      isCompleted: true,
+      completedAt: executionDate,
+      updatedAt: executionDate,
+      nextExecutionAt: nextExecutionAt,
+      lastExecutionAt: task.nextExecutionAt,
     );
+    await _localDataSource.updateTask(updatedTask);
+
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncUpdate(updatedTask));
+    } else {
+      await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+    }
   }
 
   @override
   Future<void> restoreTask(TaskEntity task) async {
     final now = DateTime.now();
-
     final today = DateTime(now.year, now.month, now.day);
-
     final nextExecutionAt = switch (task.type) {
       TaskType.oneTime => task.dueDate,
       TaskType.daily => today,
@@ -123,20 +194,29 @@ final class TasksRepository implements ITasksRepository {
       TaskType.yearly => task.lastExecutionAt,
     };
 
-    await _localDataSource.updateTask(
-      task.copyWith(
-        isCompleted: false,
-        completedAt: null,
-        nextExecutionAt: nextExecutionAt,
-        updatedAt: today,
-      ),
+    final updatedTask = task.copyWith(
+      isCompleted: false,
+      completedAt: null,
+      nextExecutionAt: nextExecutionAt,
+      updatedAt: today,
     );
+    await _localDataSource.updateTask(updatedTask);
+
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncUpdate(updatedTask));
+    } else {
+      await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+    }
   }
 
   @override
-  Future<void> syncTasks() {
-    // Firebase реализуем позжеtask.lastExecutionAt
-    throw UnimplementedError();
+  Future<void> syncTasks() async {
+    await _pendingSyncService.processQueue();
+  }
+
+  @override
+  Future<void> prepareTasksForToday() {
+    return _prepareTasksForToday();
   }
 
   DateTime? _calculateInitialNextExecutionAt({
@@ -287,8 +367,9 @@ final class TasksRepository implements ITasksRepository {
       if (nextExecutionAt == null) continue;
 
       final nextExecutionDate = _dateOnly(nextExecutionAt);
-      // Следующее выполнение ещё не наступило.
-      if (nextExecutionDate.isAfter(today)) continue;
+      // Задача назначена на сегодня или будущее.
+      // Ничего с ней не делаем.
+      if (!nextExecutionDate.isBefore(today)) continue;
 
       // Если задача уже выполнена сегодня,
       // ничего с ней не делаем.
@@ -325,5 +406,101 @@ final class TasksRepository implements ITasksRepository {
     return first.year == second.year &&
         first.month == second.month &&
         first.day == second.day;
+  }
+
+  Future<void> _restartRemoteSync(String? familyId) async {
+    await _remoteSubscription?.cancel();
+    _remoteSubscription = null;
+
+    if (familyId == null) return;
+
+    _remoteSubscription = _remoteDataSource
+        .watchTasks(familyId: familyId)
+        .listen(
+          (snapshot) {
+            for (final change in snapshot.docChanges) {
+              final task = TaskDto.fromJson(change.doc.data()!).toEntity();
+
+              switch (change.type) {
+                case DocumentChangeType.added:
+                  if (!task.isDeleted) {
+                    unawaited(_localDataSource.upsertTask(task));
+                  }
+                  break;
+
+                case DocumentChangeType.modified:
+                  _handleRemoteTask(task);
+                  break;
+
+                case DocumentChangeType.removed:
+                  break;
+              }
+            }
+          },
+          onError: (error, stackTrace) {
+            debugPrint('Remote tasks sync error: $error');
+          },
+        );
+  }
+
+  Future<void> _handleRemoteTask(TaskEntity remoteTask) async {
+    try {
+      final localTask = await _localDataSource.getTaskById(remoteTask.id);
+
+      if (localTask.updatedAt.isAfter(remoteTask.updatedAt)) {
+        await _syncUpdate(localTask);
+        return;
+      }
+
+      await _localDataSource.upsertTask(remoteTask);
+    } catch (_) {
+      await _localDataSource.upsertTask(remoteTask);
+    }
+  }
+
+  Future<void> _ensureInitialized() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    _familySubscription = _currentFamilyProvider.watchCurrentFamilyId().listen((
+      familyId,
+    ) {
+      unawaited(_restartRemoteSync(familyId));
+    });
+  }
+
+  Future<void> _syncAdd(TaskEntity task) async {
+    final familyId = await _familyId();
+    if (familyId == null) return;
+
+    await _remoteDataSource.addTask(familyId: familyId, dto: task.toDto());
+  }
+
+  Future<void> _syncUpdate(TaskEntity task) async {
+    final familyId = await _familyId();
+    if (familyId == null) return;
+
+    await _remoteDataSource.updateTask(familyId: familyId, dto: task.toDto());
+  }
+
+  Future<void> _syncDelete(TaskEntity task) async {
+    final familyId = await _familyId();
+    if (familyId == null) return;
+
+    final remoteTask = await _remoteDataSource.markDeleted(
+      familyId: familyId,
+      taskId: task.id,
+      updatedAt: task.updatedAt,
+    );
+    if (remoteTask != null) await _localDataSource.upsertTask(remoteTask);
+  }
+
+  Future<String?> _familyId() {
+    return _currentFamilyProvider.getCurrentFamilyId();
+  }
+
+  Future<void> dispose() async {
+    await _remoteSubscription?.cancel();
+    await _familySubscription?.cancel();
   }
 }

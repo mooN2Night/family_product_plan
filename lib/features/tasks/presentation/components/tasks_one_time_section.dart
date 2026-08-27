@@ -1,3 +1,4 @@
+import 'package:family_product_plan/app/presentation/ui_kit/app_box.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_list_tile.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_type_error.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/task_type_loading.dart';
@@ -66,13 +67,14 @@ class _OneTimeTasksSectionContent extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 12),
+        const HBox(12),
         ...tasks.map(
           (task) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: TaskListTile(task: task),
           ),
         ),
+        const HBox(28),
       ],
     );
   }

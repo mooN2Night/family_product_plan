@@ -5,52 +5,48 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../entity/task_entity.dart';
 import '../../repository/i_tasks_repository.dart';
 
-part 'today_tasks_event.dart';
+part 'overdue_tasks_event.dart';
 
-part 'today_tasks_state.dart';
+part 'overdue_tasks_state.dart';
 
-/// Блок управлением состоянием экрана семьи
-final class TodayTasksBloc extends Bloc<TodayTasksEvent, TodayTasksState>
+final class OverdueTasksBloc extends Bloc<OverdueTasksEvent, OverdueTasksState>
     with WidgetsBindingObserver {
-  TodayTasksBloc({required ITasksRepository taskRepository})
+  OverdueTasksBloc({required ITasksRepository taskRepository})
     : _taskRepository = taskRepository,
-      super(const TodayTasksInitialState()) {
-    on<TodayTasksStartedEvent>(_started);
-    on<TodayTasksUpdatedEvent>(_updated);
+      super(const OverdueTasksInitialState()) {
+    on<OverdueTasksStartedEvent>(_started);
+    on<OverdueTasksUpdatedEvent>(_updated);
 
     WidgetsBinding.instance.addObserver(this);
   }
 
-  /// Репозиторий задачи
   final ITasksRepository _taskRepository;
 
-  /// Подписка на прослушивание состояния списка задач
   StreamSubscription<List<TaskEntity>>? _subscription;
-
   Timer? _dayChangeTimer;
 
   DateTime _currentDate = _dateOnly(DateTime.now());
 
-  /// Метод для отслеживания обновления статуса задач.
   Future<void> _started(
-    TodayTasksStartedEvent event,
-    Emitter<TodayTasksState> emit,
+    OverdueTasksStartedEvent event,
+    Emitter<OverdueTasksState> emit,
   ) async {
-    emit(const TodayTasksLoadingState());
+    emit(const OverdueTasksLoadingState());
 
     await _subscription?.cancel();
-    _subscription = _taskRepository.watchTodayTasks().listen(
-      (tasks) => add(TodayTasksUpdatedEvent(tasks: tasks)),
+    _subscription = _taskRepository.watchOverdueTasks().listen(
+      (tasks) => add(OverdueTasksUpdatedEvent(tasks: tasks)),
     );
 
     _scheduleDayChange();
   }
 
-  /// Метод для обновления статуса задач.
   Future<void> _updated(
-    TodayTasksUpdatedEvent event,
-    Emitter<TodayTasksState> emit,
-  ) async => emit(TodayTasksSuccessState(tasks: event.tasks));
+    OverdueTasksUpdatedEvent event,
+    Emitter<OverdueTasksState> emit,
+  ) async {
+    emit(OverdueTasksSuccessState(tasks: event.tasks));
+  }
 
   void _scheduleDayChange() {
     _dayChangeTimer?.cancel();
@@ -63,9 +59,24 @@ final class TodayTasksBloc extends Bloc<TodayTasksEvent, TodayTasksState>
       if (isClosed) return;
 
       _currentDate = _dateOnly(DateTime.now());
-
-      add(const TodayTasksStartedEvent());
+      add(const OverdueTasksStartedEvent());
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+
+    final currentDate = _dateOnly(DateTime.now());
+
+    if (!_isSameDate(_currentDate, currentDate)) {
+      _currentDate = currentDate;
+
+      add(const OverdueTasksStartedEvent());
+      return;
+    }
+
+    _scheduleDayChange();
   }
 
   static DateTime _dateOnly(DateTime date) =>
@@ -77,26 +88,12 @@ final class TodayTasksBloc extends Bloc<TodayTasksEvent, TodayTasksState>
       first.day == second.day;
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed) return;
-
-    final currentDate = _dateOnly(DateTime.now());
-    if (!_isSameDate(_currentDate, currentDate)) {
-      _currentDate = currentDate;
-
-      add(const TodayTasksStartedEvent());
-      return;
-    }
-
-    _scheduleDayChange();
-  }
-
-  @override
   Future<void> close() async {
     WidgetsBinding.instance.removeObserver(this);
 
     _dayChangeTimer?.cancel();
     await _subscription?.cancel();
+
     return super.close();
   }
 }

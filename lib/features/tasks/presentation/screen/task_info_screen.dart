@@ -2,6 +2,7 @@ import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/features/tasks/domain/state/task_info/task_info_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/presentation/ui_kit/app_bar.dart';
 import '../../domain/state/task_action/tasks_action_bloc.dart';
@@ -37,21 +38,50 @@ class _TaskInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar.secondary(title: 'Информация о задаче'),
-      body: BlocBuilder<TaskInfoBloc, TaskInfoState>(
-        builder: (context, state) {
-          switch (state) {
-            case TaskInfoInitialState():
-            case TaskInfoLoadingState():
-              return const Center(child: CircularProgressIndicator());
-            case TaskInfoErrorState():
-              return Center(child: Text(state.message));
-            case TaskInfoSuccessState():
-              return TaskInfoSuccessView(task: state.task);
-          }
-        },
-      ),
+    return BlocBuilder<TaskInfoBloc, TaskInfoState>(
+      builder: (context, state) {
+        switch (state) {
+          case TaskInfoLoadingState():
+            return Scaffold(
+              appBar: _showAppBar(),
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          case TaskInfoErrorState():
+            return Scaffold(
+              appBar: _showAppBar(),
+              body: Center(child: Text(state.message)),
+            );
+          case TaskInfoSuccessState():
+            return Scaffold(
+              appBar: _showAppBar(
+                actions: [
+                  BlocListener<TasksActionBloc, TasksActionState>(
+                    listener: (context, state) {
+                      if (state is TasksActionSuccessState) context.pop();
+                    },
+                    child: IconButton(
+                      // TODO: сделать модалку для удаления задачи
+                      onPressed: () => context.read<TasksActionBloc>().add(
+                        TasksActionDeleteEvent(task: state.task),
+                      ),
+                      icon: Icon(
+                        Icons.delete_outline_rounded,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              body: TaskInfoSuccessView(task: state.task),
+            );
+          default:
+            return SizedBox.shrink();
+        }
+      },
     );
+  }
+
+  CustomAppBar _showAppBar({List<Widget>? actions}) {
+    return CustomAppBar.secondary(title: 'Информация о задаче', actions: actions);
   }
 }

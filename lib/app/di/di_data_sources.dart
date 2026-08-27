@@ -3,6 +3,7 @@ import 'package:family_product_plan/features/pending_sync/data/data_source/local
 import 'package:family_product_plan/features/tasks/data/data_source/local/i_tasks_local_data_source.dart';
 import 'package:family_product_plan/features/tasks/data/data_source/local/tasks_local_data_source.dart';
 import 'package:family_product_plan/features/tasks/data/data_source/remote/i_tasks_remote_data_source.dart';
+import 'package:family_product_plan/features/tasks/data/data_source/remote/tasks_remote_data_source.dart';
 
 import '../../features/auth/data/data_source/remote/auth_remote_data_source.dart';
 import '../../features/auth/data/data_source/remote/i_auth_remote_data_source.dart';
@@ -53,6 +54,10 @@ final class DiDataSources {
 
     tasksLocalDataSource = TasksLocalDataSource(
       database: diContainer.services.database,
+    );
+
+    tasksRemoteDataSource = TasksRemoteDataSource(
+      firestore: diContainer.services.firestore,
     );
 
     pendingSyncLocalDataSource = PendingSyncLocalDataSource(

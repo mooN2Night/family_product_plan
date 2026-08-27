@@ -5,6 +5,8 @@ abstract interface class ITasksLocalDataSource {
 
   Stream<List<TaskEntity>> watchOneTimeTasks();
 
+  Stream<List<TaskEntity>> watchOverdueTasks();
+
   Stream<List<TaskEntity>> watchDailyTasks();
 
   Stream<List<TaskEntity>> watchWeaklyTasks();

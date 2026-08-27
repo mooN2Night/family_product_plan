@@ -11,6 +11,10 @@ import '../../../features/home/data/dto/product_dto.dart';
 import '../../../features/home/domain/entity/product_entity.dart';
 import '../../../features/pending_sync/data/data_source/local/i_pending_sync_local_data_source.dart';
 import '../../../features/pending_sync/domain/entity/pending_sync_entity.dart';
+import '../../../features/tasks/data/data_source/local/i_tasks_local_data_source.dart';
+import '../../../features/tasks/data/data_source/remote/i_tasks_remote_data_source.dart';
+import '../../../features/tasks/data/dto/task_dto.dart';
+import '../../../features/tasks/domain/entity/task_entity.dart';
 import '../database/sync_operation_type.dart';
 import '../family/i_current_family_provider.dart';
 import '../network/i_network_service.dart';
@@ -19,21 +23,31 @@ import 'i_pending_sync_service.dart';
 final class PendingSyncService implements IPendingSyncService {
   PendingSyncService({
     required IPendingSyncLocalDataSource localDataSource,
-    required IProductsRemoteDataSource remoteDataSource,
+    required IProductsRemoteDataSource productsRemoteDataSource,
     required IProductsLocalDataSource productsLocalDataSource,
+    required ITasksRemoteDataSource tasksRemoteDataSource,
+    required ITasksLocalDataSource tasksLocalDataSource,
     required ICurrentFamilyProvider currentFamilyProvider,
     required INetworkService networkService,
   }) : _localDataSource = localDataSource,
-       _remoteDataSource = remoteDataSource,
+       _productsRemoteDataSource = productsRemoteDataSource,
        _productsLocalDataSource = productsLocalDataSource,
+       _tasksRemoteDataSource = tasksRemoteDataSource,
+       _tasksLocalDataSource = tasksLocalDataSource,
        _currentFamilyProvider = currentFamilyProvider,
        _networkService = networkService;
 
   final IPendingSyncLocalDataSource _localDataSource;
-  final IProductsRemoteDataSource _remoteDataSource;
+
+  final IProductsRemoteDataSource _productsRemoteDataSource;
   final IProductsLocalDataSource _productsLocalDataSource;
+
+  final ITasksRemoteDataSource _tasksRemoteDataSource;
+  final ITasksLocalDataSource _tasksLocalDataSource;
+
   final ICurrentFamilyProvider _currentFamilyProvider;
   final INetworkService _networkService;
+
   final _statusController = BehaviorSubject<SyncStatus>.seeded(
     const SyncStatus.idle(0),
   );
@@ -42,34 +56,64 @@ final class PendingSyncService implements IPendingSyncService {
   bool _processing = false;
 
   @override
-  Future<void> enqueueAdd(ProductEntity product) {
+  Future<void> enqueueProductAdd(ProductEntity entity) {
     return _enqueue(
       PendingSyncEntity(
         id: _uuid.v4(),
         type: SyncOperationType.add,
-        entityId: product.id,
-        payload: jsonEncode(product.toDto().toOfflineJson()),
+        entityType: SyncEntityType.product,
+        entityId: entity.id,
+        payload: jsonEncode(entity.toDto().toOfflineJson()),
         createdAt: DateTime.now(),
       ),
     );
   }
 
   @override
-  Future<void> enqueueUpdate(ProductEntity product) {
+  Future<void> enqueueTaskAdd(TaskEntity entity) {
+    return _enqueue(
+      PendingSyncEntity(
+        id: _uuid.v4(),
+        type: SyncOperationType.add,
+        entityType: SyncEntityType.task,
+        entityId: entity.id,
+        payload: jsonEncode(entity.toDto().toOfflineJson()),
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  @override
+  Future<void> enqueueProductUpdate(ProductEntity entity) {
     return _enqueue(
       PendingSyncEntity(
         id: _uuid.v4(),
         type: SyncOperationType.update,
-        entityId: product.id,
-        payload: jsonEncode(product.toDto().toOfflineJson()),
+        entityType: SyncEntityType.product,
+        entityId: entity.id,
+        payload: jsonEncode(entity.toDto().toOfflineJson()),
         createdAt: DateTime.now(),
       ),
     );
   }
 
   @override
-  Future<void> enqueueDelete(ProductEntity product) {
-    final deletedProduct = product.copyWith(
+  Future<void> enqueueTaskUpdate(TaskEntity entity) {
+    return _enqueue(
+      PendingSyncEntity(
+        id: _uuid.v4(),
+        type: SyncOperationType.update,
+        entityType: SyncEntityType.task,
+        entityId: entity.id,
+        payload: jsonEncode(entity.toDto().toOfflineJson()),
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  @override
+  Future<void> enqueueProductDelete(ProductEntity entity) {
+    final deletedProduct = entity.copyWith(
       isDeleted: true,
       updatedAt: DateTime.now(),
     );
@@ -78,8 +122,28 @@ final class PendingSyncService implements IPendingSyncService {
       PendingSyncEntity(
         id: _uuid.v4(),
         type: SyncOperationType.delete,
-        entityId: product.id,
+        entityType: SyncEntityType.product,
+        entityId: entity.id,
         payload: jsonEncode(deletedProduct.toDto().toOfflineJson()),
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  @override
+  Future<void> enqueueTaskDelete(TaskEntity entity) {
+    final deletedTask = entity.copyWith(
+      isDeleted: true,
+      updatedAt: DateTime.now(),
+    );
+
+    return _enqueue(
+      PendingSyncEntity(
+        id: _uuid.v4(),
+        type: SyncOperationType.delete,
+        entityType: SyncEntityType.task,
+        entityId: entity.id,
+        payload: jsonEncode(deletedTask.toDto().toOfflineJson()),
         createdAt: DateTime.now(),
       ),
     );
@@ -215,15 +279,32 @@ final class PendingSyncService implements IPendingSyncService {
     }
   }
 
-  Future<void> _processAdd(String familyId, PendingSyncEntity operation) async {
+  Future<void> _processProductAdd(
+    String familyId,
+    PendingSyncEntity operation,
+  ) async {
     final product = ProductDto.fromJsonOffline(
       jsonDecode(operation.payload!) as Map<String, dynamic>,
     ).toEntity();
 
-    await _remoteDataSource.addProduct(familyId: familyId, product: product);
+    await _productsRemoteDataSource.addProduct(
+      familyId: familyId,
+      product: product,
+    );
   }
 
-  Future<void> _processUpdate(
+  Future<void> _processTaskAdd(
+    String familyId,
+    PendingSyncEntity operation,
+  ) async {
+    final task = TaskDto.fromJsonOffline(
+      jsonDecode(operation.payload!) as Map<String, dynamic>,
+    ).toEntity();
+
+    await _tasksRemoteDataSource.addTask(familyId: familyId, dto: task.toDto());
+  }
+
+  Future<void> _processProductUpdate(
     String familyId,
     PendingSyncEntity operation,
   ) async {
@@ -231,7 +312,7 @@ final class PendingSyncService implements IPendingSyncService {
       jsonDecode(operation.payload!) as Map<String, dynamic>,
     ).toEntity();
 
-    final remoteProduct = await _remoteDataSource.updateProduct(
+    final remoteProduct = await _productsRemoteDataSource.updateProduct(
       familyId: familyId,
       product: localProduct,
     );
@@ -241,7 +322,25 @@ final class PendingSyncService implements IPendingSyncService {
     }
   }
 
-  Future<void> _processDelete(
+  Future<void> _processTaskUpdate(
+    String familyId,
+    PendingSyncEntity operation,
+  ) async {
+    final task = TaskDto.fromJsonOffline(
+      jsonDecode(operation.payload!) as Map<String, dynamic>,
+    ).toEntity();
+
+    final remoteTask = await _tasksRemoteDataSource.updateTask(
+      familyId: familyId,
+      dto: task.toDto(),
+    );
+
+    if (remoteTask != null) {
+      await _tasksLocalDataSource.upsertTask(remoteTask);
+    }
+  }
+
+  Future<void> _processProductDelete(
     String familyId,
     PendingSyncEntity operation,
   ) async {
@@ -249,11 +348,30 @@ final class PendingSyncService implements IPendingSyncService {
       jsonDecode(operation.payload!) as Map<String, dynamic>,
     ).toEntity();
 
-    await _remoteDataSource.markDeleted(
+    await _productsRemoteDataSource.markDeleted(
       familyId: familyId,
       productId: product.id,
       updatedAt: product.updatedAt,
     );
+  }
+
+  Future<void> _processTaskDelete(
+    String familyId,
+    PendingSyncEntity operation,
+  ) async {
+    final task = TaskDto.fromJsonOffline(
+      jsonDecode(operation.payload!) as Map<String, dynamic>,
+    ).toEntity();
+
+    final remoteTask = await _tasksRemoteDataSource.markDeleted(
+      familyId: familyId,
+      taskId: task.id,
+      updatedAt: task.updatedAt,
+    );
+
+    if (remoteTask != null) {
+      await _tasksLocalDataSource.upsertTask(remoteTask);
+    }
   }
 
   Future<bool> _processOperation(
@@ -269,14 +387,20 @@ final class PendingSyncService implements IPendingSyncService {
     }
 
     try {
-      switch (operation.type) {
-        case SyncOperationType.add:
-          await _processAdd(familyId, operation);
-        case SyncOperationType.update:
-          await _processUpdate(familyId, operation);
-        case SyncOperationType.delete:
-          await _processDelete(familyId, operation);
+      switch (operation.entityType) {
+        case SyncEntityType.product:
+          await _processProductOperation(familyId, operation);
+        case SyncEntityType.task:
+          await _processTaskOperation(familyId, operation);
       }
+      // switch (operation.type) {
+      //   case SyncOperationType.add:
+      //     await _processAdd(familyId, operation);
+      //   case SyncOperationType.update:
+      //     await _processUpdate(familyId, operation);
+      //   case SyncOperationType.delete:
+      //     await _processDelete(familyId, operation);
+      // }
       await _localDataSource.deleteOperation(operation.id);
       await _emitIdle();
       return true;
@@ -304,6 +428,38 @@ final class PendingSyncService implements IPendingSyncService {
         SyncStatus.error(pending: pending.length, error: error.toString()),
       );
       return false;
+    }
+  }
+
+  Future<void> _processTaskOperation(
+    String familyId,
+    PendingSyncEntity operation,
+  ) async {
+    switch (operation.type) {
+      case SyncOperationType.add:
+        await _processTaskAdd(familyId, operation);
+
+      case SyncOperationType.update:
+        await _processTaskUpdate(familyId, operation);
+
+      case SyncOperationType.delete:
+        await _processTaskDelete(familyId, operation);
+    }
+  }
+
+  Future<void> _processProductOperation(
+    String familyId,
+    PendingSyncEntity operation,
+  ) async {
+    switch (operation.type) {
+      case SyncOperationType.add:
+        await _processProductAdd(familyId, operation);
+
+      case SyncOperationType.update:
+        await _processProductUpdate(familyId, operation);
+
+      case SyncOperationType.delete:
+        await _processProductDelete(familyId, operation);
     }
   }
 

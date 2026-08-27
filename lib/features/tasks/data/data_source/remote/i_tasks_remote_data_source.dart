@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../domain/entity/task_entity.dart';
 import '../../dto/task_dto.dart';
 
 abstract interface class ITasksRemoteDataSource {
@@ -9,7 +10,11 @@ abstract interface class ITasksRemoteDataSource {
 
   Future<void> addTask({required String familyId, required TaskDto dto});
 
-  Future<void> updateTask({required String familyId, required TaskDto dto});
+  Future<TaskEntity?> updateTask({required String familyId, required TaskDto dto});
 
-  Future<void> deleteTask({required String familyId, required String taskId});
+  Future<TaskEntity?> markDeleted({
+    required String familyId,
+    required String taskId,
+    required DateTime updatedAt,
+  });
 }

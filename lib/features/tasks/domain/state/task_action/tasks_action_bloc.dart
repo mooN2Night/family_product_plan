@@ -18,6 +18,7 @@ final class TasksActionBloc extends Bloc<TasksActionEvent, TasksActionState> {
     on<TasksActionAddEvent>(_addTask);
     on<TasksActionCompleteEvent>(_completeTask);
     on<TasksActionRestoreEvent>(_restoreTask);
+    on<TasksActionDeleteEvent>(_deleteTask);
   }
 
   /// Репозиторий задач
@@ -65,6 +66,22 @@ final class TasksActionBloc extends Bloc<TasksActionEvent, TasksActionState> {
 
     try {
       await _taskRepository.restoreTask(event.task);
+      emit(const TasksActionSuccessState());
+    } on AppException catch (error, stackTrace) {
+      emit(TasksActionErrorState(message: error.message));
+      addError(error, stackTrace);
+    }
+  }
+
+  Future<void> _deleteTask(
+    TasksActionDeleteEvent event,
+    Emitter<TasksActionState> emit,
+  ) async {
+    if (state is TasksActionLoadingState) return;
+    emit(const TasksActionLoadingState());
+
+    try {
+      await _taskRepository.deleteTask(event.task);
       emit(const TasksActionSuccessState());
     } on AppException catch (error, stackTrace) {
       emit(TasksActionErrorState(message: error.message));

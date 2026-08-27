@@ -66,6 +66,10 @@ final class DiRepositories {
 
     tasksRepository = TasksRepository(
       localDataSource: diContainer.dataSource.tasksLocalDataSource,
+      currentFamilyProvider: diContainer.services.currentFamilyProvider,
+      remoteDataSource: diContainer.dataSource.tasksRemoteDataSource,
+      pendingSyncService: diContainer.business.pendingSyncService,
+      networkService: diContainer.services.networkService,
     );
   }
 }

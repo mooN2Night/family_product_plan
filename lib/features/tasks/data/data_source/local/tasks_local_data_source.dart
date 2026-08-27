@@ -24,6 +24,13 @@ final class TasksLocalDataSource implements ITasksLocalDataSource {
   }
 
   @override
+  Stream<List<TaskEntity>> watchOverdueTasks() {
+    return _database.watchOverdueTasks().map(
+      (tasks) => tasks.map((e) => e.toEntity()).toList(),
+    );
+  }
+
+  @override
   Stream<List<TaskEntity>> watchDailyTasks() {
     return _database.watchDailyTasks().map(
       (tasks) => tasks.map((e) => e.toEntity()).toList(),
