@@ -1,5 +1,6 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/features/tasks/domain/state/task_action/tasks_action_bloc.dart';
+import 'package:family_product_plan/features/tasks/domain/state/tasks_overdue/overdue_tasks_bloc.dart';
 import 'package:family_product_plan/features/tasks/domain/state/tasks_today/today_tasks_bloc.dart';
 import 'package:family_product_plan/features/tasks/presentation/components/tasks_today_section.dart';
 import 'package:family_product_plan/features/tasks/presentation/tasks_routes.dart';
@@ -14,6 +15,7 @@ import '../../domain/state/tasks_type/tasks_type_bloc.dart';
 import '../../utils/task_type.dart';
 import '../components/task_type_section.dart';
 import '../components/tasks_one_time_section.dart';
+import '../components/tasks_overdue_section.dart';
 
 class TasksScreen extends StatelessWidget {
   const TasksScreen({super.key});
@@ -28,6 +30,11 @@ class TasksScreen extends StatelessWidget {
           create: (context) =>
               TodayTasksBloc(taskRepository: taskRepository)
                 ..add(const TodayTasksStartedEvent()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              OverdueTasksBloc(taskRepository: taskRepository)
+                ..add(const OverdueTasksStartedEvent()),
         ),
         BlocProvider(
           create: (context) => TasksActionBloc(taskRepository: taskRepository),
@@ -57,10 +64,10 @@ class _TasksView extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 140),
         children: [
+          TasksOverdueSection(),
           TasksTodaySection(),
           HBox(28),
           TasksOneTimeSection(),
-          HBox(28),
           const Text(
             'Повторяющиеся',
             style: TextStyle(

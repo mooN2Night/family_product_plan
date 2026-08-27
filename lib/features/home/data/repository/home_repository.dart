@@ -85,7 +85,7 @@ final class HomeRepository implements IHomeRepository {
     if (await _networkService.hasInternet()) {
       unawaited(_syncAdd(entity));
     } else {
-      await _pendingSyncService.enqueueAdd(entity);
+      await _pendingSyncService.enqueueProductAdd(entity);
     }
   }
 
@@ -101,7 +101,7 @@ final class HomeRepository implements IHomeRepository {
     if (await _networkService.hasInternet()) {
       unawaited(_syncDelete(deletedProduct));
     } else {
-      await _pendingSyncService.enqueueDelete(deletedProduct);
+      await _pendingSyncService.enqueueProductDelete(deletedProduct);
     }
   }
 
@@ -123,7 +123,7 @@ final class HomeRepository implements IHomeRepository {
     if (await _networkService.hasInternet()) {
       unawaited(_syncUpdate(updatedProduct));
     } else {
-      await _pendingSyncService.enqueueUpdate(updatedProduct);
+      await _pendingSyncService.enqueueProductUpdate(updatedProduct);
     }
   }
 

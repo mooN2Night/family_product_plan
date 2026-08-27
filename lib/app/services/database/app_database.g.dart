@@ -613,6 +613,17 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _entityTypeMeta = const VerificationMeta(
+    'entityType',
+  );
+  @override
+  late final GeneratedColumn<String> entityType = GeneratedColumn<String>(
+    'entity_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _entityIdMeta = const VerificationMeta(
     'entityId',
   );
@@ -685,6 +696,7 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
   List<GeneratedColumn> get $columns => [
     id,
     operation,
+    entityType,
     entityId,
     payload,
     createdAt,
@@ -716,6 +728,14 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
       );
     } else if (isInserting) {
       context.missing(_operationMeta);
+    }
+    if (data.containsKey('entity_type')) {
+      context.handle(
+        _entityTypeMeta,
+        entityType.isAcceptableOrUnknown(data['entity_type']!, _entityTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entityTypeMeta);
     }
     if (data.containsKey('entity_id')) {
       context.handle(
@@ -777,6 +797,10 @@ class $PendingSyncOperationsTable extends PendingSyncOperations
         DriftSqlType.string,
         data['${effectivePrefix}operation'],
       )!,
+      entityType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity_type'],
+      )!,
       entityId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}entity_id'],
@@ -818,6 +842,9 @@ class PendingSyncOperation extends DataClass
   /// Тип операции.
   final String operation;
 
+  /// Тип операции.
+  final String entityType;
+
   /// Идентификатор продукта.
   final String entityId;
 
@@ -832,6 +859,7 @@ class PendingSyncOperation extends DataClass
   const PendingSyncOperation({
     required this.id,
     required this.operation,
+    required this.entityType,
     required this.entityId,
     this.payload,
     required this.createdAt,
@@ -844,6 +872,7 @@ class PendingSyncOperation extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['operation'] = Variable<String>(operation);
+    map['entity_type'] = Variable<String>(entityType);
     map['entity_id'] = Variable<String>(entityId);
     if (!nullToAbsent || payload != null) {
       map['payload'] = Variable<String>(payload);
@@ -863,6 +892,7 @@ class PendingSyncOperation extends DataClass
     return PendingSyncOperationsCompanion(
       id: Value(id),
       operation: Value(operation),
+      entityType: Value(entityType),
       entityId: Value(entityId),
       payload: payload == null && nullToAbsent
           ? const Value.absent()
@@ -886,6 +916,7 @@ class PendingSyncOperation extends DataClass
     return PendingSyncOperation(
       id: serializer.fromJson<String>(json['id']),
       operation: serializer.fromJson<String>(json['operation']),
+      entityType: serializer.fromJson<String>(json['entityType']),
       entityId: serializer.fromJson<String>(json['entityId']),
       payload: serializer.fromJson<String?>(json['payload']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -900,6 +931,7 @@ class PendingSyncOperation extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'operation': serializer.toJson<String>(operation),
+      'entityType': serializer.toJson<String>(entityType),
       'entityId': serializer.toJson<String>(entityId),
       'payload': serializer.toJson<String?>(payload),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -912,6 +944,7 @@ class PendingSyncOperation extends DataClass
   PendingSyncOperation copyWith({
     String? id,
     String? operation,
+    String? entityType,
     String? entityId,
     Value<String?> payload = const Value.absent(),
     DateTime? createdAt,
@@ -921,6 +954,7 @@ class PendingSyncOperation extends DataClass
   }) => PendingSyncOperation(
     id: id ?? this.id,
     operation: operation ?? this.operation,
+    entityType: entityType ?? this.entityType,
     entityId: entityId ?? this.entityId,
     payload: payload.present ? payload.value : this.payload,
     createdAt: createdAt ?? this.createdAt,
@@ -934,6 +968,9 @@ class PendingSyncOperation extends DataClass
     return PendingSyncOperation(
       id: data.id.present ? data.id.value : this.id,
       operation: data.operation.present ? data.operation.value : this.operation,
+      entityType: data.entityType.present
+          ? data.entityType.value
+          : this.entityType,
       entityId: data.entityId.present ? data.entityId.value : this.entityId,
       payload: data.payload.present ? data.payload.value : this.payload,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -952,6 +989,7 @@ class PendingSyncOperation extends DataClass
     return (StringBuffer('PendingSyncOperation(')
           ..write('id: $id, ')
           ..write('operation: $operation, ')
+          ..write('entityType: $entityType, ')
           ..write('entityId: $entityId, ')
           ..write('payload: $payload, ')
           ..write('createdAt: $createdAt, ')
@@ -966,6 +1004,7 @@ class PendingSyncOperation extends DataClass
   int get hashCode => Object.hash(
     id,
     operation,
+    entityType,
     entityId,
     payload,
     createdAt,
@@ -979,6 +1018,7 @@ class PendingSyncOperation extends DataClass
       (other is PendingSyncOperation &&
           other.id == this.id &&
           other.operation == this.operation &&
+          other.entityType == this.entityType &&
           other.entityId == this.entityId &&
           other.payload == this.payload &&
           other.createdAt == this.createdAt &&
@@ -991,6 +1031,7 @@ class PendingSyncOperationsCompanion
     extends UpdateCompanion<PendingSyncOperation> {
   final Value<String> id;
   final Value<String> operation;
+  final Value<String> entityType;
   final Value<String> entityId;
   final Value<String?> payload;
   final Value<DateTime> createdAt;
@@ -1001,6 +1042,7 @@ class PendingSyncOperationsCompanion
   const PendingSyncOperationsCompanion({
     this.id = const Value.absent(),
     this.operation = const Value.absent(),
+    this.entityType = const Value.absent(),
     this.entityId = const Value.absent(),
     this.payload = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1012,6 +1054,7 @@ class PendingSyncOperationsCompanion
   PendingSyncOperationsCompanion.insert({
     required String id,
     required String operation,
+    required String entityType,
     required String entityId,
     this.payload = const Value.absent(),
     required DateTime createdAt,
@@ -1021,11 +1064,13 @@ class PendingSyncOperationsCompanion
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        operation = Value(operation),
+       entityType = Value(entityType),
        entityId = Value(entityId),
        createdAt = Value(createdAt);
   static Insertable<PendingSyncOperation> custom({
     Expression<String>? id,
     Expression<String>? operation,
+    Expression<String>? entityType,
     Expression<String>? entityId,
     Expression<String>? payload,
     Expression<DateTime>? createdAt,
@@ -1037,6 +1082,7 @@ class PendingSyncOperationsCompanion
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (operation != null) 'operation': operation,
+      if (entityType != null) 'entity_type': entityType,
       if (entityId != null) 'entity_id': entityId,
       if (payload != null) 'payload': payload,
       if (createdAt != null) 'created_at': createdAt,
@@ -1050,6 +1096,7 @@ class PendingSyncOperationsCompanion
   PendingSyncOperationsCompanion copyWith({
     Value<String>? id,
     Value<String>? operation,
+    Value<String>? entityType,
     Value<String>? entityId,
     Value<String?>? payload,
     Value<DateTime>? createdAt,
@@ -1061,6 +1108,7 @@ class PendingSyncOperationsCompanion
     return PendingSyncOperationsCompanion(
       id: id ?? this.id,
       operation: operation ?? this.operation,
+      entityType: entityType ?? this.entityType,
       entityId: entityId ?? this.entityId,
       payload: payload ?? this.payload,
       createdAt: createdAt ?? this.createdAt,
@@ -1079,6 +1127,9 @@ class PendingSyncOperationsCompanion
     }
     if (operation.present) {
       map['operation'] = Variable<String>(operation.value);
+    }
+    if (entityType.present) {
+      map['entity_type'] = Variable<String>(entityType.value);
     }
     if (entityId.present) {
       map['entity_id'] = Variable<String>(entityId.value);
@@ -1109,6 +1160,7 @@ class PendingSyncOperationsCompanion
     return (StringBuffer('PendingSyncOperationsCompanion(')
           ..write('id: $id, ')
           ..write('operation: $operation, ')
+          ..write('entityType: $entityType, ')
           ..write('entityId: $entityId, ')
           ..write('payload: $payload, ')
           ..write('createdAt: $createdAt, ')
@@ -2385,6 +2437,7 @@ typedef $$PendingSyncOperationsTableCreateCompanionBuilder =
     PendingSyncOperationsCompanion Function({
       required String id,
       required String operation,
+      required String entityType,
       required String entityId,
       Value<String?> payload,
       required DateTime createdAt,
@@ -2397,6 +2450,7 @@ typedef $$PendingSyncOperationsTableUpdateCompanionBuilder =
     PendingSyncOperationsCompanion Function({
       Value<String> id,
       Value<String> operation,
+      Value<String> entityType,
       Value<String> entityId,
       Value<String?> payload,
       Value<DateTime> createdAt,
@@ -2422,6 +2476,11 @@ class $$PendingSyncOperationsTableFilterComposer
 
   ColumnFilters<String> get operation => $composableBuilder(
     column: $table.operation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entityType => $composableBuilder(
+    column: $table.entityType,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2475,6 +2534,11 @@ class $$PendingSyncOperationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get entityId => $composableBuilder(
     column: $table.entityId,
     builder: (column) => ColumnOrderings(column),
@@ -2520,6 +2584,11 @@ class $$PendingSyncOperationsTableAnnotationComposer
 
   GeneratedColumn<String> get operation =>
       $composableBuilder(column: $table.operation, builder: (column) => column);
+
+  GeneratedColumn<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get entityId =>
       $composableBuilder(column: $table.entityId, builder: (column) => column);
@@ -2592,6 +2661,7 @@ class $$PendingSyncOperationsTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<String> operation = const Value.absent(),
+                Value<String> entityType = const Value.absent(),
                 Value<String> entityId = const Value.absent(),
                 Value<String?> payload = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -2602,6 +2672,7 @@ class $$PendingSyncOperationsTableTableManager
               }) => PendingSyncOperationsCompanion(
                 id: id,
                 operation: operation,
+                entityType: entityType,
                 entityId: entityId,
                 payload: payload,
                 createdAt: createdAt,
@@ -2614,6 +2685,7 @@ class $$PendingSyncOperationsTableTableManager
               ({
                 required String id,
                 required String operation,
+                required String entityType,
                 required String entityId,
                 Value<String?> payload = const Value.absent(),
                 required DateTime createdAt,
@@ -2624,6 +2696,7 @@ class $$PendingSyncOperationsTableTableManager
               }) => PendingSyncOperationsCompanion.insert(
                 id: id,
                 operation: operation,
+                entityType: entityType,
                 entityId: entityId,
                 payload: payload,
                 createdAt: createdAt,

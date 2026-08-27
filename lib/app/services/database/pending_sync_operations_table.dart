@@ -7,6 +7,9 @@ class PendingSyncOperations extends Table {
   /// Тип операции.
   TextColumn get operation => text()();
 
+  /// Тип операции.
+  TextColumn get entityType => text()();
+
   /// Идентификатор продукта.
   TextColumn get entityId => text()();
 

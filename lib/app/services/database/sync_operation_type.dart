@@ -9,3 +9,12 @@ enum SyncOperationType {
   /// Удаление
   delete,
 }
+
+/// Тип синхронизируемого вида
+enum SyncEntityType {
+  /// Продукты
+  product,
+
+  /// Задачи
+  task,
+}

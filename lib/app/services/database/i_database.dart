@@ -60,6 +60,8 @@ abstract interface class IDatabase {
 
   Stream<List<Task>> watchYearlyTasks();
 
+  Stream<List<Task>> watchOverdueTasks();
+
   Future<List<Task>> getRecurringTasks();
 
   Future<void> insertTask(TasksCompanion entity);

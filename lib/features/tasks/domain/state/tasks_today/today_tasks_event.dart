@@ -20,7 +20,3 @@ final class TodayTasksUpdatedEvent extends TodayTasksEvent {
   @override
   List<Object?> get props => [tasks];
 }
-
-final class TodayTasksDayChangedEvent extends TodayTasksEvent {
-  const TodayTasksDayChangedEvent();
-}

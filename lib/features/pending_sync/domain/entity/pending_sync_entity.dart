@@ -6,6 +6,7 @@ final class PendingSyncEntity extends Equatable {
   const PendingSyncEntity({
     required this.id,
     required this.type,
+    required this.entityType,
     required this.entityId,
     required this.payload,
     required this.createdAt,
@@ -17,6 +18,8 @@ final class PendingSyncEntity extends Equatable {
   final String id;
 
   final SyncOperationType type;
+
+  final SyncEntityType entityType;
 
   final String entityId;
 
@@ -36,6 +39,7 @@ final class PendingSyncEntity extends Equatable {
   PendingSyncEntity copyWith({
     String? id,
     SyncOperationType? type,
+    SyncEntityType? entityType,
     String? entityId,
     String? payload,
     DateTime? createdAt,
@@ -46,6 +50,7 @@ final class PendingSyncEntity extends Equatable {
     return PendingSyncEntity(
       id: id ?? this.id,
       type: type ?? this.type,
+      entityType: entityType ?? this.entityType,
       entityId: entityId ?? this.entityId,
       payload: payload ?? this.payload,
       createdAt: createdAt ?? this.createdAt,
@@ -59,6 +64,7 @@ final class PendingSyncEntity extends Equatable {
   List<Object?> get props => [
     id,
     type,
+    entityType,
     entityId,
     payload,
     createdAt,

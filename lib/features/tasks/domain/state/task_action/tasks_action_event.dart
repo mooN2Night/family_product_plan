@@ -34,3 +34,12 @@ final class TasksActionRestoreEvent extends TasksActionEvent {
   @override
   List<Object?> get props => [task];
 }
+
+final class TasksActionDeleteEvent extends TasksActionEvent {
+  const TasksActionDeleteEvent({required this.task});
+
+  final TaskEntity task;
+
+  @override
+  List<Object?> get props => [task];
+}

@@ -44,9 +44,7 @@ class _TasksTodaySectionContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final completedTasks = tasks.where((task) => task.isCompleted).length;
-
     final totalTasks = tasks.length;
-
     final progress = totalTasks == 0 ? 0.0 : completedTasks / totalTasks;
 
     return Column(

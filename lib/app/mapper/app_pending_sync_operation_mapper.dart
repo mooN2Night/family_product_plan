@@ -9,6 +9,7 @@ extension PendingSyncMapper on PendingSyncOperation {
     return PendingSyncEntity(
       id: id,
       type: SyncOperationType.values.byName(operation),
+      entityType: SyncEntityType.values.byName(entityType),
       entityId: entityId,
       payload: payload,
       createdAt: createdAt,
@@ -24,6 +25,7 @@ extension PendingSyncEntityMapper on PendingSyncEntity {
     return PendingSyncOperation(
       id: id,
       operation: type.name,
+      entityType: entityType.name,
       entityId: entityId,
       payload: payload,
       createdAt: createdAt,
@@ -37,6 +39,7 @@ extension PendingSyncEntityMapper on PendingSyncEntity {
     return PendingSyncOperationsCompanion.insert(
       id: id,
       operation: type.name,
+      entityType: entityType.name,
       entityId: entityId,
       payload: Value(payload),
       createdAt: createdAt,
