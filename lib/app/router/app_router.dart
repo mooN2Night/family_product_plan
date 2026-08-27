@@ -1,6 +1,7 @@
 import 'package:family_product_plan/app/router/auth_refresh_listener.dart';
 import 'package:family_product_plan/features/auth/domain/state/auth_bloc.dart';
 import 'package:family_product_plan/features/auth/presentation/auth_routes.dart';
+import 'package:family_product_plan/features/card/presentation/card_routes.dart';
 import 'package:family_product_plan/features/family/presentation/family_routes.dart';
 import 'package:family_product_plan/features/tasks/presentation/tasks_routes.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +63,7 @@ abstract interface class AppRouter {
           branches: [
             HomeRoutes.buildShellBranch(),
             TasksRoutes.buildShellBranch(),
+            CardRoutes.buildShellBranch(),
             ProfileRoutes.buildShellBranch(
               routes: [
                 FamilyRoutes.buildFamilyCreateRoute(),

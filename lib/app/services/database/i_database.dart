@@ -77,4 +77,12 @@ abstract interface class IDatabase {
   Future<void> deleteTask(Task entity);
 
   Future<void> clearTasks();
+
+  Future<void> insertCard(CardsCompanion card);
+
+  Future<List<Card>> getCards();
+
+  Future<Card> getCard(String id);
+
+  Future<void> deleteCard(String id);
 }

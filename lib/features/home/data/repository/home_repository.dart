@@ -157,11 +157,7 @@ final class HomeRepository implements IHomeRepository {
     await _remoteSubscription?.cancel();
     _remoteSubscription = null;
 
-    if (familyId == null) {
-      await _remoteSubscription?.cancel();
-      _remoteSubscription = null;
-      return;
-    }
+    if (familyId == null) return;
 
     _remoteSubscription = _remoteDataSource
         .watchProducts(familyId: familyId)

@@ -45,7 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<key>NSPhotoLibraryUsageDescription</key>
-    <string>Необходимо для выбора фотографии профиля.</string>
+	<key>NSCameraUsageDescription</key>
+    <string>Камера нужна для сканирования штрихкодов дисконтных карт</string>
 </dict>
 </plist>
