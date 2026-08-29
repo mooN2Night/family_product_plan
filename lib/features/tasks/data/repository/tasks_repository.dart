@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:family_product_plan/features/tasks/data/mapper/tasks_exception_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -94,118 +95,142 @@ final class TasksRepository implements ITasksRepository {
 
   @override
   Future<TaskEntity> getTask(String id) {
-    return _localDataSource.getTaskById(id);
+    try {
+      return _localDataSource.getTaskById(id);
+    } on Object catch (error) {
+      throw TasksExceptionMapper.fromException(error);
+    }
   }
 
   @override
   Future<void> createTask(CreateTaskEntity createTask) async {
-    final now = DateTime.now();
-    final nextExecutionAt = _calculateInitialNextExecutionAt(
-      type: createTask.type,
-      dueDate: createTask.dueDate,
-    );
+    try {
+      final now = DateTime.now();
+      final nextExecutionAt = _calculateInitialNextExecutionAt(
+        type: createTask.type,
+        dueDate: createTask.dueDate,
+      );
 
-    final task = TaskEntity(
-      id: _uuid.v4(),
-      title: createTask.title,
-      description: createTask.description,
-      type: createTask.type,
-      priority: createTask.priority,
-      createdAt: now,
-      updatedAt: now,
-      dueDate: createTask.dueDate,
-      completedAt: null,
-      lastExecutionAt: null,
-      nextExecutionAt: nextExecutionAt,
-      isCompleted: false,
-      isDeleted: false,
-      sortOrder: 0,
-      assignedUserId: createTask.assignedUserId,
-      createdBy: createTask.createdBy,
-    );
+      final task = TaskEntity(
+        id: _uuid.v4(),
+        title: createTask.title,
+        description: createTask.description,
+        type: createTask.type,
+        priority: createTask.priority,
+        createdAt: now,
+        updatedAt: now,
+        dueDate: createTask.dueDate,
+        completedAt: null,
+        lastExecutionAt: null,
+        nextExecutionAt: nextExecutionAt,
+        isCompleted: false,
+        isDeleted: false,
+        sortOrder: 0,
+        assignedUserId: createTask.assignedUserId,
+        createdBy: createTask.createdBy,
+      );
 
-    await _localDataSource.insertTask(task);
+      await _localDataSource.insertTask(task);
 
-    if (await _networkService.hasInternet()) {
-      unawaited(_syncAdd(task));
-    } else {
-      await _pendingSyncService.enqueueTaskAdd(task);
+      if (await _networkService.hasInternet()) {
+        unawaited(_syncAdd(task));
+      } else {
+        await _pendingSyncService.enqueueTaskAdd(task);
+      }
+    } on Object catch (error) {
+      throw TasksExceptionMapper.fromException(error);
     }
   }
 
   @override
   Future<void> updateTask(TaskEntity task) async {
-    final updatedTask = task.copyWith(updatedAt: DateTime.now());
-    await _localDataSource.updateTask(updatedTask);
+    try {
+      final updatedTask = task.copyWith(updatedAt: DateTime.now());
+      await _localDataSource.updateTask(updatedTask);
 
-    if (await _networkService.hasInternet()) {
-      unawaited(_syncUpdate(updatedTask));
-    } else {
-      await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+      if (await _networkService.hasInternet()) {
+        unawaited(_syncUpdate(updatedTask));
+      } else {
+        await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+      }
+    } on Object catch (error) {
+      throw TasksExceptionMapper.fromException(error);
     }
   }
 
   @override
   Future<void> deleteTask(TaskEntity task) async {
-    final deletedTask = task.copyWith(
-      isDeleted: true,
-      updatedAt: DateTime.now(),
-    );
-    await _localDataSource.updateTask(deletedTask);
+    try {
+      final deletedTask = task.copyWith(
+        isDeleted: true,
+        updatedAt: DateTime.now(),
+      );
+      await _localDataSource.updateTask(deletedTask);
 
-    if (await _networkService.hasInternet()) {
-      unawaited(_syncDelete(deletedTask));
-    } else {
-      await _pendingSyncService.enqueueTaskDelete(deletedTask);
+      if (await _networkService.hasInternet()) {
+        unawaited(_syncDelete(deletedTask));
+      } else {
+        await _pendingSyncService.enqueueTaskDelete(deletedTask);
+      }
+    } on Object catch (error) {
+      throw TasksExceptionMapper.fromException(error);
     }
   }
 
   @override
   Future<void> completeTask(TaskEntity task) async {
-    final now = DateTime.now();
-    final executionDate = _dateOnly(now);
-    final nextExecutionAt = _calculateNextExecutionDate(task: task);
+    try {
+      final now = DateTime.now();
+      final executionDate = _dateOnly(now);
+      final nextExecutionAt = _calculateNextExecutionDate(task: task);
 
-    final updatedTask = task.copyWith(
-      isCompleted: true,
-      completedAt: executionDate,
-      updatedAt: executionDate,
-      nextExecutionAt: nextExecutionAt,
-      lastExecutionAt: task.nextExecutionAt,
-    );
-    await _localDataSource.updateTask(updatedTask);
+      final updatedTask = task.copyWith(
+        isCompleted: true,
+        completedAt: executionDate,
+        updatedAt: now,
+        nextExecutionAt: nextExecutionAt,
+        lastExecutionAt: task.nextExecutionAt,
+      );
+      await _localDataSource.updateTask(updatedTask);
 
-    if (await _networkService.hasInternet()) {
-      unawaited(_syncUpdate(updatedTask));
-    } else {
-      await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+      if (await _networkService.hasInternet()) {
+        unawaited(_syncUpdate(updatedTask));
+      } else {
+        await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+      }
+    } on Object catch (error) {
+      throw TasksExceptionMapper.fromException(error);
     }
   }
 
   @override
   Future<void> restoreTask(TaskEntity task) async {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final nextExecutionAt = switch (task.type) {
-      TaskType.oneTime => task.dueDate,
-      TaskType.daily => today,
-      TaskType.weekly => task.lastExecutionAt,
-      TaskType.monthly => task.lastExecutionAt,
-      TaskType.yearly => task.lastExecutionAt,
-    };
+    try {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final nextExecutionAt = switch (task.type) {
+        TaskType.oneTime => task.dueDate,
+        TaskType.daily => today,
+        TaskType.weekly => task.lastExecutionAt,
+        TaskType.monthly => task.lastExecutionAt,
+        TaskType.yearly => task.lastExecutionAt,
+      };
 
-    final updatedTask = task.copyWith(
-      isCompleted: false,
-      completedAt: null,
-      nextExecutionAt: nextExecutionAt,
-      updatedAt: today,
-    );
-    await _localDataSource.updateTask(updatedTask);
+      final updatedTask = task.copyWith(
+        isCompleted: false,
+        completedAt: null,
+        nextExecutionAt: nextExecutionAt,
+        updatedAt: now,
+      );
+      await _localDataSource.updateTask(updatedTask);
 
-    if (await _networkService.hasInternet()) {
-      unawaited(_syncUpdate(updatedTask));
-    } else {
-      await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+      if (await _networkService.hasInternet()) {
+        unawaited(_syncUpdate(updatedTask));
+      } else {
+        await _pendingSyncService.enqueueTaskUpdate(updatedTask);
+      }
+    } on Object catch (error) {
+      throw TasksExceptionMapper.fromException(error);
     }
   }
 
@@ -392,7 +417,7 @@ final class TasksRepository implements ITasksRepository {
           isCompleted: false,
           completedAt: null,
           nextExecutionAt: nextDate,
-          updatedAt: today,
+          updatedAt: DateTime.now(),
         ),
       );
     }
@@ -424,14 +449,12 @@ final class TasksRepository implements ITasksRepository {
               switch (change.type) {
                 case DocumentChangeType.added:
                   if (!task.isDeleted) {
-                    unawaited(_localDataSource.upsertTask(task));
+                    unawaited(_handleRemoteTask(task));
                   }
                   break;
-
                 case DocumentChangeType.modified:
-                  _handleRemoteTask(task);
+                  unawaited(_handleRemoteTask(task));
                   break;
-
                 case DocumentChangeType.removed:
                   break;
               }
@@ -473,14 +496,22 @@ final class TasksRepository implements ITasksRepository {
     final familyId = await _familyId();
     if (familyId == null) return;
 
-    await _remoteDataSource.addTask(familyId: familyId, dto: task.toDto());
+    final remoteTask = await _remoteDataSource.addTask(
+      familyId: familyId,
+      dto: task.toDto(),
+    );
+    if (remoteTask != null) await _localDataSource.updateTask(remoteTask);
   }
 
   Future<void> _syncUpdate(TaskEntity task) async {
     final familyId = await _familyId();
     if (familyId == null) return;
 
-    await _remoteDataSource.updateTask(familyId: familyId, dto: task.toDto());
+    final remoteTask = await _remoteDataSource.updateTask(
+      familyId: familyId,
+      dto: task.toDto(),
+    );
+    if (remoteTask != null) await _localDataSource.upsertTask(remoteTask);
   }
 
   Future<void> _syncDelete(TaskEntity task) async {

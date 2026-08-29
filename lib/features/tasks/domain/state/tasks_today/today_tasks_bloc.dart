@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../app/services/day_change/i_day_change_notifier.dart';
 import '../../entity/task_entity.dart';
 import '../../repository/i_tasks_repository.dart';
 
@@ -10,26 +10,30 @@ part 'today_tasks_event.dart';
 part 'today_tasks_state.dart';
 
 /// Блок управлением состоянием экрана семьи
-final class TodayTasksBloc extends Bloc<TodayTasksEvent, TodayTasksState>
-    with WidgetsBindingObserver {
-  TodayTasksBloc({required ITasksRepository taskRepository})
-    : _taskRepository = taskRepository,
-      super(const TodayTasksInitialState()) {
+final class TodayTasksBloc extends Bloc<TodayTasksEvent, TodayTasksState> {
+  TodayTasksBloc({
+    required ITasksRepository taskRepository,
+    required IDayChangeNotifier dayChangeNotifier,
+  }) : _taskRepository = taskRepository,
+       _dayChangeNotifier = dayChangeNotifier,
+       super(const TodayTasksInitialState()) {
     on<TodayTasksStartedEvent>(_started);
-    on<TodayTasksUpdatedEvent>(_updated);
+    on<_TodayTasksUpdatedEvent>(_updated);
+    on<_TodayTasksErrorEvent>(_onStreamError);
 
-    WidgetsBinding.instance.addObserver(this);
+    _dayChangeSubscription = _dayChangeNotifier.onDayChanged.listen((_) {
+      add(const TodayTasksStartedEvent());
+    });
   }
 
   /// Репозиторий задачи
   final ITasksRepository _taskRepository;
 
+  final IDayChangeNotifier _dayChangeNotifier;
+
   /// Подписка на прослушивание состояния списка задач
   StreamSubscription<List<TaskEntity>>? _subscription;
-
-  Timer? _dayChangeTimer;
-
-  DateTime _currentDate = _dateOnly(DateTime.now());
+  StreamSubscription<void>? _dayChangeSubscription;
 
   /// Метод для отслеживания обновления статуса задач.
   Future<void> _started(
@@ -40,62 +44,30 @@ final class TodayTasksBloc extends Bloc<TodayTasksEvent, TodayTasksState>
 
     await _subscription?.cancel();
     _subscription = _taskRepository.watchTodayTasks().listen(
-      (tasks) => add(TodayTasksUpdatedEvent(tasks: tasks)),
+      (tasks) => add(_TodayTasksUpdatedEvent(tasks: tasks)),
+      onError: (error, stackTrace) {
+        addError(error, stackTrace);
+        add(_TodayTasksErrorEvent(message: error.toString()));
+      },
     );
-
-    _scheduleDayChange();
   }
 
   /// Метод для обновления статуса задач.
   Future<void> _updated(
-    TodayTasksUpdatedEvent event,
+    _TodayTasksUpdatedEvent event,
     Emitter<TodayTasksState> emit,
   ) async => emit(TodayTasksSuccessState(tasks: event.tasks));
 
-  void _scheduleDayChange() {
-    _dayChangeTimer?.cancel();
-
-    final now = DateTime.now();
-    final nextDay = DateTime(now.year, now.month, now.day + 1);
-    final duration = nextDay.difference(now);
-
-    _dayChangeTimer = Timer(duration, () {
-      if (isClosed) return;
-
-      _currentDate = _dateOnly(DateTime.now());
-
-      add(const TodayTasksStartedEvent());
-    });
-  }
-
-  static DateTime _dateOnly(DateTime date) =>
-      DateTime(date.year, date.month, date.day);
-
-  static bool _isSameDate(DateTime first, DateTime second) =>
-      first.year == second.year &&
-      first.month == second.month &&
-      first.day == second.day;
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed) return;
-
-    final currentDate = _dateOnly(DateTime.now());
-    if (!_isSameDate(_currentDate, currentDate)) {
-      _currentDate = currentDate;
-
-      add(const TodayTasksStartedEvent());
-      return;
-    }
-
-    _scheduleDayChange();
+  Future<void> _onStreamError(
+    _TodayTasksErrorEvent event,
+    Emitter<TodayTasksState> emit,
+  ) async {
+    emit(TodayTasksErrorState(message: event.message));
   }
 
   @override
   Future<void> close() async {
-    WidgetsBinding.instance.removeObserver(this);
-
-    _dayChangeTimer?.cancel();
+    await _dayChangeSubscription?.cancel();
     await _subscription?.cancel();
     return super.close();
   }

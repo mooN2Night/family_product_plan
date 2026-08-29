@@ -12,11 +12,20 @@ final class OverdueTasksStartedEvent extends OverdueTasksEvent {
   const OverdueTasksStartedEvent();
 }
 
-final class OverdueTasksUpdatedEvent extends OverdueTasksEvent {
-  const OverdueTasksUpdatedEvent({required this.tasks});
+final class _OverdueTasksUpdatedEvent extends OverdueTasksEvent {
+  const _OverdueTasksUpdatedEvent({required this.tasks});
 
   final List<TaskEntity> tasks;
 
   @override
   List<Object?> get props => [tasks];
+}
+
+final class _OverdueTasksErrorEvent extends OverdueTasksEvent {
+  const _OverdueTasksErrorEvent({required this.message});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
 }

@@ -9,6 +9,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/database/app_database.dart';
 import '../services/database/i_database.dart';
+import '../services/day_change/day_change_notifier.dart';
+import '../services/day_change/i_day_change_notifier.dart';
 import '../services/family/current_family_provider.dart';
 import '../services/family/i_current_family_provider.dart';
 import '../services/image_picker/app_image_picker.dart';
@@ -45,6 +47,8 @@ final class DiServices {
   /// Сервис проверки наличия интеренета.
   late final INetworkService networkService;
 
+  late final IDayChangeNotifier dayChangeNotifier;
+
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
   // late final FirebaseStorage storage;
 
@@ -67,5 +71,7 @@ final class DiServices {
     currentFamilyProvider = CurrentFamilyProvider(storage: storage);
 
     networkService = NetworkService();
+
+    dayChangeNotifier = DayChangeNotifier();
   }
 }

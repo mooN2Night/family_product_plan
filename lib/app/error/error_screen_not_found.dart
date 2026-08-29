@@ -16,7 +16,9 @@ class ErrorScreenNotFound extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: CustomAppBar.main(),
+      appBar: CustomAppBar.main(
+        title: 'Ошибка',
+      ),
       body: Padding(
         padding: const EdgeInsets.only(bottom: 90),
         child: Center(
