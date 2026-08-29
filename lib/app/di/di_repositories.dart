@@ -78,9 +78,10 @@ final class DiRepositories {
     );
 
     cardRepository = CardRepository(
-      pendingSyncService: diContainer.business.pendingSyncService,
       networkService: diContainer.services.networkService,
       localDataSource: diContainer.dataSource.cardLocalDataSource,
+      remoteDataSource: diContainer.dataSource.cardRemoteDataSource,
+      currentFamilyProvider: diContainer.services.currentFamilyProvider,
     );
   }
 }

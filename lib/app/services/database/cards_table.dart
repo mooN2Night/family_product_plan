@@ -11,6 +11,12 @@ class Cards extends Table {
   /// Номер карты.
   TextColumn get number => text()();
 
+  /// Тип кодировки карты.
+  TextColumn get barcodeFormat => text()();
+
+  /// Код кодировки карты.
+  TextColumn get code => text()();
+
   @override
   Set<Column<Object>>? get primaryKey => {id};
 }

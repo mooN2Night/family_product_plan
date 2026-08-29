@@ -13,4 +13,7 @@ abstract interface class ICardLocalDataSource {
 
   /// Удаление карты
   Future<void> deleteCard(String id);
+
+  /// Полностью заменяет локальный список карт данными с сервера.
+  Future<void> replaceCards(List<CardEntity> cards);
 }

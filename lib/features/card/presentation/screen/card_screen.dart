@@ -7,9 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/presentation/dialog/card_add_dialog.dart';
+import '../../../../app/presentation/dialog/card_delete_dialog.dart';
 import '../../domain/state/card_action/card_action_bloc.dart';
-import 'card_scan_screen.dart';
 
 class CardScreen extends StatelessWidget {
   const CardScreen({super.key});
@@ -23,9 +22,6 @@ class CardScreen extends StatelessWidget {
         BlocProvider(
           create: (context) =>
               CardsBloc(cardRepository: cardRepository)..add(CardsFetchEvent()),
-        ),
-        BlocProvider(
-          create: (context) => CardActionBloc(cardRepository: cardRepository),
         ),
       ],
       child: const _CardView(),
@@ -49,21 +45,8 @@ class _CardView extends StatelessWidget {
           title: 'Скидочные карты',
           actions: [
             IconButton(
-              onPressed: () => showAddCardDialog(context),
+              onPressed: () => context.goNamed(CardRoutes.cardAddScreenName),
               icon: Icon(Icons.add_outlined),
-            ),
-            IconButton(
-              onPressed: () async {
-                final result = await context.pushNamed<ScannedCardResult>(
-                  CardRoutes.cardScannerScreenName,
-                );
-
-                if (result != null) {
-                  debugPrint('debugPrint ${result.rawValue}');
-                  debugPrint('debugPrint ${result.format}');
-                }
-              },
-              icon: Icon(Icons.qr_code_scanner_outlined),
             ),
           ],
         ),
@@ -115,6 +98,8 @@ class _CardSuccessView extends StatelessWidget {
             CardRoutes.cardDetailScreenName,
             pathParameters: {'id': card.id},
           ),
+          onLongPress: () =>
+              showDeleteCardDialog(context, name: card.name, id: card.id),
           title: Text(card.name),
           subtitle: Text(card.number),
         );

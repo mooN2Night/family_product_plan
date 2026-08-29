@@ -16,4 +16,17 @@ final class AppPermissionHandler implements IPermissionHandler {
 
     return (await Permission.photos.request()).isGranted;
   }
+
+  @override
+  Future<AppPermissionResult> requestCameraPermission() async {
+    final status = await Permission.camera.request();
+
+    if (status.isGranted) return AppPermissionResult.granted;
+    if (status.isPermanentlyDenied) return AppPermissionResult.permanentlyDenied;
+
+    return AppPermissionResult.denied;
+  }
+
+  @override
+  Future<bool> openSettings() => openAppSettings();
 }
