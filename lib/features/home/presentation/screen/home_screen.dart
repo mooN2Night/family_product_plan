@@ -54,6 +54,7 @@ class HomeScreenView extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: CustomAppBar.main(
+          title: 'Продукты',
           actions: [
             const _SyncStatusIndicator(),
             IconButton(

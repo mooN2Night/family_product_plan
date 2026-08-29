@@ -7,9 +7,12 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/presentation/ui_kit/app_bar.dart';
 import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
+import '../../../../app/utils/app_colors.dart';
 import '../../domain/entity/create_task_entity.dart';
 import '../../utils/task_priority.dart';
 import '../../utils/task_type.dart';
+import '../../utils/weekday.dart';
+import '../components/task_create_weekday_picker.dart';
 
 class TaskCreateScreen extends StatelessWidget {
   const TaskCreateScreen({super.key});
@@ -39,6 +42,7 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
   late final ValueNotifier<TaskPriority> _priority;
   late final ValueNotifier<TaskType> _taskType;
   late final ValueNotifier<DateTime?> _dueDate;
+  late final ValueNotifier<Weekday?> _weekday;
   late final ValueNotifier<String?> _assignedUserId;
 
   @override
@@ -50,6 +54,7 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
     _priority = ValueNotifier<TaskPriority>(TaskPriority.medium);
     _taskType = ValueNotifier<TaskType>(TaskType.oneTime);
     _dueDate = ValueNotifier<DateTime?>(null);
+    _weekday = ValueNotifier<Weekday?>(null);
     _assignedUserId = ValueNotifier<String?>(null);
   }
 
@@ -94,7 +99,11 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
               items: TaskType.values.map((type) {
                 return DropdownMenuItem(value: type, child: Text(type.title));
               }).toList(),
-              onChanged: (value) => _taskType.value = value!,
+              onChanged: (value) {
+                _taskType.value = value!;
+                _dueDate.value = null;
+                _weekday.value = null;
+              },
             ),
             ValueListenableBuilder(
               valueListenable: _taskType,
@@ -120,8 +129,7 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
                       ),
                     ],
                   );
-                } else if (type == TaskType.weekly ||
-                    type == TaskType.monthly ||
+                } else if (type == TaskType.monthly ||
                     type == TaskType.yearly) {
                   return Column(
                     children: [
@@ -138,6 +146,34 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
                             ),
                             trailing: const Icon(Icons.calendar_month),
                             onTap: _selectDate,
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                } else if (type == TaskType.weekly) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
+                      const Text(
+                        'День недели',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ValueListenableBuilder(
+                        valueListenable: _weekday,
+                        builder: (context, weekday, _) {
+                          return WeekdayPicker(
+                            selected: weekday,
+                            onChanged: (day) {
+                              _weekday.value = day;
+                              _dueDate.value = day.toNextDate();
+                            },
                           );
                         },
                       ),
@@ -206,6 +242,7 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
     _priority.dispose();
     _taskType.dispose();
     _dueDate.dispose();
+    _weekday.dispose();
     _assignedUserId.dispose();
     super.dispose();
   }

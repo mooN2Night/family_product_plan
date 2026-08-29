@@ -12,11 +12,20 @@ final class TodayTasksStartedEvent extends TodayTasksEvent {
   const TodayTasksStartedEvent();
 }
 
-final class TodayTasksUpdatedEvent extends TodayTasksEvent {
-  const TodayTasksUpdatedEvent({required this.tasks});
+final class _TodayTasksUpdatedEvent extends TodayTasksEvent {
+  const _TodayTasksUpdatedEvent({required this.tasks});
 
   final List<TaskEntity> tasks;
 
   @override
   List<Object?> get props => [tasks];
+}
+
+final class _TodayTasksErrorEvent extends TodayTasksEvent {
+  const _TodayTasksErrorEvent({required this. message});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
 }

@@ -23,18 +23,21 @@ class TasksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskRepository = context.di.repositories.tasksRepository;
+    final dayChangeNotifier = context.di.services.dayChangeNotifier;
 
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) =>
-              TodayTasksBloc(taskRepository: taskRepository)
-                ..add(const TodayTasksStartedEvent()),
+          create: (context) => TodayTasksBloc(
+            taskRepository: taskRepository,
+            dayChangeNotifier: dayChangeNotifier,
+          )..add(const TodayTasksStartedEvent()),
         ),
         BlocProvider(
-          create: (context) =>
-              OverdueTasksBloc(taskRepository: taskRepository)
-                ..add(const OverdueTasksStartedEvent()),
+          create: (context) => OverdueTasksBloc(
+            taskRepository: taskRepository,
+            dayChangeNotifier: dayChangeNotifier,
+          )..add(const OverdueTasksStartedEvent()),
         ),
         BlocProvider(
           create: (context) => TasksActionBloc(taskRepository: taskRepository),
@@ -52,6 +55,7 @@ class _TasksView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar.main(
+        title: 'Задачи',
         actions: [
           IconButton(
             onPressed: () => context.goNamed(TasksRoutes.taskCreateScreenName),
@@ -98,11 +102,13 @@ class _TasksWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskRepository = context.di.repositories.tasksRepository;
+    final dayChangeNotifier = context.di.services.dayChangeNotifier;
 
     return BlocProvider(
-      create: (context) =>
-          TasksTypeBloc(taskRepository: taskRepository)
-            ..add(TasksTypeRequestedEvent(type: type)),
+      create: (context) => TasksTypeBloc(
+        taskRepository: taskRepository,
+        dayChangeNotifier: dayChangeNotifier,
+      )..add(TasksTypeRequestedEvent(type: type)),
       child: TaskTypeSection(type: type),
     );
   }

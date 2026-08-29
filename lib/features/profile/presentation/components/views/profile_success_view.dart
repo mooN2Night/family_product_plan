@@ -1,3 +1,4 @@
+import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/features/profile/domain/entity/profile_user_entity.dart';
 import 'package:family_product_plan/features/profile/presentation/components/widgets/profile_account_actions.dart';
 import 'package:family_product_plan/features/profile/presentation/components/widgets/profile_family_card.dart';
@@ -11,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../app/presentation/ui_kit/app_box.dart';
 import '../../../../../app/utils/app_utils.dart';
 import '../../../../auth/domain/state/auth_bloc.dart';
+import '../../../../family/domain/state/family_fetch/family_fetch_bloc.dart';
 import '../../../../family/presentation/family_routes.dart';
 import '../widgets/profile_info.dart';
 import '../widgets/profile_info_card.dart';
@@ -40,6 +42,13 @@ class ProfileSuccessView extends StatelessWidget {
         HBox(28),
         ProfileInfoCard(
           children: [
+            if (user.lastName.isNotEmpty)
+              ProfileInfo(
+                icon: Icons.badge_outlined,
+                title: 'Фамилия',
+                description: user.lastName,
+              ),
+
             ProfileInfo(
               icon: Icons.person_outline,
               title: 'Имя',
@@ -47,13 +56,6 @@ class ProfileSuccessView extends StatelessWidget {
                   ? user.firstName
                   : 'Не указано',
             ),
-
-            if (user.lastName.isNotEmpty)
-              ProfileInfo(
-                icon: Icons.badge_outlined,
-                title: 'Фамилия',
-                description: user.lastName,
-              ),
 
             if (user.middleName.isNotEmpty)
               ProfileInfo(
@@ -99,10 +101,16 @@ class ProfileSuccessView extends StatelessWidget {
         ),
         HBox(12),
         if (user.familyId != null)
-          ProfileFamilyCard(
-            onTap: () => context.pushNamed(
-              FamilyRoutes.familyInfoScreenName,
-              pathParameters: {'familyId': user.familyId!},
+          BlocProvider(
+            create: (context) => FamilyFetchBloc(
+              familyRepository: context.di.repositories.familyRepository,
+            )..add(FamilyFetchRequestedEvent(familyId: user.familyId!)),
+            child: ProfileFamilyCard(
+              onTap: () => context.pushNamed(
+                FamilyRoutes.familyInfoScreenName,
+                pathParameters: {'familyId': user.familyId!},
+              ),
+              familyId: user.familyId!,
             ),
           )
         else

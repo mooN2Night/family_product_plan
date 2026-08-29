@@ -16,8 +16,18 @@ final class TasksRemoteDataSource implements ITasksRemoteDataSource {
   }) => _collection(familyId).snapshots();
 
   @override
-  Future<void> addTask({required String familyId, required TaskDto dto}) =>
-      _collection(familyId).doc(dto.id).set(dto.toJson());
+  Future<TaskEntity?> addTask({
+    required String familyId,
+    required TaskDto dto,
+  }) async {
+    final existing = await _getTask(familyId: familyId, taskId: dto.id);
+    if (existing != null && existing.updatedAt.isAfter(dto.updatedAt)) {
+      return existing.toEntity();
+    }
+
+    await _collection(familyId).doc(dto.id).set(dto.toJson());
+    return null;
+  }
 
   @override
   Future<TaskEntity?> updateTask({

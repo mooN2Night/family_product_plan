@@ -378,7 +378,7 @@ final class PendingSyncService implements IPendingSyncService {
     String familyId,
     PendingSyncEntity operation,
   ) async {
-    if (!_canRetry(operation)) {
+    if (!(await _canRetry(operation))) {
       debugPrint(
         'Skip retry ${operation.entityId}. '
         'Next retry in ${_retryDelay(operation.retryCount)}',
@@ -463,10 +463,14 @@ final class PendingSyncService implements IPendingSyncService {
     }
   }
 
-  bool _canRetry(PendingSyncEntity operation) {
+  Future<bool> _canRetry(PendingSyncEntity operation) async {
     if (operation.retryCount >= 10) {
+      final pending = await _localDataSource.getOperations();
       _statusController.add(
-        SyncStatus.error(pending: 1, error: 'Max retry count reached'),
+        SyncStatus.error(
+          pending: pending.length,
+          error: 'Max retry count reached',
+        ),
       );
 
       return false;

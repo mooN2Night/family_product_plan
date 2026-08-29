@@ -17,11 +17,13 @@ class TasksOneTimeSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskRepository = context.di.repositories.tasksRepository;
+    final dayChangeNotifier = context.di.services.dayChangeNotifier;
 
     return BlocProvider(
-      create: (context) =>
-          TasksTypeBloc(taskRepository: taskRepository)
-            ..add(const TasksTypeRequestedEvent(type: TaskType.oneTime)),
+      create: (context) => TasksTypeBloc(
+        taskRepository: taskRepository,
+        dayChangeNotifier: dayChangeNotifier,
+      )..add(const TasksTypeRequestedEvent(type: TaskType.oneTime)),
       child: BlocBuilder<TasksTypeBloc, TasksTypeState>(
         builder: (context, state) {
           switch (state) {

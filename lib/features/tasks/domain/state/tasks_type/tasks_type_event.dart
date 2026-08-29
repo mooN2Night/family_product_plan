@@ -29,3 +29,12 @@ final class TasksTypeUpdatedEvent extends TasksTypeEvent {
 final class TasksTypeClosedEvent extends TasksTypeEvent {
   const TasksTypeClosedEvent();
 }
+
+final class _TasksTypeErrorEvent extends TasksTypeEvent {
+  const _TasksTypeErrorEvent({required this.message});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}

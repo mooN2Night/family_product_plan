@@ -23,12 +23,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// Создает AppBar для главного экрана.
   factory CustomAppBar.main({
+    required String title,
     List<Widget>? actions,
     PreferredSizeWidget? bottom,
   }) {
     return CustomAppBar._(
       type: CustomAppBarType.main,
-      title: 'Семья Гавриловых',
+      title: title,
       bottom: bottom,
       actions: actions,
     );

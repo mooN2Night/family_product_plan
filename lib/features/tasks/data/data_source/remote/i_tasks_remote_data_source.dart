@@ -8,7 +8,7 @@ abstract interface class ITasksRemoteDataSource {
     required String familyId,
   });
 
-  Future<void> addTask({required String familyId, required TaskDto dto});
+  Future<TaskEntity?> addTask({required String familyId, required TaskDto dto});
 
   Future<TaskEntity?> updateTask({required String familyId, required TaskDto dto});
 
