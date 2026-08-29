@@ -85,4 +85,6 @@ abstract interface class IDatabase {
   Future<Card> getCard(String id);
 
   Future<void> deleteCard(String id);
+
+  Future<void> replaceCards(List<Card> cards);
 }

@@ -6,14 +6,24 @@ class CardEntity extends Equatable {
     required this.id,
     required this.name,
     required this.number,
+    required this.barcodeFormat,
+    required this.code,
   });
 
   final String id;
   final String name;
   final String number;
+  final String barcodeFormat;
+  final String code;
 
-  CardDto toEntity() => CardDto(id: id, name: name, number: number);
+  CardDto toDto() => CardDto(
+    id: id,
+    name: name,
+    number: number,
+    barcodeFormat: barcodeFormat,
+    code: code,
+  );
 
   @override
-  List<Object?> get props => [id, name, number];
+  List<Object?> get props => [id, name, number, barcodeFormat, code];
 }

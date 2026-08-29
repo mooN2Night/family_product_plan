@@ -16,10 +16,16 @@ class CardsBloc extends Bloc<CardsEvent, CardsState> {
     : _cardRepository = cardRepository,
       super(const CardsInitialState()) {
     on<CardsFetchEvent>(_fetchCards);
+    on<_CardsChangedEvent>(_onChanged);
+
+    _changesSubscription = _cardRepository.onCardsChanged.listen(
+      (_) => add(const _CardsChangedEvent()),
+    );
   }
 
   /// Репозиторий для запросов
   final ICardRepository _cardRepository;
+  late final StreamSubscription<void> _changesSubscription;
 
   /// Запускает наблюдение за изменениями списка продуктов.
   Future<void> _fetchCards(
@@ -29,6 +35,18 @@ class CardsBloc extends Bloc<CardsEvent, CardsState> {
     if (state is CardsLoadingState) return;
     emit(const CardsLoadingState());
 
+    await _load(emit);
+  }
+
+  Future<void> _onChanged(
+    _CardsChangedEvent event,
+    Emitter<CardsState> emit,
+  ) async {
+    // Без CardsLoadingState — список не должен "мигать" при тихом обновлении.
+    await _load(emit);
+  }
+
+  Future<void> _load(Emitter<CardsState> emit) async {
     try {
       final cards = await _cardRepository.getCards();
       emit(CardsSuccessState(cards: cards));
@@ -36,5 +54,11 @@ class CardsBloc extends Bloc<CardsEvent, CardsState> {
       emit(CardsErrorState(message: error.message));
       addError(error, stackTrace);
     }
+  }
+
+  @override
+  Future<void> close() {
+    _changesSubscription.cancel();
+    return super.close();
   }
 }

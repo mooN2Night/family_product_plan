@@ -14,4 +14,14 @@ abstract interface class ICardRepository {
 
   /// Удаление карты
   Future<void> deleteCard(String id);
+
+  /// Синхронизирует локальные карты с сервером. Возвращает true, если данные изменились.
+  Future<bool> syncCards();
+
+  /// Пинг: список карт изменился (после фоновой синхронизации). Без payload —
+  /// подписчик сам вызывает getCards().
+  Stream<void> get onCardsChanged;
+
+  /// Освобождает ресурсы (закрыть StreamController).
+  void dispose();
 }

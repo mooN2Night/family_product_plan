@@ -306,6 +306,17 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
   Future<void> insertCard(CardsCompanion card) async {
     await into(cards).insert(card);
   }
+
+  @override
+  Future<void> replaceCards(List<Card> entities) async {
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(cards, entities);
+    });
+
+    final ids = entities.map((e) => e.id).toSet();
+
+    await (delete(cards)..where((t) => t.id.isNotIn(ids))).go();
+  }
 }
 
 /// Создает подключение к базе данных.

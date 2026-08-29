@@ -5,11 +5,8 @@ import 'package:family_product_plan/features/card/domain/entity/card_entity.dart
 import 'package:family_product_plan/features/card/domain/state/card_fetch/card_fetch_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../app/app_context_ext.dart';
-import '../../../../app/utils/app_colors.dart';
-import '../../domain/state/card_action/card_action_bloc.dart';
 
 class CardDetailScreen extends StatelessWidget {
   const CardDetailScreen({required this.id, super.key});
@@ -20,17 +17,10 @@ class CardDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cardRepository = context.di.repositories.cardRepository;
 
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) =>
-              CardFetchBloc(cardRepository: cardRepository)
-                ..add(CardFetchRequestedEvent(id: id)),
-        ),
-        BlocProvider(
-          create: (context) => CardActionBloc(cardRepository: cardRepository),
-        ),
-      ],
+    return BlocProvider(
+      create: (context) =>
+          CardFetchBloc(cardRepository: cardRepository)
+            ..add(CardFetchRequestedEvent(id: id)),
       child: const _CardDetailView(),
     );
   }
@@ -74,56 +64,25 @@ class _CardDetailSuccessView extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         children: [
           Text('Магазин: ${card.name}'),
-          HBox(10),
-          Text('Номер карты: ${card.number}'),
-          HBox(10),
-          TabBar(
-            dividerColor: Colors.transparent,
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(color: AppColors.primary, width: 3),
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              insets: EdgeInsets.symmetric(horizontal: 28),
-            ),
-            labelColor: AppColors.primary,
-            unselectedLabelColor: AppColors.textSecondary,
-            labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            unselectedLabelStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-            splashBorderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            tabs: [
-              Tab(child: Text('qr_flutter')),
-              Tab(child: Text('barcode_widget qrCode')),
-              Tab(child: Text('barcode_widget code128')),
-            ],
-          ),
+          if (card.number.isNotEmpty) ...[
+            HBox(10),
+            Text('Номер карты: ${card.number}'),
+          ],
           HBox(20),
-          SizedBox(
-            height: 260,
-            child: TabBarView(
-              children: [
-                Center(child: QrImageView(data: card.number, size: 200)),
-                Center(
-                  child: BarcodeWidget(
-                    barcode: Barcode.qrCode(),
-                    data: card.number,
-                    width: 200,
-                    height: 200,
-                  ),
-                ),
-                Center(
-                  child: BarcodeWidget(
-                    barcode: Barcode.code128(),
-                    data: card.number,
-                    width: 250,
-                    height: 100,
-                    drawText: true,
-                  ),
-                ),
-              ],
-            ),
+          BarcodeWidget(
+            barcode: switch (card.barcodeFormat) {
+              'BarcodeFormat.qrCode' => Barcode.qrCode(),
+              'BarcodeFormat.code128' => Barcode.code128(),
+              'BarcodeFormat.code39' => Barcode.code39(),
+              'BarcodeFormat.codabar' => Barcode.codabar(),
+              'BarcodeFormat.ean13' => Barcode.ean13(),
+              'BarcodeFormat.upcA' => Barcode.upcA(),
+              'BarcodeFormat.itf14' => Barcode.itf14(),
+              _ => Barcode.qrCode(),
+            },
+            data: card.code,
+            width: 200,
+            height: 200,
           ),
         ],
       ),

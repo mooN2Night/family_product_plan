@@ -2173,8 +2173,28 @@ class $CardsTable extends Cards with TableInfo<$CardsTable, Card> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _barcodeFormatMeta = const VerificationMeta(
+    'barcodeFormat',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, number];
+  late final GeneratedColumn<String> barcodeFormat = GeneratedColumn<String>(
+    'barcode_format',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, number, barcodeFormat, code];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2208,6 +2228,25 @@ class $CardsTable extends Cards with TableInfo<$CardsTable, Card> {
     } else if (isInserting) {
       context.missing(_numberMeta);
     }
+    if (data.containsKey('barcode_format')) {
+      context.handle(
+        _barcodeFormatMeta,
+        barcodeFormat.isAcceptableOrUnknown(
+          data['barcode_format']!,
+          _barcodeFormatMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_barcodeFormatMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
     return context;
   }
 
@@ -2229,6 +2268,14 @@ class $CardsTable extends Cards with TableInfo<$CardsTable, Card> {
         DriftSqlType.string,
         data['${effectivePrefix}number'],
       )!,
+      barcodeFormat: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}barcode_format'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
     );
   }
 
@@ -2247,13 +2294,27 @@ class Card extends DataClass implements Insertable<Card> {
 
   /// Номер карты.
   final String number;
-  const Card({required this.id, required this.name, required this.number});
+
+  /// Тип кодировки карты.
+  final String barcodeFormat;
+
+  /// Код кодировки карты.
+  final String code;
+  const Card({
+    required this.id,
+    required this.name,
+    required this.number,
+    required this.barcodeFormat,
+    required this.code,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['number'] = Variable<String>(number);
+    map['barcode_format'] = Variable<String>(barcodeFormat);
+    map['code'] = Variable<String>(code);
     return map;
   }
 
@@ -2262,6 +2323,8 @@ class Card extends DataClass implements Insertable<Card> {
       id: Value(id),
       name: Value(name),
       number: Value(number),
+      barcodeFormat: Value(barcodeFormat),
+      code: Value(code),
     );
   }
 
@@ -2274,6 +2337,8 @@ class Card extends DataClass implements Insertable<Card> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       number: serializer.fromJson<String>(json['number']),
+      barcodeFormat: serializer.fromJson<String>(json['barcodeFormat']),
+      code: serializer.fromJson<String>(json['code']),
     );
   }
   @override
@@ -2283,19 +2348,33 @@ class Card extends DataClass implements Insertable<Card> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'number': serializer.toJson<String>(number),
+      'barcodeFormat': serializer.toJson<String>(barcodeFormat),
+      'code': serializer.toJson<String>(code),
     };
   }
 
-  Card copyWith({String? id, String? name, String? number}) => Card(
+  Card copyWith({
+    String? id,
+    String? name,
+    String? number,
+    String? barcodeFormat,
+    String? code,
+  }) => Card(
     id: id ?? this.id,
     name: name ?? this.name,
     number: number ?? this.number,
+    barcodeFormat: barcodeFormat ?? this.barcodeFormat,
+    code: code ?? this.code,
   );
   Card copyWithCompanion(CardsCompanion data) {
     return Card(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       number: data.number.present ? data.number.value : this.number,
+      barcodeFormat: data.barcodeFormat.present
+          ? data.barcodeFormat.value
+          : this.barcodeFormat,
+      code: data.code.present ? data.code.value : this.code,
     );
   }
 
@@ -2304,51 +2383,67 @@ class Card extends DataClass implements Insertable<Card> {
     return (StringBuffer('Card(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('number: $number')
+          ..write('number: $number, ')
+          ..write('barcodeFormat: $barcodeFormat, ')
+          ..write('code: $code')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, number);
+  int get hashCode => Object.hash(id, name, number, barcodeFormat, code);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Card &&
           other.id == this.id &&
           other.name == this.name &&
-          other.number == this.number);
+          other.number == this.number &&
+          other.barcodeFormat == this.barcodeFormat &&
+          other.code == this.code);
 }
 
 class CardsCompanion extends UpdateCompanion<Card> {
   final Value<String> id;
   final Value<String> name;
   final Value<String> number;
+  final Value<String> barcodeFormat;
+  final Value<String> code;
   final Value<int> rowid;
   const CardsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.number = const Value.absent(),
+    this.barcodeFormat = const Value.absent(),
+    this.code = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CardsCompanion.insert({
     required String id,
     required String name,
     required String number,
+    required String barcodeFormat,
+    required String code,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
-       number = Value(number);
+       number = Value(number),
+       barcodeFormat = Value(barcodeFormat),
+       code = Value(code);
   static Insertable<Card> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? number,
+    Expression<String>? barcodeFormat,
+    Expression<String>? code,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (number != null) 'number': number,
+      if (barcodeFormat != null) 'barcode_format': barcodeFormat,
+      if (code != null) 'code': code,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2357,12 +2452,16 @@ class CardsCompanion extends UpdateCompanion<Card> {
     Value<String>? id,
     Value<String>? name,
     Value<String>? number,
+    Value<String>? barcodeFormat,
+    Value<String>? code,
     Value<int>? rowid,
   }) {
     return CardsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       number: number ?? this.number,
+      barcodeFormat: barcodeFormat ?? this.barcodeFormat,
+      code: code ?? this.code,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2379,6 +2478,12 @@ class CardsCompanion extends UpdateCompanion<Card> {
     if (number.present) {
       map['number'] = Variable<String>(number.value);
     }
+    if (barcodeFormat.present) {
+      map['barcode_format'] = Variable<String>(barcodeFormat.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2391,6 +2496,8 @@ class CardsCompanion extends UpdateCompanion<Card> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('number: $number, ')
+          ..write('barcodeFormat: $barcodeFormat, ')
+          ..write('code: $code, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3411,6 +3518,8 @@ typedef $$CardsTableCreateCompanionBuilder =
       required String id,
       required String name,
       required String number,
+      required String barcodeFormat,
+      required String code,
       Value<int> rowid,
     });
 typedef $$CardsTableUpdateCompanionBuilder =
@@ -3418,6 +3527,8 @@ typedef $$CardsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> name,
       Value<String> number,
+      Value<String> barcodeFormat,
+      Value<String> code,
       Value<int> rowid,
     });
 
@@ -3441,6 +3552,16 @@ class $$CardsTableFilterComposer extends Composer<_$AppDatabase, $CardsTable> {
 
   ColumnFilters<String> get number => $composableBuilder(
     column: $table.number,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get barcodeFormat => $composableBuilder(
+    column: $table.barcodeFormat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3468,6 +3589,16 @@ class $$CardsTableOrderingComposer
     column: $table.number,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get barcodeFormat => $composableBuilder(
+    column: $table.barcodeFormat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CardsTableAnnotationComposer
@@ -3487,6 +3618,14 @@ class $$CardsTableAnnotationComposer
 
   GeneratedColumn<String> get number =>
       $composableBuilder(column: $table.number, builder: (column) => column);
+
+  GeneratedColumn<String> get barcodeFormat => $composableBuilder(
+    column: $table.barcodeFormat,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
 }
 
 class $$CardsTableTableManager
@@ -3520,11 +3659,15 @@ class $$CardsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> number = const Value.absent(),
+                Value<String> barcodeFormat = const Value.absent(),
+                Value<String> code = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CardsCompanion(
                 id: id,
                 name: name,
                 number: number,
+                barcodeFormat: barcodeFormat,
+                code: code,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3532,11 +3675,15 @@ class $$CardsTableTableManager
                 required String id,
                 required String name,
                 required String number,
+                required String barcodeFormat,
+                required String code,
                 Value<int> rowid = const Value.absent(),
               }) => CardsCompanion.insert(
                 id: id,
                 name: name,
                 number: number,
+                barcodeFormat: barcodeFormat,
+                code: code,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

@@ -32,4 +32,11 @@ final class CardLocalDataSource implements ICardLocalDataSource {
     final cards = await _database.getCards();
     return cards.map((e) => e.toEntity()).toList();
   }
+
+  @override
+  Future<void> replaceCards(List<CardEntity> cards) async {
+    await _database.replaceCards(
+      cards.map((e) => e.toDatabaseModel()).toList(),
+    );
+  }
 }

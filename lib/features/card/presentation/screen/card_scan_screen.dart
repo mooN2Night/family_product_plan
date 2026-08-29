@@ -2,22 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// Результат сканирования карты — то, что реально закодировано
-/// в штрихкоде/QR, плюс формат, в котором это было закодировано.
-///
-/// Важно: rawValue — это именно "сырая" строка со сканера
-/// (например "E7005000698309358T483276"), а не отформатированный
-/// номер, который может показывать приложение магазина.
-class ScannedCardResult {
-  const ScannedCardResult({required this.rawValue, required this.format});
-
-  final String rawValue;
-  final BarcodeFormat format;
-
-  @override
-  String toString() =>
-      'ScannedCardResult(rawValue: $rawValue, format: $format)';
-}
+import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
+import '../../utils/card_scanner_result.dart';
 
 class CardScannerScreen extends StatefulWidget {
   const CardScannerScreen({super.key});
@@ -27,23 +13,27 @@ class CardScannerScreen extends StatefulWidget {
 }
 
 class _CardScannerScreenState extends State<CardScannerScreen> {
-  final MobileScannerController _controller = MobileScannerController(
-    // Разрешаем сканеру ловить все распространённые форматы карт лояльности,
-    // а не только QR — иначе штрихкоды типа Code128/Codabar/EAN13 не поймает.
-    formats: const [
-      BarcodeFormat.qrCode,
-      BarcodeFormat.code128,
-      BarcodeFormat.code39,
-      BarcodeFormat.codabar,
-      BarcodeFormat.ean13,
-      BarcodeFormat.ean8,
-      BarcodeFormat.itf,
-    ],
-  );
+  final MobileScannerController _controller = MobileScannerController();
 
-  // Флаг нужен, чтобы не среагировать на один и тот же код несколько раз
-  // подряд, пока экран не успел закрыться после первого срабатывания.
+  /// Форматы, для которых у нас есть виджет для генерации кода обратно
+  static const _supportedFormats = {
+    BarcodeFormat.qrCode,
+    BarcodeFormat.code128,
+    BarcodeFormat.code39,
+    BarcodeFormat.codabar,
+    BarcodeFormat.ean13,
+    BarcodeFormat.ean8,
+    BarcodeFormat.upcA,
+    BarcodeFormat.itf14,
+  };
+
+  /// Флаг нужен, чтобы не среагировать на один и тот же код несколько раз подряд,
+  /// пока экран не успел закрыться после первого срабатывания.
   bool _handled = false;
+
+  /// Чтобы не спамить снекбарами каждый кадр, пока пользователь всё ещё держит
+  /// камеру наведённой на неподдерживаемый код.
+  DateTime? _lastUnsupportedWarningAt;
 
   @override
   void dispose() {
@@ -51,7 +41,7 @@ class _CardScannerScreenState extends State<CardScannerScreen> {
     super.dispose();
   }
 
-  void _onDetect(BarcodeCapture capture) {
+  void _onDetect(BuildContext context, BarcodeCapture capture) {
     if (_handled) return;
 
     final barcode = capture.barcodes.firstOrNull;
@@ -59,9 +49,34 @@ class _CardScannerScreenState extends State<CardScannerScreen> {
 
     if (barcode == null || rawValue == null || rawValue.isEmpty) return;
 
+    if (!_supportedFormats.contains(barcode.format)) {
+      _showUnsupportedFormatWarning(context, barcode.format);
+      return;
+    }
+
     _handled = true;
 
     context.pop(ScannedCardResult(rawValue: rawValue, format: barcode.format));
+  }
+
+  void _showUnsupportedFormatWarning(
+    BuildContext context,
+    BarcodeFormat format,
+  ) {
+    final now = DateTime.now();
+
+    if (_lastUnsupportedWarningAt != null &&
+        now.difference(_lastUnsupportedWarningAt!) <
+            const Duration(seconds: 2)) {
+      return;
+    }
+
+    _lastUnsupportedWarningAt = now;
+
+    AppSnackBar.showInfo(
+      context,
+      message: 'Данный формат пока не поддерживается',
+    );
   }
 
   @override
@@ -90,10 +105,8 @@ class _CardScannerScreenState extends State<CardScannerScreen> {
         children: [
           MobileScanner(
             controller: _controller,
-            onDetect: _onDetect,
-            // errorBuilder: (context, error, child) {
-            //   return _CameraErrorView(error: error);
-            // },
+            onDetect: (capture) => _onDetect(context, capture),
+            errorBuilder: (context, error) => _CameraErrorView(error: error),
           ),
           // Полупрозрачная рамка-подсказка, куда наводить карту.
           IgnorePointer(
