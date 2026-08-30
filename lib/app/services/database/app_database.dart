@@ -67,7 +67,9 @@ class AppDatabase extends _$AppDatabase implements IDatabase {
 
   @override
   Future<List<Product>> getProducts() {
-    return select(products).get();
+    return (select(
+      products,
+    )..where((tbl) => tbl.isDeleted.equals(false))).get();
   }
 
   @override

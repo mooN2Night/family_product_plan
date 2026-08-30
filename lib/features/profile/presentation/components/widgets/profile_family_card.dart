@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../app/presentation/ui_kit/app_box.dart';
+import '../../../../../app/utils/app_colors.dart';
 
 class ProfileFamilyCard extends StatelessWidget {
   const ProfileFamilyCard({
@@ -17,12 +18,10 @@ class ProfileFamilyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Builder(
       builder: (context) {
         return Material(
-          color: colorScheme.primaryContainer.withValues(alpha: 0.65),
+          color: AppColors.primarySoft,
           borderRadius: BorderRadius.circular(24),
           child: BlocBuilder<FamilyFetchBloc, FamilyFetchState>(
             builder: (context, state) {
@@ -41,19 +40,10 @@ class ProfileFamilyCard extends StatelessWidget {
                   padding: const EdgeInsets.all(18),
                   child: Row(
                     children: [
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surface,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.family_restroom_outlined,
-                          color: colorScheme.primary,
-                          size: 28,
-                        ),
+                      Icon(
+                        Icons.family_restroom_outlined,
+                        color: AppColors.primary,
+                        size: 28,
                       ),
                       const WBox(14),
                       Expanded(
@@ -63,9 +53,7 @@ class ProfileFamilyCard extends StatelessWidget {
                             Text(
                               'Ваша семья',
                               style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
+                                  ?.copyWith(color: AppColors.textSecondary),
                             ),
                             const HBox(3),
                             switch (state) {
@@ -88,8 +76,8 @@ class ProfileFamilyCard extends StatelessWidget {
                         ),
                       ),
                       Icon(
-                        Icons.chevron_right,
-                        color: colorScheme.onSurfaceVariant,
+                        Icons.chevron_right_rounded,
+                        color: AppColors.textSecondary,
                       ),
                     ],
                   ),

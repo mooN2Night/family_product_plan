@@ -171,16 +171,12 @@ final class HomeRepository implements IHomeRepository {
               switch (change.type) {
                 case DocumentChangeType.added:
                   if (!product.isDeleted) {
-                    unawaited(_localDataSource.upsertProduct(product));
+                    unawaited(_handleRemoteProduct(product));
                   }
                   break;
 
                 case DocumentChangeType.modified:
-                  if (product.isDeleted) {
-                    unawaited(_localDataSource.deleteProduct(product.id));
-                  } else {
-                    unawaited(_localDataSource.upsertProduct(product));
-                  }
+                  unawaited(_handleRemoteProduct(product));
                   break;
                 case DocumentChangeType.removed:
                   break;
@@ -191,6 +187,27 @@ final class HomeRepository implements IHomeRepository {
             debugPrint('Remote sync error: $error');
           },
         );
+  }
+
+  Future<void> _handleRemoteProduct(ProductEntity remoteProduct) async {
+    if (remoteProduct.isDeleted) {
+      await _localDataSource.deleteProduct(remoteProduct.id);
+      return;
+    }
+
+    try {
+      final localProduct = await _localDataSource.getProduct(remoteProduct.id);
+      final local = localProduct.toEntity();
+
+      if (local.updatedAt.isAfter(remoteProduct.updatedAt)) {
+        await _syncUpdate(local);
+        return;
+      }
+
+      await _localDataSource.upsertProduct(remoteProduct);
+    } catch (_) {
+      await _localDataSource.upsertProduct(remoteProduct);
+    }
   }
 
   /// Синхронизирует добавление продукта с удалённым хранилищем.
@@ -205,11 +222,15 @@ final class HomeRepository implements IHomeRepository {
   Future<void> _syncDelete(ProductEntity deletedProduct) async {
     final familyId = await _familyId();
     if (familyId == null) return;
-    await _remoteDataSource.markDeleted(
+
+    final remoteProduct = await _remoteDataSource.markDeleted(
       familyId: familyId,
       productId: deletedProduct.id,
       updatedAt: deletedProduct.updatedAt,
     );
+    if (remoteProduct != null) {
+      await _localDataSource.upsertProduct(remoteProduct);
+    }
   }
 
   /// Синхронизирует обновление продукта с удалённым хранилищем.

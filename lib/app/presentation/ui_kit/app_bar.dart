@@ -63,51 +63,48 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final isMain = type == CustomAppBarType.main;
 
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.primarySoft,
-          borderRadius: const BorderRadius.vertical(
-            bottom: Radius.circular(32),
-          ),
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.white.withValues(alpha: 0.7),
-              width: 1,
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.06),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
         ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-            bottom: Radius.circular(32),
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.white.withValues(alpha: 0.7),
+            width: 1,
           ),
-          child: AppBar(
-            title: Text(
-              title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
+        child: AppBar(
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
             ),
-            centerTitle: true,
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            shadowColor: Colors.transparent,
-            automaticallyImplyLeading: !isMain,
-            foregroundColor: AppColors.textPrimary,
-            actions: _buildActions(context),
-            bottom: bottom,
           ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          shadowColor: Colors.transparent,
+          automaticallyImplyLeading: !isMain,
+          foregroundColor: AppColors.textPrimary,
+          actions: _buildActions(context),
+          bottom: bottom,
         ),
       ),
     );

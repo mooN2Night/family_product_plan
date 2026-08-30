@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextButton(
                         onPressed: () =>
                             context.pushNamed(AuthRoutes.registerScreenName),
-                        child: Text('Нет аккаунта? Зарегестрируйся'),
+                        child: Text('Нет аккаунта? Зарегистрируйся'),
                       ),
                     ],
                   ),

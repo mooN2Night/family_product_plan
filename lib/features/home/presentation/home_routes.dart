@@ -1,4 +1,5 @@
 import 'package:family_product_plan/features/home/presentation/screen/home_screen.dart';
+import 'package:family_product_plan/features/home/presentation/screen/product_add_screen.dart';
 import 'package:family_product_plan/features/home/presentation/screen/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,11 +11,17 @@ abstract final class HomeRoutes {
   /// Название роута главной страницы
   static const String homeScreenName = 'home_screen';
 
+  /// Название роута главной страницы
+  static const String homeAddScreenName = 'home_add_screen';
+
   /// Название роута экрана с деталями
   static const String homeDetailScreenName = 'home_detail_screen';
 
   /// Путь роута главной страницы
   static const String homeScreenPath = '/home';
+
+  /// Путь роута главной страницы
+  static const String _homeAddScreenPath = 'home_add';
 
   /// Путь роута экрана с деталями
   static const String _homeDetailScreenPath = 'detail';
@@ -56,6 +63,11 @@ abstract final class HomeRoutes {
                 stackTrace: StackTrace.current,
               );
             },
+          ),
+          GoRoute(
+            path: _homeAddScreenPath,
+            name: homeAddScreenName,
+            builder: (context, state) => ProductAddScreen(),
           ),
           ...routes,
         ],

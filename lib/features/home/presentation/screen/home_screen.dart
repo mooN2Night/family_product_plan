@@ -2,10 +2,11 @@ import 'package:family_product_plan/app/app_context_ext.dart';
 import 'package:family_product_plan/app/presentation/ui_kit/app_box.dart';
 import 'package:family_product_plan/app/presentation/ui_kit/app_skeleton.dart';
 import 'package:family_product_plan/features/home/presentation/components/home_products_list_view.dart';
+import 'package:family_product_plan/features/home/presentation/home_routes.dart';
 import 'package:family_product_plan/features/sync_status/domain/state/sync_status_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../app/presentation/dialog/product_add_dialog.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/presentation/ui_kit/app_bar.dart';
 import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../../../app/services/pending_sync/sync_status.dart';
@@ -58,7 +59,8 @@ class HomeScreenView extends StatelessWidget {
           actions: [
             const _SyncStatusIndicator(),
             IconButton(
-              onPressed: () => showAddProductDialog(context),
+              onPressed: () => context.goNamed(HomeRoutes.homeAddScreenName),
+              // onPressed: () => showAddProductDialog(context),
               tooltip: 'Добавить продукт',
               icon: const Icon(Icons.add_rounded, size: 28),
             ),
