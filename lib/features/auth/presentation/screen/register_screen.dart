@@ -88,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       );
                     },
-                    child: Text('Зарегестрироваться'),
+                    child: Text('Зарегистрироваться'),
                   ),
                 ],
               ),

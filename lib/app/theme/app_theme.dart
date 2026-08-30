@@ -44,15 +44,10 @@ abstract final class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-
       colorScheme: colorScheme,
-
       scaffoldBackgroundColor: AppColors.background,
-
       fontFamily: GoogleFonts.manrope().fontFamily,
-
       textTheme: textTheme,
-
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textPrimary,
@@ -60,14 +55,11 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
       ),
-
       iconTheme: const IconThemeData(color: AppColors.textPrimary),
-
       dividerTheme: const DividerThemeData(
         color: AppColors.divider,
         thickness: 1,
       ),
-
       checkboxTheme: CheckboxThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         side: const BorderSide(color: AppColors.primary, width: 1.8),

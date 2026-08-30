@@ -16,6 +16,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       super(const ProductsInitialState()) {
     on<ProductsWatchEvent>(_watchProducts);
     on<_ProductsUpdatedEvent>(_onProductsUpdated);
+    on<_ProductsErrorEvent>(_onError);
   }
 
   /// Репозиторий для запросов
@@ -37,8 +38,9 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       (products) {
         add(_ProductsUpdatedEvent(products));
       },
-      onError: (error) {
-        emit(ProductsErrorState(error.toString()));
+      onError: (error, stackTrace) {
+        addError(error, stackTrace);
+        add(_ProductsErrorEvent(message: error.toString()));
       },
     );
   }
@@ -48,6 +50,9 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     _ProductsUpdatedEvent event,
     Emitter<ProductsState> emit,
   ) => emit(ProductsSuccessState(products: event.products));
+
+  void _onError(_ProductsErrorEvent event, Emitter<ProductsState> emit) =>
+      emit(ProductsErrorState(event.message));
 
   @override
   Future<void> close() async {
@@ -65,4 +70,13 @@ class _ProductsUpdatedEvent extends ProductsEvent {
 
   @override
   List<Object?> get props => [products];
+}
+
+class _ProductsErrorEvent extends ProductsEvent {
+  const _ProductsErrorEvent({required this.message});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
 }

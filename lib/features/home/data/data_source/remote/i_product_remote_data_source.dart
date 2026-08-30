@@ -26,7 +26,7 @@ abstract interface class IProductsRemoteDataSource {
   });
 
   /// Удаляет продукт из удалённой базы данных.
-  Future<void> markDeleted({
+  Future<ProductEntity?> markDeleted({
     required String familyId,
     required String productId,
     required DateTime updatedAt,

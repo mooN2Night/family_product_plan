@@ -28,6 +28,8 @@ final class ProductsLocalDataSource implements IProductsLocalDataSource {
         isToBuy: Value(product.isToBuy),
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
+        description: Value(product.description),
+        quantity: Value(product.quantity),
       ),
     );
   }

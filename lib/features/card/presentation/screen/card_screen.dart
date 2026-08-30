@@ -62,7 +62,18 @@ class _CardView extends StatelessWidget {
                   final cards = state.cards;
                   if (cards.isEmpty) {
                     return Center(
-                      child: Text('У вас пока нет зарегестрированных карт'),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('У вас пока нет зарегестрированных карт'),
+                          TextButton(
+                            onPressed: () => context.read<CardsBloc>().add(
+                              CardsFetchEvent(),
+                            ),
+                            child: Text('Обновить'),
+                          ),
+                        ],
+                      ),
                     );
                   }
 

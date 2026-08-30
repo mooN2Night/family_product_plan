@@ -3,8 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../app/presentation/ui_kit/app_actions_tile.dart';
 import '../../../../../app/presentation/ui_kit/app_box.dart';
+import '../../../../../app/presentation/ui_kit/app_dropdown_field.dart';
+import '../../../../../app/presentation/ui_kit/app_field_group.dart';
 import '../../../../../app/presentation/ui_kit/app_snack_bar.dart';
+import '../../../../../app/presentation/ui_kit/app_text_field.dart';
+import '../../../../../app/utils/app_colors.dart';
 import '../../../domain/entity/profile_user_entity.dart';
 import '../../../domain/state/profile_update/profile_update_bloc.dart';
 
@@ -31,10 +36,10 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
   late final TextEditingController _middleNameController;
 
   /// Пол
-  late Gender _gender;
+  late final ValueNotifier<Gender> _genderNotifier;
 
   /// Дата рождения
-  DateTime? _birthDate;
+  late final ValueNotifier<DateTime?> _birthDateNotifier;
 
   /// Ключ для формы
   late final GlobalKey<FormState> _formKey;
@@ -46,21 +51,17 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
     _firstNameController = TextEditingController(text: widget.user.firstName);
     _middleNameController = TextEditingController(text: widget.user.middleName);
 
-    _gender = widget.user.gender;
-    _birthDate = widget.user.birthDate;
+    _genderNotifier = ValueNotifier<Gender>(widget.user.gender);
+    _birthDateNotifier = ValueNotifier<DateTime?>(widget.user.birthDate);
 
     _formKey = GlobalKey<FormState>();
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return BlocListener<ProfileUpdateBloc, ProfileUpdateState>(
       listener: (context, state) {
-        if (state is ProfileUpdateSuccessState) {
-          context.pop();
-        }
+        if (state is ProfileUpdateSuccessState) context.pop();
 
         if (state is ProfileUpdateErrorState) {
           AppSnackBar.showError(context, message: state.message);
@@ -72,17 +73,13 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 140),
           children: [
-            const _ProfileSectionTitle(
-              icon: Icons.person_outline,
-              title: 'Личные данные',
-            ),
-            HBox(12),
-            _ProfileFieldGroup(
+            AppFieldGroup(
               children: [
-                _ProfileTextField(
+                AppTextField(
                   controller: _lastNameController,
                   label: 'Фамилия',
                   icon: Icons.badge_outlined,
+                  autofocus: _lastNameController.text.isEmpty ? true : false,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Введите фамилию';
@@ -91,8 +88,8 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
                     return null;
                   },
                 ),
-                _ProfileFieldDivider(),
-                _ProfileTextField(
+                const AppFieldDivider(),
+                AppTextField(
                   controller: _firstNameController,
                   label: 'Имя',
                   icon: Icons.person_outline,
@@ -104,8 +101,8 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
                     return null;
                   },
                 ),
-                _ProfileFieldDivider(),
-                _ProfileTextField(
+                const AppFieldDivider(),
+                AppTextField(
                   controller: _middleNameController,
                   label: 'Отчество',
                   icon: Icons.person_outline,
@@ -119,41 +116,54 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
                 ),
               ],
             ),
-            HBox(28),
-            const _ProfileSectionTitle(
-              icon: Icons.info_outline,
-              title: 'Основная информация',
-            ),
-            HBox(12),
-            _ProfileFieldGroup(
+            const HBox(16),
+            AppFieldGroup(
               children: [
-                _ProfileDropdownField(
-                  gender: _gender,
-                  onChanged: (gender) {
-                    setState(() {
-                      _gender = gender;
-                    });
+                ValueListenableBuilder<Gender>(
+                  valueListenable: _genderNotifier,
+                  builder: (context, gender, _) {
+                    return AppDropdownField<Gender>(
+                      icon: Icons.flag_outlined,
+                      label: 'Приоритет',
+                      value: gender,
+                      items: Gender.values,
+                      itemLabelBuilder: (item) => item.title,
+                      onChanged: (value) => _genderNotifier.value = value,
+                    );
                   },
                 ),
-                const _ProfileFieldDivider(),
-                _ProfileDateField(
-                  birthDate: _birthDate,
-                  onTap: () => _pickBirthDate(context),
+                const AppFieldDivider(),
+                ValueListenableBuilder(
+                  valueListenable: _birthDateNotifier,
+                  builder: (context, date, _) {
+                    return AppActionTile(
+                      icon: Icons.calendar_month_outlined,
+                      label: 'Срок выполнения',
+                      // во второй ветке — 'Дата задачи'
+                      value: date == null
+                          ? 'Не выбрана'
+                          : DateFormat('dd.MM.yyyy').format(date),
+                      trailingIcon: Icons.calendar_month,
+                      onTap: () => _pickBirthDate(context),
+                    );
+                  },
                 ),
               ],
             ),
-            HBox(32),
+            HBox(28),
             SizedBox(
+              width: double.infinity,
               height: 56,
               child: BlocBuilder<ProfileUpdateBloc, ProfileUpdateState>(
                 builder: (context, state) {
                   final isLoading = state is ProfileUpdateLoadingState;
 
-                  return FilledButton(
+                  return ElevatedButton(
                     onPressed: isLoading ? null : () => _save(context),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
@@ -179,17 +189,20 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
 
   @override
   void dispose() {
-    super.dispose();
     _lastNameController.dispose();
     _firstNameController.dispose();
     _middleNameController.dispose();
+
+    _genderNotifier.dispose();
+    _birthDateNotifier.dispose();
+    super.dispose();
   }
 
   /// Метод для отображения пикера даты рождения
   Future<void> _pickBirthDate(BuildContext context) async {
     final date = await showDatePicker(
       context: context,
-      initialDate: _birthDate ?? DateTime(2000),
+      initialDate: _birthDateNotifier.value ?? DateTime(2000),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
@@ -197,7 +210,7 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
     if (date == null) return;
 
     setState(() {
-      _birthDate = date;
+      _birthDateNotifier.value = date;
     });
   }
 
@@ -211,202 +224,8 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
           firstName: _firstNameController.text.trim(),
           lastName: _lastNameController.text.trim(),
           middleName: _middleNameController.text.trim(),
-          gender: _gender,
-          birthDate: _birthDate,
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileSectionTitle extends StatelessWidget {
-  const _ProfileSectionTitle({required this.icon, required this.title});
-
-  final IconData icon;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: colorScheme.primary),
-        const WBox(8),
-        Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-        ),
-      ],
-    );
-  }
-}
-
-class _ProfileFieldGroup extends StatelessWidget {
-  const _ProfileFieldGroup({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(children: children),
-    );
-  }
-}
-
-class _ProfileFieldDivider extends StatelessWidget {
-  const _ProfileFieldDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      height: 1,
-      indent: 16,
-      endIndent: 16,
-      color: Theme.of(
-        context,
-      ).colorScheme.outlineVariant.withValues(alpha: 0.4),
-    );
-  }
-}
-
-class _ProfileTextField extends StatelessWidget {
-  const _ProfileTextField({
-    required this.controller,
-    required this.label,
-    required this.icon,
-    required this.validator,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final IconData icon;
-  final String? Function(String?) validator;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        textCapitalization: TextCapitalization.words,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon, size: 21, color: colorScheme.onSurfaceVariant),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          focusedErrorBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 14),
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileDropdownField extends StatelessWidget {
-  const _ProfileDropdownField({required this.gender, required this.onChanged});
-
-  final Gender gender;
-  final ValueChanged<Gender> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: DropdownButtonFormField<Gender>(
-        initialValue: gender,
-        decoration: InputDecoration(
-          prefixIcon: Icon(
-            Icons.wc_outlined,
-            size: 21,
-            color: colorScheme.onSurfaceVariant,
-          ),
-          labelText: 'Пол',
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
-        ),
-        items: Gender.values.map((gender) {
-          return DropdownMenuItem(value: gender, child: Text(gender.title));
-        }).toList(),
-        onChanged: (value) {
-          if (value != null) {
-            onChanged(value);
-          }
-        },
-      ),
-    );
-  }
-}
-
-class _ProfileDateField extends StatelessWidget {
-  const _ProfileDateField({required this.birthDate, required this.onTap});
-
-  final DateTime? birthDate;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 21,
-              color: colorScheme.onSurfaceVariant,
-            ),
-            const WBox(16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Дата рождения',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const HBox(3),
-                  Text(
-                    birthDate == null
-                        ? 'Не выбрана'
-                        : DateFormat('dd.MM.yyyy').format(birthDate!),
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
-          ],
+          gender: _genderNotifier.value,
+          birthDate: _birthDateNotifier.value,
         ),
       ),
     );

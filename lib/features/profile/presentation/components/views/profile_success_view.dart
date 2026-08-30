@@ -1,21 +1,21 @@
 import 'package:family_product_plan/app/app_context_ext.dart';
+import 'package:family_product_plan/app/presentation/ui_kit/app_field_group.dart';
 import 'package:family_product_plan/features/profile/domain/entity/profile_user_entity.dart';
-import 'package:family_product_plan/features/profile/presentation/components/widgets/profile_account_actions.dart';
 import 'package:family_product_plan/features/profile/presentation/components/widgets/profile_family_card.dart';
 import 'package:family_product_plan/features/profile/presentation/components/widgets/profile_header.dart';
 import 'package:family_product_plan/features/profile/presentation/components/widgets/profile_no_family_card.dart';
-import 'package:family_product_plan/features/profile/presentation/profile_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../app/presentation/dialog/profile_delete_account_dialog.dart';
+import '../../../../../app/presentation/dialog/profile_enter_family_error_dialog.dart';
+import '../../../../../app/presentation/ui_kit/app_actions_tile.dart';
 import '../../../../../app/presentation/ui_kit/app_box.dart';
 import '../../../../../app/utils/app_utils.dart';
 import '../../../../auth/domain/state/auth_bloc.dart';
 import '../../../../family/domain/state/family_fetch/family_fetch_bloc.dart';
 import '../../../../family/presentation/family_routes.dart';
-import '../widgets/profile_info.dart';
-import '../widgets/profile_info_card.dart';
 
 /// Виджет отображения успешно загруженных данных пользователя.
 class ProfileSuccessView extends StatelessWidget {
@@ -26,80 +26,78 @@ class ProfileSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final formatedUserBirthday = AppUtils.formateDate(user.birthDate);
-    final initials = _getInitials(user);
 
     return ListView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 28, 16, 140),
       children: [
         ProfileHeader(
-          initials: initials,
+          initials: user.getInitials,
           name: user.fullName.isNotEmpty ? user.fullName : 'Пользователь',
           email: user.email,
         ),
-        HBox(28),
-        ProfileInfoCard(
+        HBox(16),
+        AppFieldGroup(
           children: [
-            if (user.lastName.isNotEmpty)
-              ProfileInfo(
+            if (user.lastName.isNotEmpty) ...[
+              AppActionTile(
                 icon: Icons.badge_outlined,
-                title: 'Фамилия',
-                description: user.lastName,
+                label: 'Фамилия',
+                value: user.lastName,
               ),
+              AppFieldDivider(),
+            ],
 
-            ProfileInfo(
+            AppActionTile(
               icon: Icons.person_outline,
-              title: 'Имя',
-              description: user.firstName.isNotEmpty
-                  ? user.firstName
-                  : 'Не указано',
+              label: 'Имя',
+              value: user.firstName.isNotEmpty ? user.firstName : 'Не указано',
             ),
+            AppFieldDivider(),
 
-            if (user.middleName.isNotEmpty)
-              ProfileInfo(
+            if (user.middleName.isNotEmpty) ...[
+              AppActionTile(
                 icon: Icons.person_outline,
-                title: 'Отчество',
-                description: user.middleName,
+                label: 'Отчество',
+                value: user.middleName,
               ),
+              AppFieldDivider(),
+            ],
 
-            ProfileInfo(
+            AppActionTile(
               icon: Icons.wc_outlined,
-              title: 'Пол',
-              description: user.gender.title,
+              label: 'Пол',
+              value: user.gender.title,
             ),
+            AppFieldDivider(),
 
-            if (formatedUserBirthday != null)
-              ProfileInfo(
+            if (formatedUserBirthday != null) ...[
+              AppActionTile(
                 icon: Icons.cake_outlined,
-                title: 'Дата рождения',
-                description: formatedUserBirthday,
+                label: 'Дата рождения',
+                value: formatedUserBirthday,
               ),
+              AppFieldDivider(),
+            ],
 
-            if (user.age != null)
-              ProfileInfo(
+            if (user.age != null) ...[
+              AppActionTile(
                 icon: Icons.calendar_today_outlined,
-                title: 'Возраст',
-                description: user.age!,
+                label: 'Возраст',
+                value: user.age!,
               ),
+              AppFieldDivider(),
+            ],
 
-            ProfileInfo(
+            AppActionTile(
               icon: Icons.email_outlined,
-              title: 'Почта',
-              description: user.email,
-              isLast: true,
+              label: 'Почта',
+              value: user.email,
             ),
           ],
         ),
-        HBox(28),
-        Text(
-          'Семья',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        HBox(12),
+        HBox(16),
         if (user.familyId != null)
           BlocProvider(
             create: (context) => FamilyFetchBloc(
@@ -134,32 +132,27 @@ class ProfileSuccessView extends StatelessWidget {
               );
             },
           ),
-        HBox(28),
-        Text(
-          'Аккаунт',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        HBox(12),
-        ProfileAccountActions(
-          onLogout: () {
-            context.read<AuthBloc>().add(const AuthSignOutEvent());
-          },
-          onDelete: () {
-            _showDeleteAccountDialog(context);
-          },
+        HBox(16),
+        AppFieldGroup(
+          children: [
+            AppActionTile(
+              icon: Icons.logout_outlined,
+              value: 'Выйти из аккаунта',
+              trailingIcon: Icons.chevron_right_rounded,
+              onTap: () =>
+                  context.read<AuthBloc>().add(const AuthSignOutEvent()),
+            ),
+            AppFieldDivider(),
+            AppActionTile(
+              icon: Icons.delete_outline,
+              value: 'Удалить аккаунт',
+              trailingIcon: Icons.chevron_right_rounded,
+              onTap: () => showDeleteAccountDialog(context),
+            ),
+          ],
         ),
       ],
     );
-  }
-
-  String _getInitials(ProfileUserEntity user) {
-    final first = user.firstName.isNotEmpty ? user.firstName[0] : '';
-    final last = user.lastName.isNotEmpty ? user.lastName[0] : '';
-    final initials = '$first$last';
-
-    return initials.isNotEmpty ? initials.toUpperCase() : '?';
   }
 
   void _handleFamilyAction(
@@ -172,7 +165,7 @@ class ProfileSuccessView extends StatelessWidget {
         user.lastName.isEmpty ||
         user.birthDate == null ||
         user.gender == Gender.unspecified) {
-      _openEnterFamilyErrorDialog(
+      openEnterFamilyErrorDialog(
         context,
         title: title,
         firstName: user.firstName,
@@ -187,86 +180,4 @@ class ProfileSuccessView extends StatelessWidget {
 
     action();
   }
-}
-
-Future<void> _openEnterFamilyErrorDialog(
-  BuildContext context, {
-  required String title,
-  required String firstName,
-  required String lastName,
-  required String middleName,
-  required DateTime? birthDate,
-  required Gender gender,
-}) {
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text('Для $title нужно указать эти поля:'),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: [
-              if (firstName.isEmpty) Text('- Имя'),
-              if (lastName.isEmpty) Text('- Фамилия'),
-              if (middleName.isEmpty) Text('- Отчество'),
-              if (birthDate == null) Text('- Дата рождения'),
-              if (gender == Gender.unspecified) Text('- Пол'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => context
-              ..pop()
-              ..pushNamed(ProfileRoutes.profileEditorScreenName),
-            child: const Text(
-              'Перейти в настройки',
-              style: TextStyle(fontSize: 18),
-            ),
-          ),
-          TextButton(
-            child: const Text('Отмена', style: TextStyle(color: Colors.red)),
-            onPressed: () => context.pop(),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Future<void> _showDeleteAccountDialog(BuildContext context) async {
-  final shouldDelete = await showDialog<bool>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Удалить аккаунт?'),
-        content: const Text(
-          'Все данные аккаунта будут удалены. '
-          'Это действие нельзя отменить.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(false),
-            child: const Text('Отмена'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            onPressed: () => context.pop(true),
-            child: const Text('Удалить'),
-          ),
-        ],
-      );
-    },
-  );
-
-  if (shouldDelete != true || !context.mounted) {
-    return;
-  }
-
-  // Здесь позже сделаем нормальный сценарий:
-  // 1. запросить пароль;
-  // 2. reauthenticate Firebase;
-  // 3. удалить аккаунт.
 }

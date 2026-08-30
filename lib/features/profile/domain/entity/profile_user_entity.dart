@@ -127,6 +127,14 @@ final class ProfileUserEntity extends Equatable {
     return '$age $pluralizeAge';
   }
 
+  String get getInitials {
+    final first = firstName.isNotEmpty ? firstName[0] : '';
+    final last = lastName.isNotEmpty ? lastName[0] : '';
+    final initials = '$first$last';
+
+    return initials.isNotEmpty ? initials.toUpperCase() : '?';
+  }
+
   /// Метод для преобразования Entity в DTO
   ProfileUserDto toDto() => ProfileUserDto(
     id: id,
