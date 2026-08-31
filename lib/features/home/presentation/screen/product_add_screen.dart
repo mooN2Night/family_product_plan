@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/presentation/ui_kit/app_field_group.dart';
 import '../../../../app/presentation/ui_kit/app_text_field.dart';
+import '../../../../app/presentation/ui_kit/app_toggle_tile.dart';
 import '../../../../app/utils/app_colors.dart';
 import '../../domain/entity/product_create_entity.dart';
 
@@ -119,7 +120,7 @@ class _ProductAddViewState extends State<_ProductAddView> {
                 ValueListenableBuilder(
                   valueListenable: _isToBuyNotifier,
                   builder: (context, isToBuy, _) {
-                    return _ToggleTile(
+                    return AppToggleTile(
                       icon: Icons.shopping_cart_outlined,
                       title: 'Нужно купить',
                       subtitle: 'Добавить в список покупок',
@@ -214,64 +215,6 @@ class _ProductAddViewState extends State<_ProductAddView> {
 
     context.read<ProductsActionBloc>().add(
       ProductActionAddEvent(product: product),
-    );
-  }
-}
-
-/// Строка с тумблером «Нужно купить».
-class _ToggleTile extends StatelessWidget {
-  const _ToggleTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: AppColors.primary),
-          const WBox(12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const HBox(2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch.adaptive(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: AppColors.primary,
-          ),
-        ],
-      ),
     );
   }
 }

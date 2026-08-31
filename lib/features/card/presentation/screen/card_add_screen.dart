@@ -13,6 +13,7 @@ import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../../../app/presentation/ui_kit/app_text_field.dart';
 import '../../../../app/utils/app_colors.dart';
 import '../../domain/state/card_action/card_action_bloc.dart';
+import '../../utils/card_formatter.dart';
 import '../../utils/card_scanner_result.dart';
 import '../card_routes.dart';
 import '../components/card_scan_result.dart';
@@ -65,6 +66,7 @@ class _CardAddViewState extends State<_CardAddView> {
                   label: 'Название магазина',
                   controller: _nameController,
                   hint: 'Например: Магнит',
+                  textCapitalization: TextCapitalization.sentences,
                   autofocus: true,
                 ),
                 const AppFieldDivider(),
@@ -74,6 +76,7 @@ class _CardAddViewState extends State<_CardAddView> {
                   controller: _numberController,
                   hint: '0000 0000 0000 0000',
                   keyboardType: TextInputType.number,
+                  inputFormatters: [const CardNumberInputFormatter()],
                 ),
               ],
             ),

@@ -21,6 +21,9 @@ abstract final class AppColors {
 
   // Other
   static const divider = Color(0xFFE8E5ED);
+  static const error = Color(0xFFFF3131);
+  static const softError = Color(0xFFEF4444);
+  static const softErrorBack = Color(0xFFFEE2E2);
 
   // Bottom navigation
   static const bottomBar = Color(0xFFF1ECFA);

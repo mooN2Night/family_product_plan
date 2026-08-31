@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../utils/app_colors.dart';
 import 'app_actions_tile.dart';
@@ -23,7 +24,7 @@ class AppDropdownField<T> extends StatelessWidget {
   final T value;
   final List<T> items;
   final String Function(T item) itemLabelBuilder;
-  final ValueChanged<T> onChanged;
+  final ValueChanged<T?> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,7 @@ class AppDropdownField<T> extends StatelessWidget {
                 final isSelected = item == value;
 
                 return ListTile(
-                  onTap: () => Navigator.of(sheetContext).pop(item),
+                  onTap: () => context.pop(item),
                   title: Text(
                     itemLabelBuilder(item),
                     style: TextStyle(
@@ -96,6 +97,6 @@ class AppDropdownField<T> extends StatelessWidget {
       },
     );
 
-    if (result != null) onChanged(result);
+    onChanged.call(result);
   }
 }

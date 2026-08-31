@@ -33,10 +33,14 @@ abstract class AppUtils {
     return formatted;
   }
 
-  static String? formateDate(DateTime? birthDate) {
-    if (birthDate != null) {
-      return DateFormat('dd MMMM yyyy', 'ru').format(birthDate);
-    }
+  static String? formatDate(DateTime? date) {
+    if (date != null) return DateFormat('dd MMMM yyyy', 'ru').format(date);
+
+    return null;
+  }
+
+  static String? formatTime(DateTime? date) {
+    if (date != null) return DateFormat('HH:mm:ss', 'ru').format(date);
 
     return null;
   }

@@ -14,10 +14,14 @@ import '../../../../app/presentation/ui_kit/app_field_group.dart';
 import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
 import '../../../../app/presentation/ui_kit/app_text_field.dart';
 import '../../../../app/utils/app_colors.dart';
+import '../../../current_family/domain/state/current_family_cubit.dart';
+import '../../../family/domain/entity/family_member_info_entity.dart';
+import '../../../family/domain/state/family_fetch_member/family_fetch_member_bloc.dart';
 import '../../domain/entity/create_task_entity.dart';
 import '../../utils/task_priority.dart';
 import '../../utils/task_type.dart';
 import '../../utils/weekday.dart';
+import '../components/task_assigned_section.dart';
 import '../components/task_create_weekday_picker.dart';
 
 class TaskCreateScreen extends StatelessWidget {
@@ -26,9 +30,18 @@ class TaskCreateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskRepository = context.di.repositories.tasksRepository;
+    final familyRepository = context.di.repositories.familyRepository;
 
-    return BlocProvider(
-      create: (context) => TasksActionBloc(taskRepository: taskRepository),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => TasksActionBloc(taskRepository: taskRepository),
+        ),
+        BlocProvider(
+          create: (context) =>
+              FamilyFetchMemberBloc(familyRepository: familyRepository),
+        ),
+      ],
       child: const AppLostFocusWrapper(child: _TaskCreateView()),
     );
   }
@@ -49,7 +62,8 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
   late final ValueNotifier<TaskType> _taskType;
   late final ValueNotifier<DateTime?> _dueDate;
   late final ValueNotifier<Weekday?> _weekday;
-  late final ValueNotifier<String?> _assignedUserId;
+  late final ValueNotifier<FamilyMemberInfoEntity?> _assignedUser;
+  static const _doesNotAssigned = 'Не назначено';
 
   @override
   void initState() {
@@ -61,15 +75,35 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
     _taskType = ValueNotifier<TaskType>(TaskType.oneTime);
     _dueDate = ValueNotifier<DateTime?>(null);
     _weekday = ValueNotifier<Weekday?>(null);
-    _assignedUserId = ValueNotifier<String?>(null);
+    _assignedUser = ValueNotifier<FamilyMemberInfoEntity?>(null);
+
+    final familyState = context.read<CurrentFamilyCubit>().state;
+    if (familyState is CurrentFamilyWithFamilyState) {
+      context.read<FamilyFetchMemberBloc>().add(
+        FamilyFetchMemberLoadEvent(familyId: familyState.familyId),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<TasksActionBloc, TasksActionState>(
-      listener: (context, state) {
-        if (state is TasksActionSuccessState) context.pop();
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<TasksActionBloc, TasksActionState>(
+          listener: (context, state) {
+            if (state is TasksActionSuccessState) context.pop();
+          },
+        ),
+        BlocListener<CurrentFamilyCubit, CurrentFamilyState>(
+          listener: (context, state) {
+            if (state is CurrentFamilyWithFamilyState) {
+              context.read<FamilyFetchMemberBloc>().add(
+                FamilyFetchMemberLoadEvent(familyId: state.familyId),
+              );
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         appBar: CustomAppBar.secondary(title: 'Новая задача'),
         body: ListView(
@@ -108,7 +142,26 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
                       value: priority,
                       items: TaskPriority.values,
                       itemLabelBuilder: (item) => item.title,
-                      onChanged: (value) => _priority.value = value,
+                      onChanged: (value) {
+                        if (value == null) return;
+
+                        _priority.value = value;
+                      },
+                    );
+                  },
+                ),
+                BlocBuilder<FamilyFetchMemberBloc, FamilyFetchMemberState>(
+                  builder: (context, state) {
+                    if (state is! FamilyFetchMemberLoadedState) {
+                      return const HWBox.shrink();
+                    }
+
+                    final members = state.members;
+
+                    return TaskAssignedWidget(
+                      assignedUserNotifier: _assignedUser,
+                      members: members,
+                      doesNotAssigned: _doesNotAssigned,
                     );
                   },
                 ),
@@ -123,6 +176,8 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
                       items: TaskType.values,
                       itemLabelBuilder: (item) => item.title,
                       onChanged: (value) {
+                        if (value == null) return;
+
                         _taskType.value = value;
                         _dueDate.value = null;
                         _weekday.value = null;
@@ -287,7 +342,9 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
       type: _taskType.value,
       priority: _priority.value,
       dueDate: _dueDate.value,
-      assignedUserId: _assignedUserId.value,
+      assignedUserId: _assignedUser.value == null
+          ? null
+          : '${_assignedUser.value?.lastName} ${_assignedUser.value?.firstName}',
       createdBy: '',
     );
 
@@ -314,7 +371,7 @@ class _TaskCreateViewState extends State<_TaskCreateView> {
     _taskType.dispose();
     _dueDate.dispose();
     _weekday.dispose();
-    _assignedUserId.dispose();
+    _assignedUser.dispose();
     super.dispose();
   }
 }

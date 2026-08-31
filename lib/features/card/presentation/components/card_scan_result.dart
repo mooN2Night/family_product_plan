@@ -52,19 +52,10 @@ class AppScanResultCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              alignment: Alignment.center,
-              child: const Icon(
-                Icons.check_circle_rounded,
-                color: Colors.green,
-                size: 22,
-              ),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.green,
+              size: 22,
             ),
             const WBox(12),
             Expanded(
@@ -77,14 +68,6 @@ class AppScanResultCard extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const HBox(2),
-                  Text(
-                    result.format.toString(),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],

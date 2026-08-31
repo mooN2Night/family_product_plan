@@ -4,6 +4,8 @@ import 'package:family_product_plan/app/services/network/i_network_service.dart'
 import 'package:family_product_plan/app/services/network/network_service.dart';
 import 'package:family_product_plan/app/services/permission_hendler/app_permission_handler.dart';
 import 'package:family_product_plan/app/services/permission_hendler/i_permission_handler.dart';
+import 'package:family_product_plan/app/services/screen_brightness/i_screen_brightness.dart';
+import 'package:family_product_plan/app/services/screen_brightness/screen_brightness.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -49,6 +51,8 @@ final class DiServices {
 
   late final IDayChangeNotifier dayChangeNotifier;
 
+  late final IScreenBrightnessService screenBrightnessService;
+
   // TODO: нужен FirebaseStorage, за который нужно платить, пока отказываемся от этой темы
   // late final FirebaseStorage storage;
 
@@ -73,5 +77,7 @@ final class DiServices {
     networkService = NetworkService();
 
     dayChangeNotifier = DayChangeNotifier();
+
+    screenBrightnessService = ScreenBrightnessService();
   }
 }

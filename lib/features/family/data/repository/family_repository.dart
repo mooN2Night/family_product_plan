@@ -165,6 +165,61 @@ final class FamilyRepository implements IFamilyRepository {
   }
 
   @override
+  Future<List<FamilyMemberInfoEntity>> getFamilyMembersInfoByFamilyId({
+    required String familyId,
+  }) async {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+
+      if (currentUser == null) throw AppUnknownException();
+
+      final familyDoc = await _firestore
+          .collection('families')
+          .doc(familyId)
+          .get();
+
+      if (!familyDoc.exists) throw FamilyNotFoundException();
+
+      final family = FamilyDto.fromJson(
+        familyDoc.data()!,
+      ).toEntity(familyDoc.id);
+
+      final currentMember = family.members.firstWhere(
+        (member) => member.userId == currentUser.uid,
+      );
+
+      final canEditRelation = currentMember.role == FamilyRole.owner;
+
+      final members = await Future.wait(
+        family.members.map((member) async {
+          final snapshot = await _firestore
+              .collection('users')
+              .doc(member.userId)
+              .get();
+
+          if (!snapshot.exists) throw ProfileNotFoundException();
+
+          final dto = FamilyMemberInfoDto.fromJson(
+            snapshot.id,
+            snapshot.data()!,
+          );
+
+          return dto.toEntity(
+            role: member.role,
+            relation: member.relation,
+            canEditRelation: canEditRelation,
+            isCurrentUser: member.userId == currentUser.uid,
+          );
+        }),
+      );
+
+      return members;
+    } on Object catch (error) {
+      throw FamilyExceptionMapper.fromException(error);
+    }
+  }
+
+  @override
   Future<void> updateMemberRelation({
     required String familyId,
     required String userId,

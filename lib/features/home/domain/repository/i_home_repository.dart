@@ -12,6 +12,9 @@ abstract interface class IHomeRepository {
   /// Получение продукта
   Future<ProductEntity> getProduct(String id);
 
+  /// Получение продукта
+  Future<void> updateProduct(ProductEntity product);
+
   /// Переключение статуса "Нужно купить"
   Future<void> toggleProductStatus(ProductEntity product);
 

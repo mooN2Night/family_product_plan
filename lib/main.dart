@@ -25,11 +25,14 @@ Future<void> _run() async {
 
     final authBloc = AuthBloc(
       authRepository: diContainer.repositories.authRepository,
+      homeRepository: diContainer.repositories.homeRepository,
     )..add(const AuthStartedEvent());
 
     final router = AppRouter.createRouter(authBloc: authBloc);
 
-    runApp(AppRoot(diContainer: diContainer, router: router, authBloc: authBloc));
+    runApp(
+      AppRoot(diContainer: diContainer, router: router, authBloc: authBloc),
+    );
   } on Object catch (error, stackTrace) {
     // В случае ошибки инициализации отображаем fallback-экран с возможностью
     // повторного запуска приложения.

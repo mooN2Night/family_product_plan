@@ -19,6 +19,12 @@ abstract interface class IFamilyRepository {
     required FamilyEntity family,
   });
 
+  /// Возвращает информацию об участниках семьи по [familyId],
+  /// не требуя предварительного получения [FamilyEntity].
+  Future<List<FamilyMemberInfoEntity>> getFamilyMembersInfoByFamilyId({
+    required String familyId,
+  });
+
   /// Изменение родственной связи участника семьи.
   Future<void> updateMemberRelation({
     required String familyId,
@@ -39,7 +45,5 @@ abstract interface class IFamilyRepository {
   });
 
   /// Удалить всю семью.
-  Future<void> deleteFamily({
-    required String familyId,
-  });
+  Future<void> deleteFamily({required String familyId});
 }

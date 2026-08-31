@@ -113,11 +113,18 @@ final class HomeRepository implements IHomeRepository {
   }
 
   @override
+  Future<void> updateProduct(ProductEntity product) async {
+    await _localDataSource.updateProduct(product);
+    if (await _networkService.hasInternet()) {
+      unawaited(_syncUpdate(product));
+    } else {
+      await _pendingSyncService.enqueueProductUpdate(product);
+    }
+  }
+
+  @override
   Future<void> toggleProductStatus(ProductEntity product) async {
-    final updatedProduct = product.copyWith(
-      isToBuy: !product.isToBuy,
-      updatedAt: DateTime.now(),
-    );
+    final updatedProduct = product.copyWith(updatedAt: DateTime.now());
 
     await _localDataSource.updateProduct(updatedProduct);
     if (await _networkService.hasInternet()) {
