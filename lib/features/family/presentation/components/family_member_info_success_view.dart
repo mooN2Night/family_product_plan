@@ -47,7 +47,7 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatedUserBirthday = AppUtils.formateDate(user.birthDate);
+    final formatedUserBirthday = AppUtils.formatDate(user.birthDate);
 
     return MultiBlocListener(
       listeners: [
@@ -90,9 +90,9 @@ class FamilyMemberInfoSuccessView extends StatelessWidget {
         ),
       ],
       child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 140),
         children: [
-          HBox(40),
           ProfileInfo(
             icon: Icons.badge_outlined,
             title: 'Фамилия:',

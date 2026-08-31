@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:family_product_plan/app/error/app_exception.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../home/domain/repository/i_home_repository.dart';
 import '../entity/auth_user_entity.dart';
 import '../repository/i_auth_repository.dart';
 
@@ -12,9 +13,12 @@ part 'auth_state.dart';
 
 /// Блок управлением состоянием экрана авторизации
 final class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc({required IAuthRepository authRepository})
-    : _authRepository = authRepository,
-      super(const AuthInitialState()) {
+  AuthBloc({
+    required IAuthRepository authRepository,
+    required IHomeRepository homeRepository,
+  }) : _authRepository = authRepository,
+       _homeRepository = homeRepository,
+       super(const AuthInitialState()) {
     on<AuthStartedEvent>(_onStarted);
     on<AuthSignUpEvent>(_onSignUp);
     on<AuthSignInEvent>(_onSignIn);
@@ -25,6 +29,9 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   /// Репозиторий для выполнения операций авторизации пользователя.
   final IAuthRepository _authRepository;
+
+  /// Репозиторий главного экрана
+  final IHomeRepository _homeRepository;
 
   /// Подписка на прослушивание состояния авторизации
   StreamSubscription<AuthUserEntity?>? _authSubscription;
@@ -80,6 +87,7 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       await _authRepository.signOut();
+      await _homeRepository.clearLocalProducts();
 
       emit(const AuthUnauthenticatedState());
     } on AppException catch (error) {
@@ -97,6 +105,7 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     try {
       await _authRepository.deleteAccount(password: event.password);
+      await _homeRepository.clearLocalProducts();
 
       emit(const AuthUnauthenticatedState());
     } on AppException catch (error) {

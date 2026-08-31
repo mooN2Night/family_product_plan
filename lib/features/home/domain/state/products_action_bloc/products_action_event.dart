@@ -51,3 +51,14 @@ final class ProductActionGetEvent extends ProductsActionEvent {
   @override
   List<Object?> get props => [id];
 }
+
+/// Класс события обновления продукта.
+final class ProductActionUpdateEvent extends ProductsActionEvent {
+  const ProductActionUpdateEvent({required this.product});
+
+  /// Продукт.
+  final ProductEntity product;
+
+  @override
+  List<Object?> get props => [product];
+}

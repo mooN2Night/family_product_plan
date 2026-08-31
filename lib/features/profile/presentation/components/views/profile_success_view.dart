@@ -26,7 +26,7 @@ class ProfileSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatedUserBirthday = AppUtils.formateDate(user.birthDate);
+    final formatedUserBirthday = AppUtils.formatDate(user.birthDate);
 
     return ListView(
       physics: const BouncingScrollPhysics(),

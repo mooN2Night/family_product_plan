@@ -9,7 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/presentation/ui_kit/app_bar.dart';
 import '../../../../app/presentation/ui_kit/app_snack_bar.dart';
-import '../../../../app/services/pending_sync/sync_status.dart';
 import '../../../../app/utils/app_colors.dart';
 import '../../../current_family/domain/state/current_family_cubit.dart';
 import '../../domain/state/products_action_bloc/products_action_bloc.dart';
@@ -57,7 +56,7 @@ class HomeScreenView extends StatelessWidget {
         appBar: CustomAppBar.main(
           title: 'Продукты',
           actions: [
-            const _SyncStatusIndicator(),
+            // const _SyncStatusIndicator(),
             IconButton(
               onPressed: () => context.goNamed(HomeRoutes.homeAddScreenName),
               // onPressed: () => showAddProductDialog(context),
@@ -156,44 +155,44 @@ class _HomeProductsTabBar extends StatelessWidget
   Size get preferredSize => const Size.fromHeight(48);
 }
 
-class _SyncStatusIndicator extends StatelessWidget {
-  const _SyncStatusIndicator();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<SyncCubit, SyncStatus>(
-      builder: (context, state) {
-        switch (state.state) {
-          case SyncState.idle:
-            if (state.pendingOperations == 0) {
-              return const Icon(Icons.cloud_done_outlined, color: Colors.green);
-            }
-
-            return Badge.count(
-              count: state.pendingOperations,
-              child: const Icon(Icons.cloud_upload_outlined),
-            );
-
-          case SyncState.syncing:
-            return const SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            );
-
-          case SyncState.success:
-            return const Icon(Icons.cloud_done, color: Colors.green);
-
-          case SyncState.error:
-            return Badge.count(
-              count: state.pendingOperations,
-              child: const Icon(Icons.cloud_off_outlined, color: Colors.red),
-            );
-        }
-      },
-    );
-  }
-}
+// class _SyncStatusIndicator extends StatelessWidget {
+//   const _SyncStatusIndicator();
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<SyncCubit, SyncStatus>(
+//       builder: (context, state) {
+//         switch (state.state) {
+//           case SyncState.idle:
+//             if (state.pendingOperations == 0) {
+//               return const Icon(Icons.cloud_done_outlined, color: Colors.green);
+//             }
+//
+//             return Badge.count(
+//               count: state.pendingOperations,
+//               child: const Icon(Icons.cloud_upload_outlined),
+//             );
+//
+//           case SyncState.syncing:
+//             return const SizedBox(
+//               width: 22,
+//               height: 22,
+//               child: CircularProgressIndicator(strokeWidth: 2),
+//             );
+//
+//           case SyncState.success:
+//             return const Icon(Icons.cloud_done, color: Colors.green);
+//
+//           case SyncState.error:
+//             return Badge.count(
+//               count: state.pendingOperations,
+//               child: const Icon(Icons.cloud_off_outlined, color: Colors.red),
+//             );
+//         }
+//       },
+//     );
+//   }
+// }
 
 class _HomeScreenLoadingView extends StatelessWidget {
   const _HomeScreenLoadingView();

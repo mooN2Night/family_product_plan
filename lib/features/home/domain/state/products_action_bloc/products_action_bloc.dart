@@ -21,6 +21,7 @@ class ProductsActionBloc
     on<ProductActionDeleteEvent>(_onDelete);
     on<ProductActionToggleEvent>(_onToggle);
     on<ProductActionGetEvent>(_onGet);
+    on<ProductActionUpdateEvent>(_onUpdate);
   }
 
   /// Репозиторий для запросов
@@ -91,6 +92,24 @@ class ProductsActionBloc
       final product = await _homeRepository.getProduct(event.id);
 
       emit(ProductsLoadedState(product: product));
+    } on AppException catch (error, stackTrace) {
+      emit(ProductsActionErrorState(message: error.message));
+      addError(error, stackTrace);
+    }
+  }
+
+  /// Обновление продукта
+  Future<void> _onUpdate(
+    ProductActionUpdateEvent event,
+    Emitter<ProductsActionState> emit,
+  ) async {
+    if (state is ProductsActionLoadingState) return;
+    emit(const ProductsActionLoadingState());
+
+    try {
+      await _homeRepository.updateProduct(event.product);
+
+      emit(const ProductsActionSuccessState());
     } on AppException catch (error, stackTrace) {
       emit(ProductsActionErrorState(message: error.message));
       addError(error, stackTrace);

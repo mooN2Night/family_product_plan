@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../utils/app_colors.dart';
 import 'app_box.dart';
@@ -18,6 +19,11 @@ class AppTextField extends StatelessWidget {
     this.textInputAction,
     this.onChanged,
     this.validator,
+    this.inputFormatters,
+    this.textCapitalization = TextCapitalization.none,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    this.suffix,
+    this.onFieldSubmitted,
     super.key,
   });
 
@@ -32,11 +38,16 @@ class AppTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onChanged;
   final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextCapitalization textCapitalization;
+  final EdgeInsets padding;
+  final Widget? suffix;
+  final Function(String)? onFieldSubmitted;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: padding,
       child: Row(
         crossAxisAlignment: maxLines > 1
             ? CrossAxisAlignment.start
@@ -62,14 +73,18 @@ class AppTextField extends StatelessWidget {
                   maxLines: maxLines,
                   minLines: minLines,
                   keyboardType: keyboardType,
+                  textCapitalization: textCapitalization,
                   textInputAction: textInputAction,
                   onChanged: onChanged,
                   validator: validator,
+                  inputFormatters: inputFormatters,
                   style: const TextStyle(
                     fontSize: 17,
                     color: AppColors.textPrimary,
                   ),
+                  onFieldSubmitted: onFieldSubmitted,
                   decoration: InputDecoration(
+                    suffix: suffix,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     border: InputBorder.none,
@@ -80,29 +95,6 @@ class AppTextField extends StatelessWidget {
                     ),
                   ),
                 ),
-                // TextField(
-                //   controller: controller,
-                //   autofocus: autofocus,
-                //   maxLines: maxLines,
-                //   minLines: minLines,
-                //   keyboardType: keyboardType,
-                //   textInputAction: textInputAction,
-                //   onChanged: onChanged,
-                //   style: const TextStyle(
-                //     fontSize: 17,
-                //     color: AppColors.textPrimary,
-                //   ),
-                //   decoration: InputDecoration(
-                //     isDense: true,
-                //     contentPadding: EdgeInsets.zero,
-                //     border: InputBorder.none,
-                //     hintText: hint,
-                //     hintStyle: const TextStyle(
-                //       color: AppColors.textInactive,
-                //       fontWeight: FontWeight.normal,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),

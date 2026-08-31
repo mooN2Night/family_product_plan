@@ -12,24 +12,20 @@ class HomeProductSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatedCreatedAt = AppUtils.formateDate(product.createdAt);
-    final formatedUpdatedAt = AppUtils.formateDate(product.updatedAt);
+    final formatedDateCreatedAt = AppUtils.formatDate(product.createdAt);
+    final formatedDateUpdatedAt = AppUtils.formatDate(product.updatedAt);
+    final formatedTimeCreatedAt = AppUtils.formatTime(product.createdAt);
+    final formatedTimeUpdatedAt = AppUtils.formatTime(product.updatedAt);
 
     return ListView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 140),
       children: [
         _ProductMainCard(product: product),
-
-        if (product.description.isNotEmpty) ...[
-          const HBox(20),
-          _ProductDescriptionCard(description: product.description),
-        ],
-
         const HBox(28),
         _ProductDates(
-          createdAt: formatedCreatedAt,
-          updatedAt: formatedUpdatedAt,
+          createdAt: '$formatedDateCreatedAt в $formatedTimeCreatedAt',
+          updatedAt: '$formatedDateUpdatedAt в $formatedTimeUpdatedAt',
         ),
       ],
     );
@@ -103,6 +99,15 @@ class _ProductMainCard extends StatelessWidget {
               icon: Icons.factory_outlined,
               title: 'Производитель',
               value: product.productManufacturer,
+            ),
+          ],
+
+          if (product.description.isNotEmpty) ...[
+            const HBox(14),
+            _ProductInfoRow(
+              icon: Icons.notes_rounded,
+              title: 'Описание',
+              value: product.description,
             ),
           ],
         ],
@@ -188,42 +193,6 @@ class _ProductInfoRow extends StatelessWidget {
   }
 }
 
-class _ProductDescriptionCard extends StatelessWidget {
-  const _ProductDescriptionCard({required this.description});
-
-  final String description;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.notes_rounded, size: 20, color: Colors.grey.shade600),
-              const WBox(8),
-              Text(
-                'Описание',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-          const HBox(10),
-          Text(description, style: Theme.of(context).textTheme.bodyLarge),
-        ],
-      ),
-    );
-  }
-}
-
 class _ProductDates extends StatelessWidget {
   const _ProductDates({required this.createdAt, required this.updatedAt});
 
@@ -236,7 +205,7 @@ class _ProductDates extends StatelessWidget {
       children: [
         if (createdAt != null)
           _ProductDateRow(title: 'Создан', value: createdAt!),
-        if (updatedAt != null) ...[
+        if (updatedAt != null && updatedAt != createdAt) ...[
           const SizedBox(height: 8),
           _ProductDateRow(title: 'Изменён', value: updatedAt!),
         ],

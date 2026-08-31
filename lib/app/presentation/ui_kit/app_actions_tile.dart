@@ -14,6 +14,9 @@ class AppActionTile extends StatelessWidget {
     this.onTap,
     this.trailingIcon,
     this.valueColor,
+    this.showChangeIcon = false,
+    this.onChangeTap,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     super.key,
   });
 
@@ -35,13 +38,20 @@ class AppActionTile extends StatelessWidget {
   /// Цвет текста значения. По умолчанию [AppColors.textPrimary].
   final Color? valueColor;
 
+  final bool showChangeIcon;
+
+  /// Обработчик тапа по иконке изменения.
+  final VoidCallback? onChangeTap;
+
+  final EdgeInsets padding;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: padding,
         child: Row(
           children: [
             Icon(icon, size: 20, color: AppColors.primary),
@@ -60,13 +70,37 @@ class AppActionTile extends StatelessWidget {
                     ),
                     const HBox(2),
                   ],
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 17,
-                      color: valueColor ?? AppColors.textPrimary,
+                  if (showChangeIcon) ...[
+                    Row(
+                      children: [
+                        Text(
+                          value,
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: valueColor ?? AppColors.textPrimary,
+                          ),
+                        ),
+                        WBox(15),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onChangeTap,
+                          child: Icon(
+                            Icons.edit_outlined,
+                            size: 24,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  ] else ...[
+                    Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: valueColor ?? AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

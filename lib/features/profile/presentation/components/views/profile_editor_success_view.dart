@@ -128,7 +128,11 @@ class _ProfileEditorSuccessViewState extends State<ProfileEditorSuccessView> {
                       value: gender,
                       items: Gender.values,
                       itemLabelBuilder: (item) => item.title,
-                      onChanged: (value) => _genderNotifier.value = value,
+                      onChanged: (value) {
+                        if (value == null) return;
+
+                        _genderNotifier.value = value;
+                      },
                     );
                   },
                 ),
